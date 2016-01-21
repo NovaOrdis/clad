@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.novaordis.clad</groupId>
-    <artifactId>clad</artifactId>
+    <artifactId>novaordis-clad</artifactId>
     <packaging>jar</packaging>
 
     <version>1-SNAPSHOT</version>

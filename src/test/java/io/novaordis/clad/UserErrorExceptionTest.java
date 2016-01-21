@@ -69,7 +69,7 @@ public class UserErrorExceptionTest {
             throw new UserErrorException(new RuntimeException());
         }
         catch (UserErrorException e) {
-            assertNull(e.getMessage());
+            assertEquals("java.lang.RuntimeException", e.getMessage());
             assertTrue(e.getCause() instanceof RuntimeException);
         }
     }
