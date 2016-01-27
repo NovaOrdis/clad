@@ -16,13 +16,14 @@
 
 package io.novaordis.clad;
 
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/21/16
+ * @since 1/26/16
  */
-public abstract class CommandLineDrivenTest {
+public class TestCommand implements Command {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,15 +31,38 @@ public abstract class CommandLineDrivenTest {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private List<String> commandLineArguments;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public TestCommand() {
+
+        this.commandLineArguments = new ArrayList<>();
+    }
+
+
+    // Command implementation ------------------------------------------------------------------------------------------
+
+    @Override
+    public void applyCommandLineArguments(List<String> commandLineArguments) throws Exception {
+
+        this.commandLineArguments.addAll(commandLineArguments);
+    }
+
+    @Override
+    public void execute() throws UserErrorException {
+        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public List<String> getCommandLineArguments() {
+        return commandLineArguments;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    protected abstract CommandLineDriven getCommandLineDrivenToTest();
 
     // Private ---------------------------------------------------------------------------------------------------------
 

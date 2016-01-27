@@ -16,7 +16,12 @@
 
 package io.novaordis.clad;
 
+import java.util.List;
+
 /**
+ * A command implementation must have a non-argument public constructor, this is how the command line application
+ * framework instantiates commands.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/22/16
  */
@@ -27,6 +32,12 @@ public interface Command {
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * Feed the command line arguments for this command (everything following the command name). This method is called
+     * by the command line application framework immediately after instantiation.
+     */
+    void applyCommandLineArguments(List<String> commandLineArguments) throws Exception;
 
     void execute() throws UserErrorException;
 
