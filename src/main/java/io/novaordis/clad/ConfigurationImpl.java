@@ -30,16 +30,43 @@ public class ConfigurationImpl implements Configuration {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String applicationName;
     private List<Option> globalOptions;
+    private List<Option> commandOptions;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public ConfigurationImpl() throws UserErrorException {
+
+        //
+        // we expect to find the application name in the environment
+        //
+
+        this.applicationName = System.getProperty(APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
+
+        if (applicationName == null) {
+            throw new UserErrorException("no '" + APPLICATION_NAME_SYSTEM_PROPERTY_NAME + "' system property set");
+        }
+    }
+
     // Configuration implementation ------------------------------------------------------------------------------------
+
+    @Override
+    public String getApplicationName() {
+
+        return applicationName;
+    }
 
     @Override
     public List<Option> getGlobalOptions() {
 
         return globalOptions;
+    }
+
+    @Override
+    public List<Option> getCommandOptions() {
+
+        return commandOptions;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -48,6 +75,14 @@ public class ConfigurationImpl implements Configuration {
 
     void setGlobalOptions(List<Option> globalOptions) {
         this.globalOptions = globalOptions;
+    }
+
+    void setCommandOptions(List<Option> commandOptions) {
+        this.commandOptions = commandOptions;
+    }
+
+    void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
     }
 
     // Protected -------------------------------------------------------------------------------------------------------

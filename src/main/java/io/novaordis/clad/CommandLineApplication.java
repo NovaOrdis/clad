@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -56,14 +55,24 @@ public abstract class CommandLineApplication {
 
         try {
 
+            ConfigurationImpl configuration = new ConfigurationImpl();
+
             //
+            // identify and instantiate the runtime
+            //
+
+            ApplicationRuntime runtime = identifyRuntime(configuration);
+
+            if (runtime == null) {
+                throw new UserErrorException("no application runtime");
+            }
+
             // identify and instantiate the command - the first command line argument that corresponds to a Command
             // implementation
-            //
 
             List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
 
-            Command command = identifyCommand(commandLineArguments);
+            Command command = identifyCommand(commandLineArguments, configuration);
 
             log.debug("command: " + command);
 
@@ -71,18 +80,23 @@ public abstract class CommandLineApplication {
 
             log.debug("global options: " + globalOptions);
 
-            //
             // place global options in configuration
-            //
 
-            ConfigurationImpl configuration = new ConfigurationImpl();
             configuration.setGlobalOptions(globalOptions);
 
             if (command == null) {
                 throw new UserErrorException("no command");
             }
 
-            command.execute(configuration);
+            log.debug("initializing the runtime");
+
+            runtime.init(configuration);
+
+            log.debug("runtime initialized");
+
+            command.execute(configuration, runtime);
+
+            log.debug("command successfully executed");
         }
         catch(UserErrorException e) {
             System.err.println("[error]: " + e.getMessage());
@@ -98,6 +112,56 @@ public abstract class CommandLineApplication {
     // Package protected -----------------------------------------------------------------------------------------------
 
     /**
+     * The method attempts to locate an ApplicationRuntime implementation on classpath and instantiates it.
+     *
+     * If no implementation is found, the method returns null.
+     *
+     * @return the ApplicationRuntime instance or null if no command was identified.
+     */
+    static ApplicationRuntime identifyRuntime(Configuration configuration) throws Exception {
+
+        ApplicationRuntime runtime = null;
+
+        String applicationName = configuration.getApplicationName();
+
+        if (applicationName == null) {
+            throw new UserErrorException("missing application name");
+        }
+
+        log.debug("application name: \"" + applicationName + "\"");
+
+        String applicationRuntimeClassName = getFullyQualifiedClassName(applicationName, "ApplicationRuntime");
+
+        if (applicationRuntimeClassName != null) {
+
+            //
+            // we identified a class file in the class path whose name matches a application runtime class file pattern,
+            // so try to load it
+            //
+            Class applicationRuntimeClass;
+
+            try {
+                applicationRuntimeClass =
+                        CommandLineApplication.class.getClassLoader().loadClass(applicationRuntimeClassName);
+            }
+            catch(Exception e) {
+                throw new IllegalStateException(
+                        "failed to load ApplicationRuntime class " + applicationRuntimeClassName);
+            }
+
+            try {
+                runtime = (ApplicationRuntime) applicationRuntimeClass.newInstance();
+            }
+            catch(Exception e) {
+                throw new IllegalStateException(
+                        "failed to instantiate ApplicationRuntime class " + applicationRuntimeClass);
+            }
+        }
+
+        return runtime;
+    }
+
+    /**
      * The method parses the command line arguments and attempts to identify the first command line argument that
      * can be mapped on a command.
      *
@@ -109,21 +173,21 @@ public abstract class CommandLineApplication {
      *
      * @return the Command instance or null if no command was identified.
      */
-    static Command identifyCommand(List<String> commandLineArguments) throws Exception {
+    static Command identifyCommand(List<String> commandLineArguments, ConfigurationImpl configuration)
+            throws Exception {
 
         Command command = null;
 
         for(int i = 0; i < commandLineArguments.size(); i++) {
 
             String commandCandidate = commandLineArguments.get(i);
-            String commandClassName = getCommandClassName(commandCandidate);
+            String commandClassName = getFullyQualifiedClassName(commandCandidate, "Command");
 
             if (commandClassName != null) {
 
                 //
                 // we identified a class file in the class path whose name matches a command class file pattern, so
-                // try to load it; since we have our command name, remove it from the top level command line argument
-                // list
+                // try to load it
                 //
 
                 commandLineArguments.remove(i);
@@ -144,7 +208,7 @@ public abstract class CommandLineApplication {
                     throw new IllegalStateException("failed to instantiate Command class " + commandClass);
                 }
 
-                injectCommandOptions(command, i, commandLineArguments);
+                injectCommandOptionsIntoConfiguration(configuration, i, commandLineArguments);
             }
         }
 
@@ -152,13 +216,14 @@ public abstract class CommandLineApplication {
     }
 
     /**
-     * @return the fully qualified class name of the class that corresponds to the given command, or null if no such
+     * @return the fully qualified class name of the class that corresponds to the given prefix (which will be
+     * camel-cased) and the given suffix (currently Command or ApplicationRuntime). It will return null if no such
      * class is detected on the classpath.
      */
-    static String getCommandClassName(String command) throws Exception {
+    static String getFullyQualifiedClassName(String prefix, String suffix) throws Exception {
 
         //
-        // scan the classpath and look for classes implementing the Command interface
+        // scan the classpath and look for classes named camelCased(prefix) + suffix.
         //
 
         String classPath = System.getProperty(JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME);
@@ -177,7 +242,9 @@ public abstract class CommandLineApplication {
 
         List<File> directories = new ArrayList<>();
         List<JarFile> jarFiles = new ArrayList<>();
+
         for(StringTokenizer st = new StringTokenizer(classPath, pathSeparator); st.hasMoreTokens(); ) {
+
             String path = st.nextToken();
             log.debug("path: " + path);
             File f = new File(path);
@@ -203,7 +270,7 @@ public abstract class CommandLineApplication {
             }
         }
 
-        String simpleClassName = commandNameToSimpleClassName(command);
+        String simpleClassName = toSimpleClassName(prefix, suffix);
         String fullyQualifiedClassName;
 
         //
@@ -234,13 +301,18 @@ public abstract class CommandLineApplication {
         return fullyQualifiedClassName;
     }
 
-    static String commandNameToSimpleClassName(String command) {
+    static String toSimpleClassName(String prefix, String suffix) {
 
-        if (command == null) {
-            throw new IllegalArgumentException("null command name");
+        if (prefix == null) {
+            throw new IllegalArgumentException("null prefix");
         }
 
-        return Character.toUpperCase(command.charAt(0)) + command.substring(1).toLowerCase() + "Command";
+        if (suffix == null) {
+            throw new IllegalArgumentException("null suffix");
+        }
+
+
+        return Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1).toLowerCase() + suffix;
     }
 
     /**
@@ -328,11 +400,11 @@ public abstract class CommandLineApplication {
     /**
      * @param commandLineArguments will remove all command line arguments accepted by the command
      */
-    private static void injectCommandOptions(Command command, int from, List<String> commandLineArguments)
-            throws Exception {
+    private static void injectCommandOptionsIntoConfiguration(
+            ConfigurationImpl configuration, int from, List<String> commandLineArguments) throws Exception {
 
         List<Option> options = OptionParser.parse(from, commandLineArguments);
-        command.injectCommandOptions(options);
+        configuration.setCommandOptions(options);
     }
 
     // Inner classes ---------------------------------------------------------------------------------------------------

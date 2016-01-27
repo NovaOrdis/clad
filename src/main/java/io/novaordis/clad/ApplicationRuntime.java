@@ -16,37 +16,18 @@
 
 package io.novaordis.clad;
 
-import java.util.List;
-
 /**
- * The configuration of the command execution context.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public interface Configuration {
+public interface ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    public static final String APPLICATION_NAME_SYSTEM_PROPERTY_NAME = "application.name";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * The application name. The application runtime class must implement <tt>&lt;applicationName&gt;ApplicationRuntime</tt>.
-     */
-    public String getApplicationName();
-
-    /**
-     * The global configuration options specified as command line arguments, preceding the command name.
-     */
-    List<Option> getGlobalOptions();
-
-    /**
-     * The command options specified as command line arguments, immediately following the command name.
-     */
-    List<Option> getCommandOptions();
+    void init(Configuration configuration) throws UserErrorException;
 
 }

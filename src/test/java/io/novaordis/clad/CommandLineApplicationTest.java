@@ -16,6 +16,8 @@
 
 package io.novaordis.clad;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -50,11 +53,22 @@ public class CommandLineApplicationTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @Before
+    public void setUp() {
+        System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "test");
+    }
+
+    @After
+    public void tearDown() {
+        System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
+    }
+
     @Test
     public void identifyCommand_NoArguments() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>();
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         assertNull(c);
         assertTrue(commandLineArguments.isEmpty());
@@ -63,9 +77,10 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_NoArguments_NoSuchCommand() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>(Collections.singletonList("no-such-command"));
 
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         assertNull(c);
 
@@ -76,9 +91,10 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_NoArguments_TWwoNoSuchCommand() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList("no-such-command", "no-such-command-2"));
 
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         assertNull(c);
 
@@ -90,13 +106,15 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_testCommand_NoArguments() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>(Collections.singletonList("test"));
 
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(0, testCommand.getCommandOptions().size());
+
+        assertEquals(0, configuration.getCommandOptions().size());
 
         // make sure the command name disappeared from the argument list
         assertEquals(0, commandLineArguments.size());
@@ -105,14 +123,15 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_testCommand_OneArgument() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList("test", "-m"));
 
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(1, testCommand.getCommandOptions().size());
-        BooleanOption bo = (BooleanOption)testCommand.getCommandOptions().get(0);
+        assertEquals(1, configuration.getCommandOptions().size());
+        BooleanOption bo = (BooleanOption)configuration.getCommandOptions().get(0);
         assertEquals('m', bo.getShortLiteral().charValue());
         assertNull(bo.getLongLiteral());
         assertTrue(bo.getValue());
@@ -124,20 +143,48 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_testCommand_TwoArguments() throws Exception {
 
+        ConfigurationImpl configuration = new ConfigurationImpl();
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList("test", "-n", "test"));
 
-        Command c = CommandLineApplication.identifyCommand(commandLineArguments);
+        Command c = CommandLineApplication.identifyCommand(commandLineArguments, configuration);
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(1, testCommand.getCommandOptions().size());
+        assertEquals(1, configuration.getCommandOptions().size());
 
-        StringOption so = (StringOption)testCommand.getCommandOptions().get(0);
+        StringOption so = (StringOption)configuration.getCommandOptions().get(0);
         assertEquals('n', so.getShortLiteral().charValue());
         assertEquals("test", so.getValue());
 
         // make sure the command name disappeared from the argument list
         assertEquals(0, commandLineArguments.size());
+    }
+
+    // identifyRuntime() -----------------------------------------------------------------------------------------------
+
+    @Test
+    public void identifyRuntime_ConfigurationDoesNotHaveTheApplicationName() throws Exception {
+
+        ConfigurationImpl configuration = new ConfigurationImpl();
+        configuration.setApplicationName(null);
+
+        try {
+            CommandLineApplication.identifyRuntime(configuration);
+            fail("should have thrown exception, missing application name");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void identifyRuntime() throws Exception {
+
+        ConfigurationImpl configuration = new ConfigurationImpl();
+        configuration.setApplicationName("test");
+
+        TestApplicationRuntime runtime = (TestApplicationRuntime)CommandLineApplication.identifyRuntime(configuration);
+        assertNotNull(runtime);
     }
 
     // getFileNames() --------------------------------------------------------------------------------------------------
@@ -160,13 +207,21 @@ public class CommandLineApplicationTest {
         assertEquals(name, names.get(1));
     }
 
-    // commandNameToSimpleClassName() ----------------------------------------------------------------------------------
+    // toSimpleClassName() ---------------------------------------------------------------------------------------------
 
     @Test
-    public void commandNameToSimpleClassName_Null() throws Exception {
+    public void toSimpleClassName_Null() throws Exception {
 
         try {
-            CommandLineApplication.commandNameToSimpleClassName(null);
+            CommandLineApplication.toSimpleClassName(null, "Something");
+            fail("should have thrown IllegalArgumentException");
+        }
+        catch(IllegalArgumentException e) {
+            log.debug(e.getMessage());
+        }
+
+        try {
+            CommandLineApplication.toSimpleClassName("something", null);
             fail("should have thrown IllegalArgumentException");
         }
         catch(IllegalArgumentException e) {
@@ -175,24 +230,38 @@ public class CommandLineApplicationTest {
     }
 
     @Test
-    public void commandNameToSimpleClassName() throws Exception {
+    public void toSimpleClassName() throws Exception {
 
-        String s = CommandLineApplication.commandNameToSimpleClassName("test");
+        String s = CommandLineApplication.toSimpleClassName("test", "Command");
         assertEquals("TestCommand", s);
     }
 
     @Test
-    public void commandNameToSimpleClassName2() throws Exception {
+    public void toSimpleClassName2() throws Exception {
 
-        String s = CommandLineApplication.commandNameToSimpleClassName("Test");
+        String s = CommandLineApplication.toSimpleClassName("Test", "Command");
         assertEquals("TestCommand", s);
     }
 
     @Test
-    public void commandNameToSimpleClassName3() throws Exception {
+    public void toSimpleClassName3() throws Exception {
 
-        String s = CommandLineApplication.commandNameToSimpleClassName("TEST");
+        String s = CommandLineApplication.toSimpleClassName("TEST", "Command");
         assertEquals("TestCommand", s);
+    }
+
+    @Test
+    public void toSimpleClassName4() throws Exception {
+
+        String s = CommandLineApplication.toSimpleClassName("test", "ApplicationRuntime");
+        assertEquals("TestApplicationRuntime", s);
+    }
+
+    @Test
+    public void toSimpleClassName5() throws Exception {
+
+        String s = CommandLineApplication.toSimpleClassName("TEST", "ApplicationRuntime");
+        assertEquals("TestApplicationRuntime", s);
     }
 
     // main() ----------------------------------------------------------------------------------------------------------
@@ -203,13 +272,21 @@ public class CommandLineApplicationTest {
 
         try {
 
+            assertFalse(TestApplicationRuntime.isInitialized());
             assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
             assertTrue(TestCommand.getCommandOptionsInjectedByExecution().isEmpty());
 
-            CommandLineApplication.main(new String[]{
-                    "-g", "global-value", "--global2=global2-value",
-                    "test",
-                    "-c", "command-value", "--command2=command2-value"});
+            String[] args = new String[]
+                    {
+                            "-g", "global-value", "--global2=global2-value",
+                            "test",
+                            "-c", "command-value", "--command2=command2-value"
+                    };
+
+
+            CommandLineApplication.main(args);
+
+            assertTrue(TestApplicationRuntime.isInitialized());
 
             List<Option> globalOptions = TestCommand.getGlobalOptionsInjectedByExecution();
 
@@ -242,6 +319,8 @@ public class CommandLineApplicationTest {
             TestCommand.clear();
             assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
             assertTrue(TestCommand.getCommandOptionsInjectedByExecution().isEmpty());
+            TestApplicationRuntime.clear();
+            assertFalse(TestApplicationRuntime.isInitialized());
         }
     }
 

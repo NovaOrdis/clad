@@ -34,15 +34,12 @@ public interface Command {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Called by the framework immediately after instantiation. It feeds the command options specified as command line
-     * arguments (everything following the command name). This method is called by the command line application
-     * framework immediately after instantiation.
+     * @param configuration the command execution context configuration. Offers access to global options and command
+     *                      options.
+     *
+     * @param runtime the command execution runtime. Guaranteed to be called init() at this time.
+     *
      */
-    void injectCommandOptions(List<Option> commandOption) throws Exception;
-
-    /**
-     * @param configuration the command execution context configuration.
-     */
-    void execute(Configuration configuration) throws UserErrorException;
+    void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException;
 
 }

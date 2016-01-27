@@ -16,51 +16,38 @@
 
 package io.novaordis.clad;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class TestCommand implements Command {
+public class TestApplicationRuntime implements ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    private static final List<Option> globalOptionsInjectedByExecution = new ArrayList<>();
-    private static final List<Option> commandOptionsInjectedByExecution = new ArrayList<>();
+    private static boolean initialized = false;
 
-    public static List<Option> getGlobalOptionsInjectedByExecution() {
-        return globalOptionsInjectedByExecution;
-    }
+    public static boolean isInitialized() {
 
-    public static List<Option> getCommandOptionsInjectedByExecution() {
-        return commandOptionsInjectedByExecution;
+        return initialized;
     }
 
     public static void clear() {
 
-        globalOptionsInjectedByExecution.clear();
-        commandOptionsInjectedByExecution.clear();
+        initialized = false;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Command implementation ------------------------------------------------------------------------------------------
+    // ApplicationRuntime implementation -------------------------------------------------------------------------------
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
+    public void init(Configuration configuration) throws UserErrorException {
 
-        //
-        // inject global options and command options into the static lists for testing
-        //
-
-        globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
-        commandOptionsInjectedByExecution.addAll(configuration.getCommandOptions());
+        this.initialized = true;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

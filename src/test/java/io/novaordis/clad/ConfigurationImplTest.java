@@ -19,34 +19,36 @@ package io.novaordis.clad;
 import java.util.List;
 
 /**
- * The configuration of the command execution context.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public interface Configuration {
+public class ConfigurationImplTest extends ConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    public static final String APPLICATION_NAME_SYSTEM_PROPERTY_NAME = "application.name";
-
     // Static ----------------------------------------------------------------------------------------------------------
+
+    // Attributes ------------------------------------------------------------------------------------------------------
+
+    // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * The application name. The application runtime class must implement <tt>&lt;applicationName&gt;ApplicationRuntime</tt>.
-     */
-    public String getApplicationName();
+    // Package protected -----------------------------------------------------------------------------------------------
 
-    /**
-     * The global configuration options specified as command line arguments, preceding the command name.
-     */
-    List<Option> getGlobalOptions();
+    // Protected -------------------------------------------------------------------------------------------------------
 
-    /**
-     * The command options specified as command line arguments, immediately following the command name.
-     */
-    List<Option> getCommandOptions();
+    @Override
+    protected ConfigurationImpl getConfigurationToTest(List<Option> global, List<Option> command) throws Exception {
+
+        ConfigurationImpl c = new ConfigurationImpl();
+        c.setGlobalOptions(global);
+        c.setCommandOptions(command);
+        return c;
+    }
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 
 }
