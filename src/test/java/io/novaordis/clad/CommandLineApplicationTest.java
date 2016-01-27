@@ -96,7 +96,7 @@ public class CommandLineApplicationTest {
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(0, testCommand.getCommandLineArguments().size());
+        assertEquals(0, testCommand.getCommandOptions().size());
 
         // make sure the command name disappeared from the argument list
         assertEquals(0, commandLineArguments.size());
@@ -105,32 +105,36 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyCommand_testCommand_OneArgument() throws Exception {
 
-        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("test", "test-command-arg-0"));
+        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("test", "-m"));
 
         Command c = CommandLineApplication.identifyCommand(commandLineArguments);
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(1, testCommand.getCommandLineArguments().size());
-        assertEquals("test-command-arg-0", testCommand.getCommandLineArguments().get(0));
+        assertEquals(1, testCommand.getCommandOptions().size());
+        BooleanOption bo = (BooleanOption)testCommand.getCommandOptions().get(0);
+        assertEquals('m', bo.getShortLiteral());
+        assertNull(bo.getLongLiteral());
+        assertTrue(bo.getValue());
 
-        // make sure the command name disappeared from the argument list
+        // make sure the command name and its arguments disappeared from the argument list
         assertEquals(0, commandLineArguments.size());
     }
 
     @Test
     public void identifyCommand_testCommand_TwoArguments() throws Exception {
 
-        List<String> commandLineArguments = new ArrayList<>(Arrays.asList(
-                "test", "test-command-arg-0", "test-command-arg-1"));
+        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("test", "-n", "test"));
 
         Command c = CommandLineApplication.identifyCommand(commandLineArguments);
 
         TestCommand testCommand = (TestCommand)c;
         assertNotNull(testCommand);
-        assertEquals(2, testCommand.getCommandLineArguments().size());
-        assertEquals("test-command-arg-0", testCommand.getCommandLineArguments().get(0));
-        assertEquals("test-command-arg-1", testCommand.getCommandLineArguments().get(1));
+        assertEquals(1, testCommand.getCommandOptions().size());
+
+        StringOption so = (StringOption)testCommand.getCommandOptions().get(0);
+        assertEquals('n', so.getShortLiteral());
+        assertEquals("test", so.getValue());
 
         // make sure the command name disappeared from the argument list
         assertEquals(0, commandLineArguments.size());
@@ -191,6 +195,14 @@ public class CommandLineApplicationTest {
         assertEquals("TestCommand", s);
     }
 
+    // parseOptions() --------------------------------------------------------------------------------------------------
+
+    @Test
+    public void parseOptions_EmptyList() throws Exception {
+
+        List<Option> options = CommandLineApplication.parseOptions(Collections.emptyList());
+        assertTrue(options.isEmpty());
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

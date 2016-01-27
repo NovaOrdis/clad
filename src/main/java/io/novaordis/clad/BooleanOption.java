@@ -30,11 +30,29 @@ public class BooleanOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public BooleanOption(char shortLiteral) {
+        super(shortLiteral, null);
+    }
+
     public BooleanOption(char shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public boolean getValue() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        if (getShortLiteral() != 0) {
+            return "-" + getShortLiteral();
+        }
+
+        return "--" + getLongLiteral();
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

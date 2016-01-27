@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
@@ -68,6 +68,10 @@ public abstract class CommandLineApplication {
         log.debug("command: " + command);
 
         log.debug("global options: " + globalOptions);
+
+        if (command == null) {
+            throw new UserErrorException("no command");
+        }
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -94,9 +98,9 @@ public abstract class CommandLineApplication {
 
         Command command = null;
 
-        for(Iterator<String> i = commandLineArguments.iterator(); i.hasNext(); ) {
+        for(int i = 0; i < commandLineArguments.size(); i++) {
 
-            String commandCandidate = i.next();
+            String commandCandidate = commandLineArguments.get(i);
             String commandClassName = getCommandClassName(commandCandidate);
 
             if (commandClassName != null) {
@@ -107,7 +111,7 @@ public abstract class CommandLineApplication {
                 // list
                 //
 
-                i.remove();
+                commandLineArguments.remove(0);
 
                 Class commandClass;
 
@@ -125,13 +129,7 @@ public abstract class CommandLineApplication {
                     throw new IllegalStateException("failed to instantiate Command class " + commandClass);
                 }
 
-                List<String> thisCommandCommandLineArguments = new ArrayList<>();
-                while(i.hasNext()) {
-                    thisCommandCommandLineArguments.add(i.next());
-                    i.remove();
-                }
-
-                command.applyCommandLineArguments(thisCommandCommandLineArguments);
+                injectCommandOptions(command, i, commandLineArguments);
             }
         }
 
@@ -221,6 +219,53 @@ public abstract class CommandLineApplication {
         return fullyQualifiedClassName;
     }
 
+    static String commandNameToSimpleClassName(String command) {
+
+        if (command == null) {
+            throw new IllegalArgumentException("null command name");
+        }
+
+        return Character.toUpperCase(command.charAt(0)) + command.substring(1).toLowerCase() + "Command";
+    }
+
+    /**
+     * @return all files contained by the given directory. The file name is relative to the given directory.
+     */
+    static List<String> getFileNames(String relativePath, File dir) {
+
+        List<String> result = new ArrayList<>();
+
+        if (!dir.isDirectory()) {
+            throw new IllegalArgumentException(dir + " is not a directory");
+        }
+
+        File[] content = dir.listFiles();
+
+        if (content != null) {
+
+            for (File f : content) {
+
+                if (f.isFile()) {
+                    result.add(relativePath + File.separator + f.getName());
+                } else if (f.isDirectory()) {
+                    result.addAll(getFileNames(relativePath + File.separator + f.getName(), f));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    static List<Option> parseOptions(List<String> commandLineArguments) throws Exception {
+
+        List<Option> result = Collections.emptyList();
+        return result;
+    }
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
     /**
      * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
      * The search is performed only in the specified directories. May return null if no such class is found.
@@ -271,46 +316,15 @@ public abstract class CommandLineApplication {
         return null;
     }
 
-    static String commandNameToSimpleClassName(String command) {
-
-        if (command == null) {
-            throw new IllegalArgumentException("null command name");
-        }
-
-        return Character.toUpperCase(command.charAt(0)) + command.substring(1).toLowerCase() + "Command";
-    }
-
     /**
-     * @return all files contained by the given directory. The file name is relative to the given directory.
+     * @param commandLineArguments will remove all command line arguments accepted by the command
      */
-    static List<String> getFileNames(String relativePath, File dir) {
+    private static void injectCommandOptions(Command command, int from, List<String> commandLineArguments)
+            throws Exception {
 
-        List<String> result = new ArrayList<>();
-
-        if (!dir.isDirectory()) {
-            throw new IllegalArgumentException(dir + " is not a directory");
-        }
-
-        File[] content = dir.listFiles();
-
-        if (content != null) {
-
-            for (File f : content) {
-
-                if (f.isFile()) {
-                    result.add(relativePath + File.separator + f.getName());
-                } else if (f.isDirectory()) {
-                    result.addAll(getFileNames(relativePath + File.separator + f.getName(), f));
-                }
-            }
-        }
-
-        return result;
+        List<Option> options = OptionParser.parse(from, commandLineArguments);
+        command.injectCommandOptions(options);
     }
-
-    // Protected -------------------------------------------------------------------------------------------------------
-
-    // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

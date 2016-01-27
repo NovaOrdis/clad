@@ -18,8 +18,6 @@
 
     <build>
 
-        <finalName>playground-project-template</finalName>
-
         <pluginManagement>
             <plugins>
                 <plugin>

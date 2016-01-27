@@ -34,11 +34,15 @@ public interface Command {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Feed the command line arguments for this command (everything following the command name). This method is called
-     * by the command line application framework immediately after instantiation.
+     * Called by the framework immediately after instantiation. It feeds the command options specified as command line
+     * arguments (everything following the command name). This method is called by the command line application
+     * framework immediately after instantiation.
      */
-    void applyCommandLineArguments(List<String> commandLineArguments) throws Exception;
+    void injectCommandOptions(List<Option> commandOption) throws Exception;
 
-    void execute() throws UserErrorException;
+    /**
+     * @param configuration the command execution context configuration.
+     */
+    void execute(Configuration configuration) throws UserErrorException;
 
 }

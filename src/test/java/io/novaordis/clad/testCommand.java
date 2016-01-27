@@ -31,33 +31,33 @@ public class TestCommand implements Command {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private List<String> commandLineArguments;
+    private List<Option> commandOptions;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public TestCommand() {
 
-        this.commandLineArguments = new ArrayList<>();
+        this.commandOptions = new ArrayList<>();
     }
 
 
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public void applyCommandLineArguments(List<String> commandLineArguments) throws Exception {
+    public void injectCommandOptions(List<Option> options) throws Exception {
 
-        this.commandLineArguments.addAll(commandLineArguments);
+        this.commandOptions.addAll(options);
     }
 
     @Override
-    public void execute() throws UserErrorException {
+    public void execute(Configuration configuration) throws UserErrorException {
         throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public List<String> getCommandLineArguments() {
-        return commandLineArguments;
+    public List<Option> getCommandOptions() {
+        return commandOptions;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
