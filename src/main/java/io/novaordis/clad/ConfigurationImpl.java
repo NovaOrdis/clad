@@ -16,11 +16,13 @@
 
 package io.novaordis.clad;
 
+import java.util.List;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public abstract class OptionBase implements Option {
+public class ConfigurationImpl implements Configuration {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,51 +30,25 @@ public abstract class OptionBase implements Option {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Character shortLiteral;
-    private String longLiteral;
+    private List<Option> globalOptions;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    protected OptionBase(Character shortLiteral, String longLiteral) {
-        this.shortLiteral = shortLiteral;
-        this.longLiteral = longLiteral;
-    }
-
-    // Option implementation -------------------------------------------------------------------------------------------
+    // Configuration implementation ------------------------------------------------------------------------------------
 
     @Override
-    public Character getShortLiteral()
-    {
-        return shortLiteral;
-    }
+    public List<Option> getGlobalOptions() {
 
-    @Override
-    public String getLongLiteral()
-    {
-        return longLiteral;
+        return globalOptions;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public abstract Object getValue();
-
-    @Override
-    public String toString() {
-
-        if (getShortLiteral() != null) {
-
-            if (getLongLiteral() != null) {
-
-                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=\"" + getValue() + "\"";
-            }
-            return "-" + getShortLiteral() + " \"" + getValue() + "\"";
-        }
-        else {
-            return "--" + getLongLiteral() + "=\"" + getValue() + "\"";
-        }
-    }
-
     // Package protected -----------------------------------------------------------------------------------------------
+
+    void setGlobalOptions(List<Option> globalOptions) {
+        this.globalOptions = globalOptions;
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

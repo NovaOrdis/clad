@@ -86,7 +86,7 @@ public class OptionParserTest {
 
         Option option = options.get(0);
 
-        assertEquals('t', option.getShortLiteral());
+        assertEquals('t', option.getShortLiteral().charValue());
 
         BooleanOption bo = (BooleanOption)option;
 
@@ -106,9 +106,37 @@ public class OptionParserTest {
 
         StringOption so = (StringOption)options.get(0);
 
-        assertEquals('t', so.getShortLiteral());
+        assertEquals('t', so.getShortLiteral().charValue());
 
         assertEquals("test", so.getValue());
+    }
+
+
+    @Test
+    public void parseOptions() throws Exception {
+
+        List<String> args = new ArrayList<>(Arrays.asList(
+                "global1", "global2", "-c", "command-value", "--command2=command2-value"));
+
+        List<Option> options = OptionParser.parse(2, args);
+
+        assertEquals(2, args.size());
+        assertEquals("global1", args.get(0));
+        assertEquals("global2", args.get(1));
+
+        assertEquals(2, options.size());
+
+        StringOption option = (StringOption)options.get(0);
+
+        assertEquals('c', option.getShortLiteral().charValue());
+        assertNull(option.getLongLiteral());
+        assertEquals("command-value", option.getValue());
+
+        option = (StringOption)options.get(1);
+
+        assertNull(option.getShortLiteral());
+        assertEquals("command2", option.getLongLiteral());
+        assertEquals("command2-value", option.getValue());
     }
 
     // typeHeuristics() ------------------------------------------------------------------------------------------------
@@ -170,6 +198,42 @@ public class OptionParserTest {
 
         String value = (String)OptionParser.typeHeuristics("something");
         assertEquals("something", value);
+    }
+
+    // parseLongLiteralOption() ----------------------------------------------------------------------------------------
+
+    @Test
+    public void pastLongLiteralOption_Null() throws Exception {
+
+        try {
+            OptionParser.parseLongLiteralOption(null);
+            fail("should have thrown Exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void pastLongLiteralOption_DoesNotStartWithDashDash() throws Exception {
+
+        try {
+            OptionParser.parseLongLiteralOption("-something");
+            fail("should have thrown Exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void pastLongLiteralOption() throws Exception {
+
+        StringOption option = (StringOption)OptionParser.parseLongLiteralOption("--option=option-value");
+
+        assertEquals("option", option.getLongLiteral());
+        assertNull(option.getShortLiteral());
+        assertEquals("option-value", option.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

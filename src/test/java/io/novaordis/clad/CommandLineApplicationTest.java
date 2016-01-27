@@ -113,7 +113,7 @@ public class CommandLineApplicationTest {
         assertNotNull(testCommand);
         assertEquals(1, testCommand.getCommandOptions().size());
         BooleanOption bo = (BooleanOption)testCommand.getCommandOptions().get(0);
-        assertEquals('m', bo.getShortLiteral());
+        assertEquals('m', bo.getShortLiteral().charValue());
         assertNull(bo.getLongLiteral());
         assertTrue(bo.getValue());
 
@@ -133,7 +133,7 @@ public class CommandLineApplicationTest {
         assertEquals(1, testCommand.getCommandOptions().size());
 
         StringOption so = (StringOption)testCommand.getCommandOptions().get(0);
-        assertEquals('n', so.getShortLiteral());
+        assertEquals('n', so.getShortLiteral().charValue());
         assertEquals("test", so.getValue());
 
         // make sure the command name disappeared from the argument list
@@ -195,13 +195,54 @@ public class CommandLineApplicationTest {
         assertEquals("TestCommand", s);
     }
 
-    // parseOptions() --------------------------------------------------------------------------------------------------
+    // main() ----------------------------------------------------------------------------------------------------------
+
 
     @Test
-    public void parseOptions_EmptyList() throws Exception {
+    public void main() throws Exception {
 
-        List<Option> options = CommandLineApplication.parseOptions(Collections.emptyList());
-        assertTrue(options.isEmpty());
+        try {
+
+            assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
+            assertTrue(TestCommand.getCommandOptionsInjectedByExecution().isEmpty());
+
+            CommandLineApplication.main(new String[]{
+                    "-g", "global-value", "--global2=global2-value",
+                    "test",
+                    "-c", "command-value", "--command2=command2-value"});
+
+            List<Option> globalOptions = TestCommand.getGlobalOptionsInjectedByExecution();
+
+            assertEquals(2, globalOptions.size());
+
+            StringOption option = (StringOption)globalOptions.get(0);
+            assertEquals('g', option.getShortLiteral().charValue());
+            assertEquals("global-value", option.getValue());
+
+            option = (StringOption)globalOptions.get(1);
+            assertNull(option.getShortLiteral());
+            assertEquals("global2", option.getLongLiteral());
+            assertEquals("global2-value", option.getValue());
+
+            List<Option> commandOptions = TestCommand.getCommandOptionsInjectedByExecution();
+
+            assertEquals(2, commandOptions.size());
+
+            option = (StringOption)commandOptions.get(0);
+            assertEquals('c', option.getShortLiteral().charValue());
+            assertEquals("command-value", option.getValue());
+
+            option = (StringOption)commandOptions.get(1);
+            assertNull(option.getShortLiteral());
+            assertEquals("command2", option.getLongLiteral());
+            assertEquals("command2-value", option.getValue());
+        }
+        finally {
+
+            TestCommand.clear();
+            assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
+            assertTrue(TestCommand.getCommandOptionsInjectedByExecution().isEmpty());
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

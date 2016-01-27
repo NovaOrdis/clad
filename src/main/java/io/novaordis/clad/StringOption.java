@@ -32,33 +32,30 @@ public class StringOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public StringOption(char shortLiteral) {
-        super(shortLiteral, null);
+    public StringOption(Character shortLiteral) {
+        this(shortLiteral, null);
     }
 
-    public StringOption(char shortLiteral, String longLiteral) {
+    public StringOption(String longLiteral) {
+        this(null, longLiteral);
+    }
+
+    public StringOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
     }
 
-    // Public ----------------------------------------------------------------------------------------------------------
+    // OptionBase overrides --------------------------------------------------------------------------------------------
 
+    @Override
     public String getValue() {
         return value;
     }
 
+
+    // Public ----------------------------------------------------------------------------------------------------------
+
     public void setValue(String s) {
         this.value = s;
-    }
-
-    @Override
-    public String toString() {
-
-        if (getShortLiteral() != 0) {
-            return "-" + getShortLiteral() + " \"" + value + "\"";
-        }
-        else {
-            return "???";
-        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

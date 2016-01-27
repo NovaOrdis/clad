@@ -28,30 +28,34 @@ public class BooleanOption extends OptionBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Boolean value;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public BooleanOption(char shortLiteral) {
-        super(shortLiteral, null);
+    public BooleanOption(Character shortLiteral) {
+        this(shortLiteral, null);
     }
 
-    public BooleanOption(char shortLiteral, String longLiteral) {
+    public BooleanOption(String longLiteral) {
+        this(null, longLiteral);
+    }
+
+    public BooleanOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
+        value = true;
+    }
+
+    // OptionBase overrides --------------------------------------------------------------------------------------------
+
+    @Override
+    public Boolean getValue() {
+        return value;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public boolean getValue() {
-        return true;
-    }
-
-    @Override
-    public String toString() {
-
-        if (getShortLiteral() != 0) {
-            return "-" + getShortLiteral();
-        }
-
-        return "--" + getLongLiteral();
+    public void setValue(Boolean b) {
+        this.value = b;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

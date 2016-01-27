@@ -37,12 +37,7 @@ public class BooleanOptionTest extends OptionTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected BooleanOption getOptionToTest(char shortLiteral, String longLiteral) {
-
-        if (longLiteral == null) {
-
-            return new BooleanOption(shortLiteral);
-        }
+    protected BooleanOption getOptionToTest(Character shortLiteral, String longLiteral) {
 
         return new BooleanOption(shortLiteral, longLiteral);
     }

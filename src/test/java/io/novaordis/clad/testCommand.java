@@ -29,6 +29,23 @@ public class TestCommand implements Command {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    private static final List<Option> globalOptionsInjectedByExecution = new ArrayList<>();
+    private static final List<Option> commandOptionsInjectedByExecution = new ArrayList<>();
+
+    public static List<Option> getGlobalOptionsInjectedByExecution() {
+        return globalOptionsInjectedByExecution;
+    }
+
+    public static List<Option> getCommandOptionsInjectedByExecution() {
+        return commandOptionsInjectedByExecution;
+    }
+
+    public static void clear() {
+
+        globalOptionsInjectedByExecution.clear();
+        commandOptionsInjectedByExecution.clear();
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private List<Option> commandOptions;
@@ -40,7 +57,6 @@ public class TestCommand implements Command {
         this.commandOptions = new ArrayList<>();
     }
 
-
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
@@ -51,7 +67,13 @@ public class TestCommand implements Command {
 
     @Override
     public void execute(Configuration configuration) throws UserErrorException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+
+        //
+        // inject global options and command options into the static lists for testing
+        //
+
+        globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
+        commandOptionsInjectedByExecution.addAll(commandOptions);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

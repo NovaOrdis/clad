@@ -54,23 +54,38 @@ public abstract class CommandLineApplication {
 
     public static void main(String[] args) throws Exception {
 
-        //
-        // identify and instantiate the command - the first command line argument that corresponds to a Command
-        // implementation
-        //
+        try {
 
-        List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
+            //
+            // identify and instantiate the command - the first command line argument that corresponds to a Command
+            // implementation
+            //
 
-        Command command = identifyCommand(commandLineArguments);
+            List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
 
-        List<String> globalOptions = new ArrayList<>(commandLineArguments);
+            Command command = identifyCommand(commandLineArguments);
 
-        log.debug("command: " + command);
+            log.debug("command: " + command);
 
-        log.debug("global options: " + globalOptions);
+            List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
 
-        if (command == null) {
-            throw new UserErrorException("no command");
+            log.debug("global options: " + globalOptions);
+
+            //
+            // place global options in configuration
+            //
+
+            ConfigurationImpl configuration = new ConfigurationImpl();
+            configuration.setGlobalOptions(globalOptions);
+
+            if (command == null) {
+                throw new UserErrorException("no command");
+            }
+
+            command.execute(configuration);
+        }
+        catch(UserErrorException e) {
+            System.err.println("[error]: " + e.getMessage());
         }
     }
 
@@ -111,7 +126,7 @@ public abstract class CommandLineApplication {
                 // list
                 //
 
-                commandLineArguments.remove(0);
+                commandLineArguments.remove(i);
 
                 Class commandClass;
 
@@ -253,12 +268,6 @@ public abstract class CommandLineApplication {
             }
         }
 
-        return result;
-    }
-
-    static List<Option> parseOptions(List<String> commandLineArguments) throws Exception {
-
-        List<Option> result = Collections.emptyList();
         return result;
     }
 

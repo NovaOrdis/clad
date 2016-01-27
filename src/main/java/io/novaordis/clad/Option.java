@@ -37,12 +37,12 @@ public interface Option {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * The short form literal character (-o <value>).
+     * @return the short form literal character (-o <value>). May return null.
      */
-    char getShortLiteral();
+    Character getShortLiteral();
 
     /**
-     * The long form literal character (--option=<value>).
+     * The long form literal character (--option=<value>). May return null.
      */
     String getLongLiteral();
 

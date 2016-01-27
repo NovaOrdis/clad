@@ -43,7 +43,10 @@ public class OptionParser {
             current = commandLineArguments.get(i);
 
             if (current.startsWith("--")) {
-                throw new RuntimeException("NOT YET IMPLEMENTED");
+
+                String longLiteralOptionString = commandLineArguments.remove(i--);
+                Option option = parseLongLiteralOption(longLiteralOptionString);
+                result.add(option);
             }
             else if (current.startsWith("-")) {
 
@@ -66,7 +69,7 @@ public class OptionParser {
                     result.add(new BooleanOption(shortLiteral));
                 }
                 else {
-                    String valueAsString = commandLineArguments.get(0);
+                    String valueAsString = commandLineArguments.get(i);
                     Object value = typeHeuristics(valueAsString);
                     Option option;
                     if (value instanceof String) {
@@ -86,7 +89,7 @@ public class OptionParser {
                     }
 
                     result.add(option);
-                    commandLineArguments.remove(i);
+                    commandLineArguments.remove(i--);
                 }
             }
             else {
@@ -142,6 +145,54 @@ public class OptionParser {
 
                 return value;
             }
+        }
+    }
+
+    public static Option parseLongLiteralOption(String longLiteralOptionString) throws UserErrorException {
+
+        if (longLiteralOptionString == null) {
+            throw new IllegalArgumentException("null argument");
+        }
+
+        String original = longLiteralOptionString;
+
+        if (!longLiteralOptionString.startsWith("--")) {
+
+            throw new IllegalArgumentException("argument does not start with '--': " + original);
+        }
+
+        longLiteralOptionString = longLiteralOptionString.substring(2);
+
+        int i = longLiteralOptionString.indexOf('=');
+
+        if (i == -1) {
+            throw new IllegalArgumentException("argument does not contain '=':" + original);
+        }
+
+        String optionName = longLiteralOptionString.substring(0, i);
+        String valueAsString = longLiteralOptionString.substring(i + 1);
+
+        Object o = typeHeuristics(valueAsString);
+
+        if (o instanceof Long) {
+            LongOption option = new LongOption(optionName);
+            option.setValue((Long)o);
+            return option;
+        }
+        else if (o instanceof Double) {
+            DoubleOption option = new DoubleOption(optionName);
+            option.setValue((Double)o);
+            return option;
+        }
+        else if (o instanceof Boolean) {
+            BooleanOption option = new BooleanOption(optionName);
+            option.setValue((Boolean)o);
+            return option;
+        }
+        else {
+            StringOption option = new StringOption(optionName);
+            option.setValue((String)o);
+            return option;
         }
     }
 

@@ -16,6 +16,11 @@
 
 package io.novaordis.clad;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
@@ -32,12 +37,23 @@ public class StringOptionTest extends OptionTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @Test
+    public void setGetValue() throws Exception {
+
+        StringOption o = getOptionToTest('t', "test");
+
+        assertNull(o.getValue());
+
+        o.setValue("test-value");
+        assertEquals("test-value", o.getValue());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected StringOption getOptionToTest(char shortLiteral, String longLiteral) {
+    protected StringOption getOptionToTest(Character shortLiteral, String longLiteral) {
 
         return new StringOption(shortLiteral, longLiteral);
     }

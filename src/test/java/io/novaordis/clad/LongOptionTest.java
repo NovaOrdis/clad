@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNull;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public abstract class OptionTest {
+public class LongOptionTest extends OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -38,41 +38,25 @@ public abstract class OptionTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void bothLiterals() throws Exception {
+    public void setGetValue() throws Exception {
 
-        Option option = getOptionToTest('o', "option");
+        LongOption o = getOptionToTest('t', "test");
 
-        assertEquals(new Character('o'), option.getShortLiteral());
-        assertEquals("option", option.getLongLiteral());
-    }
+        assertNull(o.getValue());
 
-    @Test
-    public void shortLiteral() throws Exception {
-
-        Option option = getOptionToTest('o', null);
-
-        assertEquals(new Character('o'), option.getShortLiteral());
-        assertNull(option.getLongLiteral());
-    }
-
-    @Test
-    public void longLiteral() throws Exception {
-
-        Option option = getOptionToTest(null, "option");
-
-        assertNull(option.getShortLiteral());
-        assertEquals("option", option.getLongLiteral());
+        o.setValue(1L);
+        assertEquals(1L, o.getValue().longValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    /**
-     * @param shortLiteral null is acceptable (as long as longLiteral is not null)
-     * @param longLiteral null is acceptable (as long as shortLiteral is not null)
-     */
-    protected abstract Option getOptionToTest(Character shortLiteral, String longLiteral);
+    @Override
+    protected LongOption getOptionToTest(Character shortLiteral, String longLiteral) {
+
+        return new LongOption(shortLiteral, longLiteral);
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 
