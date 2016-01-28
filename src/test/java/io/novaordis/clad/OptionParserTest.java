@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,6 +43,14 @@ public class OptionParserTest {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    private static List<String> tokenizeCommandLine(String commandLine) {
+        List<String> result = new ArrayList<>();
+        for(StringTokenizer st = new StringTokenizer(commandLine, " "); st.hasMoreTokens(); ) {
+            result.add(st.nextToken());
+        }
+        return result;
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -59,7 +67,7 @@ public class OptionParserTest {
     @Test
     public void parse_DashByItself() throws Exception {
 
-        List<String> args = new ArrayList<>(Collections.singletonList("-"));
+        List<String> args = tokenizeCommandLine("-");
 
         try {
 
@@ -76,7 +84,7 @@ public class OptionParserTest {
     @Test
     public void parse_ShortLiteral_BooleanValue() throws Exception {
 
-        List<String> args = new ArrayList<>(Collections.singletonList("-t"));
+        List<String> args = tokenizeCommandLine("-t");
 
         List<Option> options = OptionParser.parse(0, args);
 
@@ -96,7 +104,7 @@ public class OptionParserTest {
     @Test
     public void parse_ShortLiteral_StringValue() throws Exception {
 
-        List<String> args = new ArrayList<>(Arrays.asList("-t", "test"));
+        List<String> args = tokenizeCommandLine("-t test");
 
         List<Option> options = OptionParser.parse(0, args);
 
@@ -111,12 +119,10 @@ public class OptionParserTest {
         assertEquals("test", so.getValue());
     }
 
-
     @Test
     public void parseOptions() throws Exception {
 
-        List<String> args = new ArrayList<>(Arrays.asList(
-                "global1", "global2", "-c", "command-value", "--command2=command2-value"));
+        List<String> args = tokenizeCommandLine("global1 global2 -c command-value --command2=command2-value");
 
         List<Option> options = OptionParser.parse(2, args);
 
@@ -137,6 +143,188 @@ public class OptionParserTest {
         assertNull(option.getShortLiteral());
         assertEquals("command2", option.getLongLiteral());
         assertEquals("command2-value", option.getValue());
+    }
+
+    @Test
+    public void parse_HandleDoubleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-f \"something something else\"");
+
+        List<Option> options = OptionParser.parse(0, args);
+
+        assertTrue(args.isEmpty());
+
+        assertEquals(1, options.size());
+        StringOption option = (StringOption)options.get(0);
+        assertEquals('f', option.getShortLiteral().charValue());
+        assertNull(option.getLongLiteral());
+        assertEquals("something something else", option.getValue());
+    }
+
+    @Test
+    public void parse_HandleSingleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-f 'something something else'");
+
+        List<Option> options = OptionParser.parse(0, args);
+
+        assertTrue(args.isEmpty());
+
+        assertEquals(1, options.size());
+        StringOption option = (StringOption)options.get(0);
+        assertEquals('f', option.getShortLiteral().charValue());
+        assertNull(option.getLongLiteral());
+        assertEquals("something something else", option.getValue());
+    }
+
+    // handleQuotes ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void handleDoubleQuotes_UnbalancedDoubleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a \"b \"c");
+
+        try {
+            OptionParser.handleQuotes(1, args);
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+
+        assertEquals(3, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("\"b", args.get(1));
+        assertEquals("\"c", args.get(2));
+    }
+
+    @Test
+    public void handleSingleQuotes_UnbalancedSingleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a 'b 'c");
+
+        try {
+            OptionParser.handleQuotes(1, args);
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+
+        assertEquals(3, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("'b", args.get(1));
+        assertEquals("'c", args.get(2));
+    }
+
+    @Test
+    public void handleDoubleQuotes_UnbalancedDoubleQuotes2() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a \"b c \"d");
+
+        try {
+            OptionParser.handleQuotes(1, args);
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+
+        assertEquals(4, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("\"b", args.get(1));
+        assertEquals("c", args.get(2));
+        assertEquals("\"d", args.get(3));
+    }
+
+    @Test
+    public void handleSingleQuotes_UnbalancedSingleQuotes2() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a 'b c 'd");
+
+        try {
+            OptionParser.handleQuotes(1, args);
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+
+        assertEquals(4, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("'b", args.get(1));
+        assertEquals("c", args.get(2));
+        assertEquals("'d", args.get(3));
+    }
+
+    @Test
+    public void handleDoubleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a \"b c\"");
+
+        OptionParser.handleQuotes(0, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c", args.get(1));
+    }
+
+    @Test
+    public void handleSingleQuotes() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a 'b c'");
+
+        OptionParser.handleQuotes(0, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c", args.get(1));
+    }
+
+    @Test
+    public void handleDoubleQuotes2() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a \"b c\"");
+        OptionParser.handleQuotes(1, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c", args.get(1));
+    }
+
+    @Test
+    public void handleSingleQuotes2() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a 'b c'");
+        OptionParser.handleQuotes(1, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c", args.get(1));
+    }
+
+    @Test
+    public void handleDoubleQuotes3() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a \"b c d\"");
+
+        OptionParser.handleQuotes(1, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c d", args.get(1));
+    }
+
+    @Test
+    public void handleSingleQuotes3() throws Exception {
+
+        List<String> args = tokenizeCommandLine("a 'b c d'");
+
+        OptionParser.handleQuotes(1, args);
+
+        assertEquals(2, args.size());
+        assertEquals("a", args.get(0));
+        assertEquals("b c d", args.get(1));
     }
 
     // typeHeuristics() ------------------------------------------------------------------------------------------------

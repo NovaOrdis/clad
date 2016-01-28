@@ -34,6 +34,11 @@ public class OptionParser {
      */
     public static List<Option> parse(int from, List<String> commandLineArguments) throws UserErrorException {
 
+        //
+        // pre-parse to handle single quotes and double quotes
+        //
+        handleQuotes(from, commandLineArguments);
+
         List<Option> result = new ArrayList<>();
 
         String current;
@@ -98,6 +103,92 @@ public class OptionParser {
         }
 
         return result;
+    }
+
+    /**
+     * Coalesces strings between single and double quotes in place withing the argument list. Works by side-effect.
+     * @param from - only start from 'from', leave the first arguments untouched.
+     */
+    public static void handleQuotes(int from, List<String> commandLineArguments) throws UserErrorException {
+
+        StringBuilder doubleQuoted = null;
+        StringBuilder singleQuoted = null;
+        int index = -1;
+        int toRemoveCount = 0;
+
+        for(int i = from; i < commandLineArguments.size(); i++) {
+
+            String current = commandLineArguments.get(i);
+
+            if (current.startsWith("\"") || current.startsWith("'")) {
+
+                boolean doubleQuote = current.startsWith("\"");
+                boolean singleQuote = current.startsWith("'");
+
+                if (doubleQuote && doubleQuoted != null) {
+                    String beginning = doubleQuoted.toString();
+                    if (beginning.indexOf(' ') != -1) {
+                        beginning = beginning.substring(0, beginning.indexOf(' '));
+                    }
+                    throw new UserErrorException("unbalanced double quotes: \"" + beginning + " ... " + current);
+                }
+
+                if (singleQuote && singleQuoted != null) {
+                    String beginning = singleQuoted.toString();
+                    if (beginning.indexOf(' ') != -1) {
+                        beginning = beginning.substring(0, beginning.indexOf(' '));
+                    }
+                    throw new UserErrorException("unbalanced single quotes: '" + beginning + " ... " + current);
+                }
+
+                current = current.substring(1);
+                doubleQuoted = doubleQuote ? new StringBuilder(current) : null;
+                singleQuoted = singleQuote ? new StringBuilder(current) : null;
+                index = i;
+
+            }
+            else if (doubleQuoted != null || singleQuoted != null) {
+
+                toRemoveCount ++;
+
+                if (current.endsWith("\"") || current.endsWith("'")) {
+
+                    boolean doubleQuote = current.endsWith("\"");
+
+                    current = current.substring(0, current.length() - 1);
+
+                    if (doubleQuote) {
+                        assert doubleQuoted != null;
+                        doubleQuoted.append(" ").append(current);
+                    }
+                    else {
+                        assert singleQuoted != null;
+                        singleQuoted.append(" ").append(current);
+                    }
+
+                    //
+                    // replace in place
+                    //
+
+                    commandLineArguments.set(index, doubleQuote ? doubleQuoted.toString() : singleQuoted.toString());
+
+                    //
+                    // remove components
+                    //
+
+                    for(int j = 0; j < toRemoveCount; j ++) {
+                        commandLineArguments.remove(index + 1);
+                    }
+                }
+                else if (doubleQuoted != null) {
+                    doubleQuoted.append(" ").append(current);
+                }
+                else //noinspection ConstantConditions
+                    if (singleQuoted != null) {
+                    singleQuoted.append(" ").append(current);
+                }
+            }
+        }
     }
 
     public static Object typeHeuristics(String value) {
