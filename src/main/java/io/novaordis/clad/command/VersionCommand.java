@@ -20,6 +20,12 @@ import io.novaordis.clad.ApplicationRuntime;
 import io.novaordis.clad.Command;
 import io.novaordis.clad.Configuration;
 import io.novaordis.clad.UserErrorException;
+import io.novaordis.utilities.VersionUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -29,9 +35,13 @@ public class VersionCommand implements Command {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = LoggerFactory.getLogger(VersionCommand.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
+
+    private OutputStream os;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -40,11 +50,37 @@ public class VersionCommand implements Command {
     @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
 
-        System.out.println("version ");
-        System.out.println("release data ");
+        String version = VersionUtilities.getVersion();
+        String releaseDate = VersionUtilities.getReleaseDate();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("version ").append((version == null ? "N/A" : version)).append("\n");
+        sb.append("release date ").append((releaseDate == null ? "N/A" : releaseDate)).append("\n");
+
+        if (os == null) {
+            System.out.print(sb);
+        }
+        else {
+            try {
+                os.write(sb.toString().getBytes());
+                os.flush();
+            }
+            catch(IOException e) {
+
+                log.error("failed to write to output stream", e);
+            }
+        }
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public void setOutputStream(OutputStream os) {
+        this.os = os;
+    }
+
+    public OutputStream getOutputStream() {
+        return os;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
