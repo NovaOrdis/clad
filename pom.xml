@@ -19,6 +19,14 @@
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.txt</include>
+                </includes>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>

@@ -16,6 +16,9 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.HelpOption;
+import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.OptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -381,20 +384,58 @@ public class CommandLineApplication {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
+    private ConfigurationImpl configuration;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     CommandLineApplication() {
 
-        stderrOutputStream = System.err;
+        this(null);
+    }
+
+    CommandLineApplication(OutputStream stderrOutputStream) {
+
+        this(null, stderrOutputStream);
+    }
+
+    CommandLineApplication(OutputStream stdoutOutputStream, OutputStream stderrOutputStream) {
+
+        if (stdoutOutputStream == null) {
+            stdoutOutputStream = System.out;
+        }
+
+        if (stderrOutputStream == null) {
+            stderrOutputStream = System.err;
+        }
+
+        this.stdoutOutputStream = stdoutOutputStream;
+        this.stderrOutputStream = stderrOutputStream;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    public void setStdoutOutputStream(OutputStream outputStream) {
+
+        this.stdoutOutputStream = outputStream;
+    }
+
+    public OutputStream getStdoutOutputStream() {
+        return stdoutOutputStream;
+    }
+
     public void setStderrOutputStream(OutputStream outputStream) {
 
         this.stderrOutputStream = outputStream;
+    }
+
+    public OutputStream getStderrOutputStream() {
+        return stderrOutputStream;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -406,7 +447,7 @@ public class CommandLineApplication {
 
         try {
 
-            ConfigurationImpl configuration = new ConfigurationImpl();
+            this.configuration = new ConfigurationImpl();
 
             //
             // identify and instantiate the runtime
@@ -457,6 +498,30 @@ public class CommandLineApplication {
                     throw new UserErrorException("...");
                 }
             }
+
+            //
+            // handle special situations
+            //
+
+            for(Option o: getConfiguration().getGlobalOptions()) {
+
+                if (o instanceof HelpOption) {
+
+                    //
+                    // handle help requests
+                    //
+
+                    HelpOption helpOption = (HelpOption)o;
+                    // inject the current command, if any
+                    helpOption.setCommand(command);
+                    helpOption.displayHelp(getStdoutOutputStream());
+                    return 0;
+                }
+            }
+
+            //
+            // not a special situation, execute the command
+            //
 
             log.debug("initializing the runtime");
 

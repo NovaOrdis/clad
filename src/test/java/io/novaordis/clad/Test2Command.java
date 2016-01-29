@@ -16,15 +16,11 @@
 
 package io.novaordis.clad;
 
-import io.novaordis.clad.option.Option;
-
-import java.util.List;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class ConfigurationImpl implements Configuration {
+public class Test2Command implements Command {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,60 +28,25 @@ public class ConfigurationImpl implements Configuration {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private String applicationName;
-    private List<Option> globalOptions;
-    private List<Option> commandOptions;
-
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public ConfigurationImpl() throws UserErrorException {
-
-        //
-        // we expect to find the application name in the environment
-        //
-
-        this.applicationName = System.getProperty(APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
-
-        if (applicationName == null) {
-            throw new UserErrorException("no '" + APPLICATION_NAME_SYSTEM_PROPERTY_NAME + "' system property set");
-        }
-    }
-
-    // Configuration implementation ------------------------------------------------------------------------------------
+    // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public String getApplicationName() {
+    public String getName() {
 
-        return applicationName;
+        return "test2";
     }
 
     @Override
-    public List<Option> getGlobalOptions() {
+    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
 
-        return globalOptions;
-    }
-
-    @Override
-    public List<Option> getCommandOptions() {
-
-        return commandOptions;
+        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
-
-    void setGlobalOptions(List<Option> globalOptions) {
-        this.globalOptions = globalOptions;
-    }
-
-    void setCommandOptions(List<Option> commandOptions) {
-        this.commandOptions = commandOptions;
-    }
-
-    void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

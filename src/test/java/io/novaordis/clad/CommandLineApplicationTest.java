@@ -16,6 +16,9 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.BooleanOption;
+import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.StringOption;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -344,7 +347,7 @@ public class CommandLineApplicationTest {
 
             assertEquals(1, exitCode);
 
-            byte[] bytes = mos.getWrittenContent();
+            byte[] bytes = mos.getWrittenBytes();
             String msg = new String(bytes);
             assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
 
@@ -354,6 +357,164 @@ public class CommandLineApplicationTest {
             TestApplicationRuntime.clear();
             assertFalse(TestApplicationRuntime.isInitialized());
         }
+    }
+
+    @Test
+    public void main_UnknownCommand() throws Exception {
+
+        try {
+
+            assertFalse(TestApplicationRuntime.isInitialized());
+
+            CommandLineApplication commandLineApplication = new CommandLineApplication();
+
+            MockOutputStream mos = new MockOutputStream();
+
+            commandLineApplication.setStderrOutputStream(mos);
+
+            String[] args = new String[] {"something"};
+
+            int exitCode = commandLineApplication.execute(args);
+
+            assertEquals(1, exitCode);
+
+            byte[] bytes = mos.getWrittenBytes();
+            String msg = new String(bytes);
+            assertEquals("[error]: unknown option: 'something'\n", msg);
+
+            assertFalse(TestApplicationRuntime.isInitialized());
+        }
+        finally {
+            TestApplicationRuntime.clear();
+            assertFalse(TestApplicationRuntime.isInitialized());
+        }
+    }
+
+    // help() ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void help() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
+
+        String[] args = new String[] {"help", "test"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(0, exitCode);
+
+        assertEquals("test help line 1\ntest help line 2\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void help2() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
+
+        String[] args = new String[] {"--help", "test"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(0, exitCode);
+
+        assertEquals("test help line 1\ntest help line 2\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void help3() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
+
+        String[] args = new String[] {"--help=test"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(0, exitCode);
+
+        assertEquals("test help line 1\ntest help line 2\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void help4() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
+
+        String[] args = new String[] {"-h", "test"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(0, exitCode);
+
+        assertEquals("test help line 1\ntest help line 2\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void unknownCommandHelp() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        String[] args = new String[] {"help", "no-such-command"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(1, exitCode);
+        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void unknownCommandHelp2() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        String[] args = new String[] {"--help", "no-such-command"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(1, exitCode);
+        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    @Test
+    public void unknownCommandHelp3() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        String[] args = new String[] {"--help=no-such-command"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(1, exitCode);
+        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+
+    @Test
+    public void unknownCommandHelp4() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        String[] args = new String[] {"-h", "no-such-command"};
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(1, exitCode);
+        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertFalse(TestApplicationRuntime.isInitialized());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

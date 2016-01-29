@@ -16,6 +16,8 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.Option;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +53,12 @@ public class TestCommand implements Command {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Command implementation ------------------------------------------------------------------------------------------
+
+    @Override
+    public String getName() {
+
+        return "test";
+    }
 
     @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {

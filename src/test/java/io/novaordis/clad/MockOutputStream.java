@@ -50,9 +50,14 @@ public class MockOutputStream extends OutputStream {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public byte[] getWrittenContent() {
+    public byte[] getWrittenBytes() {
 
         return baos.toByteArray();
+    }
+
+    public String getWrittenString() {
+
+        return new String(getWrittenBytes());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

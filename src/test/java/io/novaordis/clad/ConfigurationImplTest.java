@@ -16,6 +16,8 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.Option;
+
 import java.util.List;
 
 /**

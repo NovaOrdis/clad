@@ -16,7 +16,6 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.OptionParser;
 import io.novaordis.clad.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;

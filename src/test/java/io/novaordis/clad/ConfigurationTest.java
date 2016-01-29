@@ -16,6 +16,8 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.StringOption;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

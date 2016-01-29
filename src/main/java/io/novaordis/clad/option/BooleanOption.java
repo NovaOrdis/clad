@@ -16,8 +16,6 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.OptionBase;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16

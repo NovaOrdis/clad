@@ -54,7 +54,12 @@ public class OptionParser {
 
             current = commandLineArguments.get(i);
 
-            if (current.startsWith("--")) {
+            if (("--" + HelpOption.LONG_LITERAL).equals(current)) {
+
+                commandLineArguments.remove(current);
+                result.add(new HelpOption());
+            }
+            else if (current.startsWith("--")) {
 
                 String longLiteralOptionString = commandLineArguments.remove(i--);
                 Option option = parseLongLiteralOption(longLiteralOptionString);

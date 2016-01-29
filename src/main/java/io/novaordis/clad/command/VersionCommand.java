@@ -48,6 +48,12 @@ public class VersionCommand implements Command {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
+    public String getName() {
+
+        return "version";
+    }
+
+    @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
 
         String version = VersionUtilities.getVersion();
