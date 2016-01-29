@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
 
 /**
  * A command-line option. Works as both global option or command option.

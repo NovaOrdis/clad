@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public abstract class OptionBase implements Option {
+public class DoubleOptionTest extends OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,53 +33,30 @@ public abstract class OptionBase implements Option {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Character shortLiteral;
-    private String longLiteral;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    protected OptionBase(Character shortLiteral, String longLiteral) {
-        this.shortLiteral = shortLiteral;
-        this.longLiteral = longLiteral;
-    }
-
-    // Option implementation -------------------------------------------------------------------------------------------
-
-    @Override
-    public Character getShortLiteral()
-    {
-        return shortLiteral;
-    }
-
-    @Override
-    public String getLongLiteral()
-    {
-        return longLiteral;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public abstract Object getValue();
+    @Test
+    public void setGetValue() throws Exception {
 
-    @Override
-    public String toString() {
+        DoubleOption o = getOptionToTest('t', "test");
 
-        if (getShortLiteral() != null) {
+        assertNull(o.getValue());
 
-            if (getLongLiteral() != null) {
-
-                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=\"" + getValue() + "\"";
-            }
-            return "-" + getShortLiteral() + " \"" + getValue() + "\"";
-        }
-        else {
-            return "--" + getLongLiteral() + "=\"" + getValue() + "\"";
-        }
+        o.setValue(1.1);
+        assertEquals(1.1, o.getValue().doubleValue(), 0.0001);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected DoubleOption getOptionToTest(Character shortLiteral, String longLiteral) {
+
+        return new DoubleOption(shortLiteral, longLiteral);
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

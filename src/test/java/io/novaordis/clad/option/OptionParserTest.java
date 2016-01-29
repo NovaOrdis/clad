@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
 
+import io.novaordis.clad.OptionParser;
+import io.novaordis.clad.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +79,7 @@ public class OptionParserTest {
         catch(UserErrorException e) {
             String msg = e.getMessage();
             log.info(e.getMessage());
-            assertEquals("invalid option \"-\"", msg);
+            assertEquals("invalid option: '-'", msg);
         }
     }
 
@@ -175,6 +177,20 @@ public class OptionParserTest {
         assertEquals('f', option.getShortLiteral().charValue());
         assertNull(option.getLongLiteral());
         assertEquals("something something else", option.getValue());
+    }
+
+    @Test
+    public void parse_InvalidOption() throws Exception {
+
+        List<String> args = tokenizeCommandLine("something");
+
+        try {
+            OptionParser.parse(0, args);
+        }
+        catch(UserErrorException e) {
+
+            assertEquals("unknown option: 'something'", e.getMessage());
+        }
     }
 
     // handleQuotes ----------------------------------------------------------------------------------------------------

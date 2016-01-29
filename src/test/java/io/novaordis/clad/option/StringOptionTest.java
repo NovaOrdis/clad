@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/21/16
+ * @since 1/26/16
  */
-public abstract class CommandLineDrivenTest {
+public class StringOptionTest extends OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -34,11 +37,26 @@ public abstract class CommandLineDrivenTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @Test
+    public void setGetValue() throws Exception {
+
+        StringOption o = getOptionToTest('t', "test");
+
+        assertNull(o.getValue());
+
+        o.setValue("test-value");
+        assertEquals("test-value", o.getValue());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected abstract CommandLineDriven getCommandLineDrivenToTest();
+    @Override
+    protected StringOption getOptionToTest(Character shortLiteral, String longLiteral) {
+
+        return new StringOption(shortLiteral, longLiteral);
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

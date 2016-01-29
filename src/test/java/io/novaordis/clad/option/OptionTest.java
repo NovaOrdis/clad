@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import io.novaordis.clad.option.Option;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class BooleanOption extends OptionBase {
+public abstract class OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,39 +34,46 @@ public class BooleanOption extends OptionBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Boolean value;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    public BooleanOption(Character shortLiteral) {
-        this(shortLiteral, null);
-    }
-
-    public BooleanOption(String longLiteral) {
-        this(null, longLiteral);
-    }
-
-    public BooleanOption(Character shortLiteral, String longLiteral) {
-        super(shortLiteral, longLiteral);
-        value = true;
-    }
-
-    // OptionBase overrides --------------------------------------------------------------------------------------------
-
-    @Override
-    public Boolean getValue() {
-        return value;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public void setValue(Boolean b) {
-        this.value = b;
+    @Test
+    public void bothLiterals() throws Exception {
+
+        Option option = getOptionToTest('o', "option");
+
+        assertEquals(new Character('o'), option.getShortLiteral());
+        assertEquals("option", option.getLongLiteral());
+    }
+
+    @Test
+    public void shortLiteral() throws Exception {
+
+        Option option = getOptionToTest('o', null);
+
+        assertEquals(new Character('o'), option.getShortLiteral());
+        assertNull(option.getLongLiteral());
+    }
+
+    @Test
+    public void longLiteral() throws Exception {
+
+        Option option = getOptionToTest(null, "option");
+
+        assertNull(option.getShortLiteral());
+        assertEquals("option", option.getLongLiteral());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    /**
+     * @param shortLiteral null is acceptable (as long as longLiteral is not null)
+     * @param longLiteral null is acceptable (as long as shortLiteral is not null)
+     */
+    protected abstract Option getOptionToTest(Character shortLiteral, String longLiteral);
 
     // Private ---------------------------------------------------------------------------------------------------------
 

@@ -14,24 +14,36 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
 
 /**
- * The classes implementing this interface are "command line-driven": an instance is typically instantiated in a
- * main(String[]) method, the instance interprets and executes the command line content via executeCommandLine(), and
- * then the JVM exists.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/21/16
+ * @since 1/26/16
  */
-public interface CommandLineDriven {
+public class BooleanOptionTest extends OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    // Attributes ------------------------------------------------------------------------------------------------------
+
+    // Constructors ----------------------------------------------------------------------------------------------------
+
     // Public ----------------------------------------------------------------------------------------------------------
 
-    void executeCommandLine(String[] args) throws UserErrorException;
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected BooleanOption getOptionToTest(Character shortLiteral, String longLiteral) {
+
+        return new BooleanOption(shortLiteral, longLiteral);
+    }
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 
 }

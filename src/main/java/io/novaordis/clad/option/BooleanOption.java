@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import io.novaordis.clad.OptionBase;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class BooleanOptionTest extends OptionTest {
+public class BooleanOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,19 +30,39 @@ public class BooleanOptionTest extends OptionTest {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Boolean value;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public BooleanOption(Character shortLiteral) {
+        this(shortLiteral, null);
+    }
+
+    public BooleanOption(String longLiteral) {
+        this(null, longLiteral);
+    }
+
+    public BooleanOption(Character shortLiteral, String longLiteral) {
+        super(shortLiteral, longLiteral);
+        value = true;
+    }
+
+    // OptionBase overrides --------------------------------------------------------------------------------------------
+
+    @Override
+    public Boolean getValue() {
+        return value;
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public void setValue(Boolean b) {
+        this.value = b;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected BooleanOption getOptionToTest(Character shortLiteral, String longLiteral) {
-
-        return new BooleanOption(shortLiteral, longLiteral);
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

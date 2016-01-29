@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import io.novaordis.clad.option.Option;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class DoubleOption extends OptionBase {
+public abstract class OptionBase implements Option {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,33 +30,48 @@ public class DoubleOption extends OptionBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Double value;
+    private Character shortLiteral;
+    private String longLiteral;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public DoubleOption(Character shortLiteral) {
-        this(shortLiteral, null);
+    protected OptionBase(Character shortLiteral, String longLiteral) {
+        this.shortLiteral = shortLiteral;
+        this.longLiteral = longLiteral;
     }
 
-    public DoubleOption(String longLiteral) {
-        this(null, longLiteral);
-    }
-
-    public DoubleOption(Character shortLiteral, String longLiteral) {
-        super(shortLiteral, longLiteral);
-    }
-
-    // OptionBase override ---------------------------------------------------------------------------------------------
+    // Option implementation -------------------------------------------------------------------------------------------
 
     @Override
-    public Double getValue() {
-        return value;
+    public Character getShortLiteral()
+    {
+        return shortLiteral;
+    }
+
+    @Override
+    public String getLongLiteral()
+    {
+        return longLiteral;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public void setValue(Double d) {
-        this.value = d;
+    public abstract Object getValue();
+
+    @Override
+    public String toString() {
+
+        if (getShortLiteral() != null) {
+
+            if (getLongLiteral() != null) {
+
+                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=\"" + getValue() + "\"";
+            }
+            return "-" + getShortLiteral() + " \"" + getValue() + "\"";
+        }
+        else {
+            return "--" + getLongLiteral() + "=\"" + getValue() + "\"";
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

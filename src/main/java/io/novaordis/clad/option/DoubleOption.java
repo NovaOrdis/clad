@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import io.novaordis.clad.OptionBase;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class DoubleOptionTest extends OptionTest {
+public class DoubleOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -33,30 +30,38 @@ public class DoubleOptionTest extends OptionTest {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Double value;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    public DoubleOption(Character shortLiteral) {
+        this(shortLiteral, null);
+    }
+
+    public DoubleOption(String longLiteral) {
+        this(null, longLiteral);
+    }
+
+    public DoubleOption(Character shortLiteral, String longLiteral) {
+        super(shortLiteral, longLiteral);
+    }
+
+    // OptionBase override ---------------------------------------------------------------------------------------------
+
+    @Override
+    public Double getValue() {
+        return value;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    @Test
-    public void setGetValue() throws Exception {
-
-        DoubleOption o = getOptionToTest('t', "test");
-
-        assertNull(o.getValue());
-
-        o.setValue(1.1);
-        assertEquals(1.1, o.getValue().doubleValue(), 0.0001);
+    public void setValue(Double d) {
+        this.value = d;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected DoubleOption getOptionToTest(Character shortLiteral, String longLiteral) {
-
-        return new DoubleOption(shortLiteral, longLiteral);
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

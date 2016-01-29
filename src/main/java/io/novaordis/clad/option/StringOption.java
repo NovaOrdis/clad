@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import io.novaordis.clad.OptionBase;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class LongOption extends OptionBase {
+public class StringOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,33 +30,34 @@ public class LongOption extends OptionBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Long value;
+    private String value;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public LongOption(Character shortLiteral) {
+    public StringOption(Character shortLiteral) {
         this(shortLiteral, null);
     }
 
-    public LongOption(String longLiteral) {
+    public StringOption(String longLiteral) {
         this(null, longLiteral);
     }
 
-    public LongOption(Character shortLiteral, String longLiteral) {
+    public StringOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
     }
 
-    // OptionBase override ---------------------------------------------------------------------------------------------
+    // OptionBase overrides --------------------------------------------------------------------------------------------
 
     @Override
-    public Long getValue() {
+    public String getValue() {
         return value;
     }
 
+
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public void setValue(Long l) {
-        this.value = l;
+    public void setValue(String s) {
+        this.value = s;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

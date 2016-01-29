@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.option;
+
+import io.novaordis.clad.UserErrorException;
+import io.novaordis.clad.option.BooleanOption;
+import io.novaordis.clad.option.DoubleOption;
+import io.novaordis.clad.option.LongOption;
+import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.StringOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +64,7 @@ public class OptionParser {
 
                 if (current.length() == 1) {
                     // "-" - currently we have no use for it, advertise it as a user error
-                    throw new UserErrorException("invalid option \"-\"");
+                    throw new UserErrorException("invalid option: '-'");
                 }
 
                 //
@@ -98,7 +105,7 @@ public class OptionParser {
                 }
             }
             else {
-                throw new RuntimeException("NOT YET IMPLEMENTED");
+                throw new UserErrorException("unknown option: '" + current + "'");
             }
         }
 
