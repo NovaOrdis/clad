@@ -16,8 +16,6 @@
 
 package io.novaordis.clad;
 
-import java.util.List;
-
 /**
  * A command implementation must have a non-argument public constructor, this is how the command line application
  * framework instantiates commands.
@@ -39,7 +37,11 @@ public interface Command {
      *
      * @param runtime the command execution runtime. Guaranteed to be called init() at this time.
      *
+     * @exception UserErrorException - if thrown, the framework will display the message after [error]: and exit with
+     *  a non-zero exit code.
+     *
+     * @exception Exception any other kind of error.
      */
-    void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException;
+    void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception;
 
 }
