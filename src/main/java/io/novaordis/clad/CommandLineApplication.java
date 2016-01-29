@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -32,7 +33,7 @@ import java.util.jar.JarFile;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/22/16
  */
-public abstract class CommandLineApplication {
+public class CommandLineApplication {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -53,63 +54,18 @@ public abstract class CommandLineApplication {
 
     public static void main(String[] args) throws Exception {
 
+        int exitCode = 0;
+
+        //noinspection finally
         try {
-
-            ConfigurationImpl configuration = new ConfigurationImpl();
-
-            //
-            // identify and instantiate the runtime
-            //
-
-            ApplicationRuntime runtime = identifyRuntime(configuration);
-
-            if (runtime == null) {
-                throw new UserErrorException("no application runtime");
-            }
-
-            // identify and instantiate the command - the first command line argument that corresponds to a Command
-            // implementation
-
-            List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
-
-            Command command = identifyCommand(commandLineArguments, configuration);
-
-            log.debug("command: " + command);
-
-            List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
-
-            log.debug("global options: " + globalOptions);
-
-            // place global options in configuration
-
-            configuration.setGlobalOptions(globalOptions);
-
-            if (command == null) {
-                throw new UserErrorException("no command");
-            }
-
-            log.debug("initializing the runtime");
-
-            runtime.init(configuration);
-
-            log.debug("runtime initialized");
-
-            command.execute(configuration, runtime);
-
-            log.debug("command successfully executed");
+            exitCode = new CommandLineApplication().execute(args);
         }
-        catch(UserErrorException e) {
-            System.err.println("[error]: " + e.getMessage());
+        finally {
+            System.exit(exitCode);
         }
     }
 
-    // Attributes ------------------------------------------------------------------------------------------------------
-
-    // Constructors ----------------------------------------------------------------------------------------------------
-
-    // Public ----------------------------------------------------------------------------------------------------------
-
-    // Package protected -----------------------------------------------------------------------------------------------
+    // Static Package Protected ----------------------------------------------------------------------------------------
 
     /**
      * The method attempts to locate an ApplicationRuntime implementation on classpath and instantiates it.
@@ -180,10 +136,10 @@ public abstract class CommandLineApplication {
 
         for(int i = 0; i < commandLineArguments.size(); i++) {
 
-            String commandCandidate = commandLineArguments.get(i);
-            String commandClassName = getFullyQualifiedClassName(commandCandidate, "Command");
+            String commandCandidateName = commandLineArguments.get(i);
+            command = getCommand(commandCandidateName);
 
-            if (commandClassName != null) {
+            if (command != null) {
 
                 //
                 // we identified a class file in the class path whose name matches a command class file pattern, so
@@ -192,27 +148,45 @@ public abstract class CommandLineApplication {
 
                 commandLineArguments.remove(i);
 
-                Class commandClass;
-
-                try {
-                    commandClass = CommandLineApplication.class.getClassLoader().loadClass(commandClassName);
-                }
-                catch(Exception e) {
-                    throw new IllegalStateException("failed to load Command class " + commandClassName);
-                }
-
-                try {
-                    command = (Command)commandClass.newInstance();
-                }
-                catch(Exception e) {
-                    throw new IllegalStateException("failed to instantiate Command class " + commandClass);
-                }
-
                 injectCommandOptionsIntoConfiguration(configuration, i, commandLineArguments);
             }
         }
 
         return command;
+    }
+
+    /**
+     * @return a non-initialized Command instance if the corresponding command implementation class was found on the
+     * class path and the no-argument constructor instantiation went well.
+     */
+    static Command getCommand(String commandName) throws Exception {
+
+        String commandClassName = getFullyQualifiedClassName(commandName, "Command");
+
+        if (commandClassName == null) {
+            return null;
+        }
+
+        //
+        // we identified a class file in the class path whose name matches a command class file pattern, so try to load
+        // it
+        //
+
+        Class commandClass;
+
+        try {
+            commandClass = CommandLineApplication.class.getClassLoader().loadClass(commandClassName);
+        }
+        catch(Exception e) {
+            throw new IllegalStateException("failed to load Command class " + commandClassName);
+        }
+
+        try {
+            return (Command)commandClass.newInstance();
+        }
+        catch(Exception e) {
+            throw new IllegalStateException("failed to instantiate Command class " + commandClass);
+        }
     }
 
     /**
@@ -343,9 +317,7 @@ public abstract class CommandLineApplication {
         return result;
     }
 
-    // Protected -------------------------------------------------------------------------------------------------------
-
-    // Private ---------------------------------------------------------------------------------------------------------
+    // Static Private --------------------------------------------------------------------------------------------------
 
     /**
      * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
@@ -406,6 +378,110 @@ public abstract class CommandLineApplication {
         List<Option> options = OptionParser.parse(from, commandLineArguments);
         configuration.setCommandOptions(options);
     }
+
+    // Attributes ------------------------------------------------------------------------------------------------------
+
+    private OutputStream stderrOutputStream;
+
+    // Constructors ----------------------------------------------------------------------------------------------------
+
+    CommandLineApplication() {
+
+        stderrOutputStream = System.err;
+    }
+
+    // Public ----------------------------------------------------------------------------------------------------------
+
+    public void setStderrOutputStream(OutputStream outputStream) {
+
+        this.stderrOutputStream = outputStream;
+    }
+
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    /**
+     * @return the exit code to be returned by the process on exit.
+     */
+    int execute(String[] args) throws Exception {
+
+        try {
+
+            ConfigurationImpl configuration = new ConfigurationImpl();
+
+            //
+            // identify and instantiate the runtime
+            //
+
+            ApplicationRuntime runtime = identifyRuntime(configuration);
+
+            if (runtime == null) {
+                throw new UserErrorException("no application runtime");
+            }
+
+            // identify and instantiate the command - the first command line argument that corresponds to a Command
+            // implementation
+
+            List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
+
+            Command command = identifyCommand(commandLineArguments, configuration);
+
+            log.debug("command: " + command);
+
+            List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+
+            log.debug("global options: " + globalOptions);
+
+            // place global options in configuration
+
+            configuration.setGlobalOptions(globalOptions);
+
+            if (command == null) {
+
+                //
+                // try to figure out the default command
+                //
+
+                String defaultCommandName = runtime.getDefaultCommandName();
+
+                if (defaultCommandName == null) {
+
+                    throw new UserErrorException(
+                            "no command specified on command line and no default command was configured");
+                }
+
+                // attempt to instantiate the default command and execute it
+                command = getCommand(defaultCommandName);
+
+                if (command == null) {
+
+                    throw new UserErrorException("...");
+                }
+            }
+
+            log.debug("initializing the runtime");
+
+            runtime.init(configuration);
+
+            log.debug("runtime initialized");
+
+            command.execute(configuration, runtime);
+
+            log.debug("command successfully executed");
+
+            return 0;
+        }
+        catch(UserErrorException e) {
+
+            String msg = "[error]: " + e.getMessage() + "\n";
+            stderrOutputStream.write(msg.getBytes());
+            stderrOutputStream.flush();
+            return 1;
+        }
+    }
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

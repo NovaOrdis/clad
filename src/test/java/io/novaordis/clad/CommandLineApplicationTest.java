@@ -264,11 +264,10 @@ public class CommandLineApplicationTest {
         assertEquals("TestApplicationRuntime", s);
     }
 
-    // main() ----------------------------------------------------------------------------------------------------------
-
+    // execute() -------------------------------------------------------------------------------------------------------
 
     @Test
-    public void main() throws Exception {
+    public void execute() throws Exception {
 
         try {
 
@@ -284,7 +283,9 @@ public class CommandLineApplicationTest {
                     };
 
 
-            CommandLineApplication.main(args);
+            int exitCode = new CommandLineApplication().execute(args);
+
+            assertEquals(0, exitCode);
 
             assertTrue(TestApplicationRuntime.isInitialized());
 
@@ -319,6 +320,37 @@ public class CommandLineApplicationTest {
             TestCommand.clear();
             assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
             assertTrue(TestCommand.getCommandOptionsInjectedByExecution().isEmpty());
+            TestApplicationRuntime.clear();
+            assertFalse(TestApplicationRuntime.isInitialized());
+        }
+    }
+
+    @Test
+    public void main_NoDefaultCommand() throws Exception {
+
+        try {
+
+            assertFalse(TestApplicationRuntime.isInitialized());
+
+            CommandLineApplication commandLineApplication = new CommandLineApplication();
+
+            MockOutputStream mos = new MockOutputStream();
+
+            commandLineApplication.setStderrOutputStream(mos);
+
+            String[] args = new String[] {"-g", "global-value"};
+
+            int exitCode = commandLineApplication.execute(args);
+
+            assertEquals(1, exitCode);
+
+            byte[] bytes = mos.getWrittenContent();
+            String msg = new String(bytes);
+            assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
+
+            assertFalse(TestApplicationRuntime.isInitialized());
+        }
+        finally {
             TestApplicationRuntime.clear();
             assertFalse(TestApplicationRuntime.isInitialized());
         }

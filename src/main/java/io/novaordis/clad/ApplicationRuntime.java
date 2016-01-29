@@ -28,6 +28,12 @@ public interface ApplicationRuntime {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * @return the default command name. The command implementation must exist somewhere on the classpath. May
+     * return null.
+     */
+    String getDefaultCommandName();
+
     void init(Configuration configuration) throws UserErrorException;
 
 }

@@ -16,46 +16,44 @@
 
 package io.novaordis.clad;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 1/28/16
  */
-public class TestApplicationRuntime implements ApplicationRuntime {
+public class MockOutputStream extends OutputStream {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    private static boolean initialized = false;
-
-    public static boolean isInitialized() {
-
-        return initialized;
-    }
-
-    public static void clear() {
-
-        initialized = false;
-    }
-
     // Attributes ------------------------------------------------------------------------------------------------------
+
+    private ByteArrayOutputStream baos;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // ApplicationRuntime implementation -------------------------------------------------------------------------------
-
-    @Override
-    public String getDefaultCommandName() {
-        return null;
+    public MockOutputStream() {
+        this.baos = new ByteArrayOutputStream();
     }
 
-    @Override
-    public void init(Configuration configuration) throws UserErrorException {
+    // OutputStream overrides ------------------------------------------------------------------------------------------
 
-        this.initialized = true;
+    @Override
+    public void write(int b) throws IOException {
+
+        baos.write(b);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public byte[] getWrittenContent() {
+
+        return baos.toByteArray();
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
