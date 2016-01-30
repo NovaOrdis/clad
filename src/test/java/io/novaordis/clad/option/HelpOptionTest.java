@@ -20,12 +20,12 @@ import io.novaordis.clad.Command;
 import io.novaordis.clad.MockOutputStream;
 import io.novaordis.clad.Test2Command;
 import io.novaordis.clad.TestCommand;
-import io.novaordis.clad.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -97,7 +97,7 @@ public class HelpOptionTest extends OptionTest {
     }
 
     @Test
-    public void displayHelp_CommandDoesNotExist() throws Exception {
+    public void displayHelp_AllCommands() throws Exception {
 
         HelpOption helpOption = new HelpOption();
         assertNull(helpOption.getCommand());
@@ -105,15 +105,11 @@ public class HelpOptionTest extends OptionTest {
 
         MockOutputStream mos = new MockOutputStream();
 
-        try {
-            helpOption.displayHelp(mos);
-            fail("should have thrown Exception");
-        }
-        catch (UserErrorException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertEquals("no command specified", msg);
-        }
+        helpOption.displayHelp(mos);
+
+        String s = mos.getWrittenString();
+        assertNotNull(s);
+        assertTrue(s.trim().length() > 0);
     }
 
     // setCommand() ----------------------------------------------------------------------------------------------------

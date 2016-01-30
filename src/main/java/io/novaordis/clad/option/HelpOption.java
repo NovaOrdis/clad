@@ -87,12 +87,7 @@ public class HelpOption extends OptionBase {
 
     public void displayHelp(OutputStream outputStream) throws Exception {
 
-        if (command == null) {
-
-            String message = commandName == null ? "no command specified" : "unknown command: '" + commandName + "'";
-            throw new UserErrorException(message);
-        }
-        else {
+        if (command != null) {
 
             // pull the help content
 
@@ -127,6 +122,24 @@ public class HelpOption extends OptionBase {
                 outputStream.flush();
             }
         }
+        else {
+
+            if (commandName != null) {
+                throw new UserErrorException("unknown command: '" + commandName + "'");
+            }
+
+            //
+            // all commands help
+            //
+
+            displayAllCommandsHelp(outputStream);
+        }
+    }
+
+    public void displayAllCommandsHelp(OutputStream outputStream) throws Exception {
+
+        outputStream.write("ALL COMMANDS HELP\n".getBytes());
+        outputStream.flush();
     }
 
     @Override

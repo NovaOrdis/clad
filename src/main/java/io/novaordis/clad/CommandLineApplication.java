@@ -255,7 +255,13 @@ public class CommandLineApplication {
                 HelpOption helpOption = Configuration.findHelpOption(globalOptions);
                 if (helpOption != null) {
                     if (helpOption.getCommand() == null) {
-                        helpOption.setCommandName(commandLineArguments.get(0));
+
+                        // no command detected on the command line and no command name following after --help=
+                        // heuristically we assume that the first argument left on the command line is an unknown
+                        // command
+                        if (!commandLineArguments.isEmpty()) {
+                            helpOption.setCommandName(commandLineArguments.get(0));
+                        }
                     }
                     helpOption.displayHelp(getStdoutOutputStream());
                     return 0;
