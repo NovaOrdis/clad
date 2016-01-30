@@ -336,6 +336,11 @@ public class InstanceFactory<I> {
      * return a list of instances of classes implementing that interface. All the classes are assumed to have a public
      * no-argument constructor. We also assume that all the implementing classes follow a consistent name pattern - if
      * the interface is Command, then the implementation is .+Command.
+     *
+     * For instantiating an individual Command or ApplicationRuntime implementation class with detailed error message
+     * on various failures, see:
+     *
+     * @see InstanceFactory#getCommand(String)
      */
     public Set<I> instances(
             Class<? extends I> interfaceType, List<JarFile> jarFiles, List<File> directories) {
