@@ -160,8 +160,13 @@ public abstract class ConfigurationTest {
         List<Option> commandOptions = Collections.emptyList();
         Configuration c = getConfigurationToTest(global, commandOptions);
 
-        Option o = c.getGlobalOption('o', "option");
-        assertEquals(so2, o);
+        try {
+            c.getGlobalOption('o', "option");
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

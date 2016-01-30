@@ -70,7 +70,7 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public Option getGlobalOption(Character shortLiteral, String longLiteral) {
+    public Option getGlobalOption(Character shortLiteral, String longLiteral) throws UserErrorException {
 
         Option result = null;
 
@@ -80,8 +80,7 @@ public class ConfigurationImpl implements Configuration {
                     (longLiteral != null && longLiteral.equals(o.getLongLiteral()))) {
 
                 if (result != null) {
-                    // duplicate option
-                    log.warn("duplicate option for -" + shortLiteral + "|--" + longLiteral);
+                    throw new UserErrorException("duplicate option -" + shortLiteral + "|--" + longLiteral);
                 }
 
                 result = o;

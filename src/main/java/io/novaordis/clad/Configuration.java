@@ -72,8 +72,11 @@ public interface Configuration {
      * as arguments are present, the last one will take precedence and a warning will be issued.
      *
      * @return the Option for the equivalent literals.
+     *
+     * @exception UserErrorException this is the first time when we tell the configuration instance that two literal
+     * (short and long) are equivalent, so if we have two different values for the same option, complain and stop.
      */
-    Option getGlobalOption(Character shortLiteral, String longLiteral);
+    Option getGlobalOption(Character shortLiteral, String longLiteral) throws UserErrorException;
 
     /**
      * The command options specified as command line arguments, immediately following the command name.
