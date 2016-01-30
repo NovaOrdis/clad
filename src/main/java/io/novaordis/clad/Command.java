@@ -23,7 +23,7 @@ package io.novaordis.clad;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/22/16
  */
-public interface Command {
+public interface Command extends Comparable<Command> {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -35,6 +35,11 @@ public interface Command {
      * @return the name (literal) of the command, as specified on the command line.
      */
     String getName();
+
+    /**
+     * @return the relative path of the help file associated with this command. The path is relative to classpath.
+     */
+    String getHelpFilePath();
 
     /**
      * @param configuration the command execution context configuration. Offers access to global options and command

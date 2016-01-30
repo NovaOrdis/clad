@@ -17,11 +17,15 @@
 package io.novaordis.clad.option;
 
 import io.novaordis.clad.Command;
+import io.novaordis.clad.InstanceFactory;
 import io.novaordis.clad.UserErrorException;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -90,18 +94,9 @@ public class HelpOption extends OptionBase {
         if (command != null) {
 
             // pull the help content
+            String helpFilePath = command.getHelpFilePath();
 
-            Class c = command.getClass();
-            String name = c.getName();
-
-            int i = name.lastIndexOf('.');
-            String helpFileName = name.substring(i + 1);
-            helpFileName = helpFileName.replace("Command", "").toLowerCase() + ".txt";
-            String path = name.substring(0, i);
-            path = path.replace(".", File.separator);
-            helpFileName = path + File.separator + helpFileName;
-
-            InputStream is = c.getClassLoader().getResourceAsStream(helpFileName);
+            InputStream is = getClass().getClassLoader().getResourceAsStream(helpFilePath);
 
             if (is == null) {
                 // help file not found
@@ -138,7 +133,35 @@ public class HelpOption extends OptionBase {
 
     public void displayAllCommandsHelp(OutputStream outputStream) throws Exception {
 
-        outputStream.write("ALL COMMANDS HELP\n".getBytes());
+        InstanceFactory<Command> i = new InstanceFactory<>();
+
+        Set<Command> commands = i.instances(
+                Command.class, InstanceFactory.getClasspathJars(), InstanceFactory.getClasspathDirectories());
+
+        List<Command> commandList = new ArrayList<>(commands);
+        Collections.sort(commandList);
+
+        outputStream.write("\n".getBytes());
+        outputStream.write("Commands:\n".getBytes());
+        outputStream.write("\n".getBytes());
+
+        for(Command c: commandList) {
+
+            String helpFilePath = c.getHelpFilePath();
+            InputStream is = getClass().getClassLoader().getResourceAsStream(helpFilePath);
+
+            outputStream.write(("  " + c.getName()).getBytes());
+
+            if (is != null) {
+                outputStream.write("\n".getBytes());
+            }
+            else {
+                // no help file found
+                outputStream.write(" (no in-line help found)\n".getBytes());
+            }
+        }
+
+        outputStream.write("\n".getBytes());
         outputStream.flush();
     }
 

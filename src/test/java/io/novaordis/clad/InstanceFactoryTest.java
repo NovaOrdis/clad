@@ -16,6 +16,9 @@
 
 package io.novaordis.clad;
 
+import a.test.Sample1Command;
+import b.test.Sample2Command;
+import c.test.Sample3Command;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 import static org.junit.Assert.assertEquals;
@@ -204,7 +208,7 @@ public class InstanceFactoryTest {
         assertEquals("c.test.Example3", names.get(2));
     }
 
-    // getFullyQualifiedClassNamesFromJARs() --------------------------------------------------------------------
+    // getFullyQualifiedClassNamesFromJARs() ---------------------------------------------------------------------------
 
     @Test
     public void getFullyQualifiedClassNamesFromJars_InvalidPattern() throws Exception {
@@ -267,6 +271,100 @@ public class InstanceFactoryTest {
         assertEquals("a.test.Example1", names.get(0));
         assertEquals("b.test.Example2", names.get(1));
         assertEquals("c.test.Example3", names.get(2));
+    }
+
+    // instances() -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void instancesFromJAR() throws Exception {
+
+        InstanceFactory<Command> commandFactory = new InstanceFactory<>();
+
+        File jarFile = new File(System.getProperty("basedir"), "src/test/resources/data/test.jar");
+        assertTrue(jarFile.isFile());
+        List<JarFile> files = Collections.singletonList(new JarFile(jarFile));
+
+        Set<Command> commands = commandFactory.instances(Command.class, files, Collections.emptyList());
+
+        assertEquals(5, commands.size());
+        boolean sample1found = false;
+        boolean sample2found = false;
+        boolean sample3found = false;
+        boolean testFound = false;
+        boolean test2Found = false;
+
+        for(Command c: commands) {
+            if (c instanceof Sample1Command) {
+                sample1found = true;
+            }
+            else if (c instanceof Sample2Command) {
+                sample2found = true;
+            }
+            else if (c instanceof Sample3Command) {
+                sample3found  = true;
+            }
+            else if (c instanceof TestCommand) {
+                testFound  = true;
+            }
+            else if (c instanceof Test2Command) {
+                test2Found  = true;
+            }
+            else {
+                fail("unknown command: " + c);
+            }
+        }
+
+        assertTrue(sample1found);
+        assertTrue(sample2found);
+        assertTrue(sample3found);
+        assertTrue(testFound);
+        assertTrue(test2Found);
+    }
+
+    @Test
+    public void instancesFromDirectory() throws Exception {
+
+        InstanceFactory<Command> commandFactory = new InstanceFactory<>();
+
+        File directory = new File(System.getProperty("basedir"), "target/test-classes");
+        assertTrue(directory.isDirectory());
+        List<File> directories = Collections.singletonList(directory);
+
+        Set<Command> commands = commandFactory.instances(Command.class, Collections.emptyList(), directories);
+
+        assertEquals(5, commands.size());
+        boolean sample1found = false;
+        boolean sample2found = false;
+        boolean sample3found = false;
+        boolean testFound = false;
+        boolean test2Found = false;
+
+        for(Command c: commands) {
+            if (c instanceof Sample1Command) {
+                sample1found = true;
+            }
+            else if (c instanceof Sample2Command) {
+                sample2found = true;
+            }
+            else if (c instanceof Sample3Command) {
+                sample3found  = true;
+            }
+            else if (c instanceof TestCommand) {
+                testFound  = true;
+            }
+            else if (c instanceof Test2Command) {
+                test2Found  = true;
+            }
+            else {
+                fail("unknown command: " + c);
+            }
+        }
+
+        assertTrue(sample1found);
+        assertTrue(sample2found);
+        assertTrue(sample3found);
+        assertTrue(testFound);
+        assertTrue(test2Found);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

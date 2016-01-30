@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/27/16
  */
-public class VersionCommandTest {
+public class VersionCommandTest extends CommandTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -113,6 +113,11 @@ public class VersionCommandTest {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected VersionCommand getCommandToTest() throws Exception {
+        return new VersionCommand();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

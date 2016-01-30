@@ -20,9 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -32,7 +35,7 @@ import java.util.regex.Pattern;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/29/16
  */
-public class InstanceFactory {
+public class InstanceFactory<I> {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -93,53 +96,8 @@ public class InstanceFactory {
      */
     public static String getFullyQualifiedClassName(String prefix, String suffix) throws Exception {
 
-        //
-        // scan the classpath and look for classes named camelCased(prefix) + suffix.
-        //
-
-        String classPath = System.getProperty(JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME);
-
-        if (classPath == null) {
-            throw new IllegalArgumentException(
-                    "no value found for system property '" + JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME + "'");
-        }
-
-        String pathSeparator = System.getProperty(PATH_SEPARATOR_SYSTEM_PROPERTY_NAME);
-
-        if (pathSeparator == null) {
-            throw new IllegalArgumentException(
-                    "no value found for system property '" + PATH_SEPARATOR_SYSTEM_PROPERTY_NAME + "'");
-        }
-
-        List<File> directories = new ArrayList<>();
-        List<JarFile> jarFiles = new ArrayList<>();
-
-        for(StringTokenizer st = new StringTokenizer(classPath, pathSeparator); st.hasMoreTokens(); ) {
-
-            String path = st.nextToken();
-            log.debug("path: " + path);
-            File f = new File(path);
-            if (f.isDirectory()) {
-
-                //
-                // directory containing classes, possibly commands
-                //
-
-                log.debug("directory: " + path);
-                directories.add(f);
-
-            }
-            else if (f.isFile()) {
-
-                //
-                // we assume it's a JAR
-                //
-
-                JarFile jarFile = new JarFile(f.getPath());
-                log.debug("JAR file: " + jarFile);
-                jarFiles.add(jarFile);
-            }
-        }
+        List<File> directories = getClasspathDirectories();
+        List<JarFile> jarFiles = getClasspathJars();
 
         String simpleClassName = toSimpleClassName(prefix, suffix);
         String fullyQualifiedClassNameRegex = ".*\\." + simpleClassName;
@@ -284,13 +242,152 @@ public class InstanceFactory {
         return result;
     }
 
+    public static List<File> getClasspathDirectories() {
+
+        //
+        // scan the classpath and look for classes named camelCased(prefix) + suffix.
+        //
+
+        String classPath = System.getProperty(JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME);
+
+        if (classPath == null) {
+            throw new IllegalArgumentException(
+                    "no value found for system property '" + JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME + "'");
+        }
+
+        String pathSeparator = System.getProperty(PATH_SEPARATOR_SYSTEM_PROPERTY_NAME);
+
+        if (pathSeparator == null) {
+            throw new IllegalArgumentException(
+                    "no value found for system property '" + PATH_SEPARATOR_SYSTEM_PROPERTY_NAME + "'");
+        }
+
+        List<File> directories = new ArrayList<>();
+
+        for (StringTokenizer st = new StringTokenizer(classPath, pathSeparator); st.hasMoreTokens(); ) {
+
+            String path = st.nextToken();
+            log.debug("path: " + path);
+            File f = new File(path);
+            if (f.isDirectory()) {
+
+                //
+                // directory containing classes, possibly commands
+                //
+
+                log.debug("directory: " + path);
+                directories.add(f);
+            }
+        }
+
+        return directories;
+    }
+
+    public static List<JarFile> getClasspathJars() throws IOException {
+
+        //
+        // scan the classpath and look for classes named camelCased(prefix) + suffix.
+        //
+
+        String classPath = System.getProperty(JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME);
+
+        if (classPath == null) {
+            throw new IllegalArgumentException(
+                    "no value found for system property '" + JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME + "'");
+        }
+
+        String pathSeparator = System.getProperty(PATH_SEPARATOR_SYSTEM_PROPERTY_NAME);
+
+        if (pathSeparator == null) {
+            throw new IllegalArgumentException(
+                    "no value found for system property '" + PATH_SEPARATOR_SYSTEM_PROPERTY_NAME + "'");
+        }
+
+        List<JarFile> jarFiles = new ArrayList<>();
+
+        for(StringTokenizer st = new StringTokenizer(classPath, pathSeparator); st.hasMoreTokens(); ) {
+
+            String path = st.nextToken();
+            log.debug("path: " + path);
+            File f = new File(path);
+            if (f.isFile()) {
+
+                //
+                // we assume it's a JAR
+                //
+
+                JarFile jarFile = new JarFile(f.getPath());
+                log.debug("JAR file: " + jarFile);
+                jarFiles.add(jarFile);
+            }
+        }
+
+        return jarFiles;
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Static Package protected -----------------------------------------------------------------------------------------------
+    /**
+     * Given a specific interface, and a list of JAR files and directories (assumed to be classpath roots) to look into,
+     * return a list of instances of classes implementing that interface. All the classes are assumed to have a public
+     * no-argument constructor. We also assume that all the implementing classes follow a consistent name pattern - if
+     * the interface is Command, then the implementation is .+Command.
+     */
+    public Set<I> instances(
+            Class<? extends I> interfaceType, List<JarFile> jarFiles, List<File> directories) {
+
+        Set<I> result = new HashSet<>();
+
+        String interfaceSimpleName = interfaceType.getSimpleName();
+
+        String classNameRegex = ".*\\..+" + interfaceSimpleName;
+        List<String> fullyQualifiedClassNamesFromJARs =
+                getFullyQualifiedClassNamesFromJars(classNameRegex, jarFiles);
+        List<String> fullyQualifiedClassNamesFromDirectories =
+                getFullyQualifiedClassNamesFromDirectories(classNameRegex, directories);
+
+        List<String> fullyQualifiedClassNames = new ArrayList<>(fullyQualifiedClassNamesFromJARs);
+        fullyQualifiedClassNames.addAll(fullyQualifiedClassNamesFromDirectories);
+
+        for(String fqcn: fullyQualifiedClassNames) {
+
+            Class c;
+
+            try {
+                c = getClass().getClassLoader().loadClass(fqcn);
+            }
+            catch (Exception e) {
+                log.debug("failed to load class " + fqcn);
+                continue;
+            }
+
+            if (!interfaceType.isAssignableFrom(c)) {
+                log.debug(interfaceType + " is not assignable from " + c);
+                continue;
+            }
+
+            I o;
+
+            try {
+                //noinspection unchecked
+                o = (I)c.newInstance();
+            }
+            catch (Exception e) {
+                log.debug("failed to instantiate class " + c);
+                continue;
+            }
+
+            result.add(o);
+        }
+
+        return result;
+    }
+
+    // Static Package protected ----------------------------------------------------------------------------------------
 
     /**
      * @return all files contained by the given directory. The file name is relative to the given directory.

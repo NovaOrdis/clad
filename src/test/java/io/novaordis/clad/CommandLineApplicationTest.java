@@ -330,30 +330,30 @@ public class CommandLineApplicationTest {
         assertFalse(TestApplicationRuntime.isInitialized());
     }
 
-//    @Test
-//    public void help_AllCommands() throws Exception {
-//
-//        MockOutputStream mos = new MockOutputStream();
-//        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
-//
-//        String[] args = new String[] { "help" };
-//
-//        //
-//        // all commands help
-//        //
-//
-//        int exitCode = commandLineApplication.execute(args);
-//
-//        assertEquals(0, exitCode);
-//
-//        String allCommandsHelp = mos.getWrittenString();
-//
-//        assertTrue(allCommandsHelp.contains("test"));
-//        assertTrue(allCommandsHelp.contains("test2"));
-//        assertTrue(allCommandsHelp.contains("version"));
-//
-//        assertFalse(TestApplicationRuntime.isInitialized());
-//    }
+    @Test
+    public void help_AllCommands() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos, null);
+
+        String[] args = new String[] { "help" };
+
+        //
+        // all commands help
+        //
+
+        int exitCode = commandLineApplication.execute(args);
+
+        assertEquals(0, exitCode);
+
+        String allCommandsHelp = mos.getWrittenString();
+
+        assertTrue(allCommandsHelp.contains("test"));
+        assertTrue(allCommandsHelp.contains("test2"));
+        assertTrue(allCommandsHelp.contains("version"));
+
+        assertFalse(TestApplicationRuntime.isInitialized());
+    }
 
     @Test
     public void help2() throws Exception {

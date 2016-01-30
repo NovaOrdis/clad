@@ -14,40 +14,21 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package c.test;
 
+import io.novaordis.clad.ApplicationRuntime;
+import io.novaordis.clad.Configuration;
 import io.novaordis.clad.command.CommandBase;
-import io.novaordis.clad.option.Option;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 1/29/16
  */
-public class TestCommand extends CommandBase {
+public class Sample3Command extends CommandBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    private static final List<Option> globalOptionsInjectedByExecution = new ArrayList<>();
-    private static final List<Option> commandOptionsInjectedByExecution = new ArrayList<>();
-
-    public static List<Option> getGlobalOptionsInjectedByExecution() {
-        return globalOptionsInjectedByExecution;
-    }
-
-    public static List<Option> getCommandOptionsInjectedByExecution() {
-        return commandOptionsInjectedByExecution;
-    }
-
-    public static void clear() {
-
-        globalOptionsInjectedByExecution.clear();
-        commandOptionsInjectedByExecution.clear();
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -56,14 +37,8 @@ public class TestCommand extends CommandBase {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
-
-        //
-        // inject global options and command options into the static lists for testing
-        //
-
-        globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
-        commandOptionsInjectedByExecution.addAll(configuration.getCommandOptions());
+    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
+        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

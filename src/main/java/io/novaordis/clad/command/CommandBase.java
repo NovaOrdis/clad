@@ -14,40 +14,19 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.command;
 
-import io.novaordis.clad.command.CommandBase;
-import io.novaordis.clad.option.Option;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.novaordis.clad.Command;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 1/29/16
  */
-public class TestCommand extends CommandBase {
+public abstract class CommandBase implements Command {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    private static final List<Option> globalOptionsInjectedByExecution = new ArrayList<>();
-    private static final List<Option> commandOptionsInjectedByExecution = new ArrayList<>();
-
-    public static List<Option> getGlobalOptionsInjectedByExecution() {
-        return globalOptionsInjectedByExecution;
-    }
-
-    public static List<Option> getCommandOptionsInjectedByExecution() {
-        return commandOptionsInjectedByExecution;
-    }
-
-    public static void clear() {
-
-        globalOptionsInjectedByExecution.clear();
-        commandOptionsInjectedByExecution.clear();
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -56,14 +35,28 @@ public class TestCommand extends CommandBase {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
+    public int compareTo(Command o) {
 
-        //
-        // inject global options and command options into the static lists for testing
-        //
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        return getName().compareTo(o.getName());
+    }
 
-        globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
-        commandOptionsInjectedByExecution.addAll(configuration.getCommandOptions());
+    @Override
+    public String getName() {
+
+        String s = getClass().getSimpleName();
+        return s.replaceAll("Command", "").toLowerCase();
+    }
+
+    @Override
+    public String getHelpFilePath() {
+
+        String s = getClass().getName();
+        s = s.substring(0, s.lastIndexOf('.'));
+        s = s.replace('.', '/');
+        return s + "/" + getName() + ".txt";
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

@@ -16,11 +16,13 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.command.CommandBase;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public class Test2Command implements Command {
+public class Test2Command extends CommandBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -31,12 +33,6 @@ public class Test2Command implements Command {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Command implementation ------------------------------------------------------------------------------------------
-
-    @Override
-    public String getName() {
-
-        return "test2";
-    }
 
     @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {

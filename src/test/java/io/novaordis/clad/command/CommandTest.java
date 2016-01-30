@@ -16,74 +16,65 @@
 
 package io.novaordis.clad.command;
 
-import io.novaordis.clad.ApplicationRuntime;
-import io.novaordis.clad.Configuration;
-import io.novaordis.clad.UserErrorException;
-import io.novaordis.utilities.VersionUtilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.novaordis.clad.Command;
+import org.junit.Test;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/27/16
+ * @since 1/29/16
  */
-public class VersionCommand extends CommandBase {
+public abstract class CommandTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    private static final Logger log = LoggerFactory.getLogger(VersionCommand.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private OutputStream os;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    // Command implementation ------------------------------------------------------------------------------------------
-
-    @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
-
-        String version = VersionUtilities.getVersion();
-        String releaseDate = VersionUtilities.getReleaseDate();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("version ").append((version == null ? "N/A" : version)).append("\n");
-        sb.append("release date ").append((releaseDate == null ? "N/A" : releaseDate)).append("\n");
-
-        if (os == null) {
-            System.out.print(sb);
-        }
-        else {
-            try {
-                os.write(sb.toString().getBytes());
-                os.flush();
-            }
-            catch(IOException e) {
-
-                log.error("failed to write to output stream", e);
-            }
-        }
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public void setOutputStream(OutputStream os) {
-        this.os = os;
+    // getName() -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getName() throws Exception {
+
+        Command c = getCommandToTest();
+        String name = c.getName();
+        assertNotNull(name);
+
+        String s = c.getClass().getSimpleName();
+        s = s.replaceAll("Command", "").toLowerCase();
+        assertEquals(s, name);
     }
 
-    public OutputStream getOutputStream() {
-        return os;
+    // getHelpFilePath() -----------------------------------------------------------------------------------------------
+
+    @Test
+    public void getHelpFilePath() throws Exception {
+
+        Command c = getCommandToTest();
+        String helpFilePath = c.getHelpFilePath();
+        assertNotNull(helpFilePath);
+
+        String s = c.getClass().getName();
+        s = s.substring(0, s.lastIndexOf('.'));
+        s = s.replace('.', '/');
+        s = s + "/" + c.getName() + ".txt";
+        assertEquals(s, helpFilePath);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected abstract Command getCommandToTest() throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 
