@@ -58,6 +58,10 @@ public class StringOption extends OptionBase {
         this.value = s;
     }
 
+    public String getString() {
+        return getValue();
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

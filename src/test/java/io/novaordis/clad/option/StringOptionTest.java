@@ -46,6 +46,8 @@ public class StringOptionTest extends OptionTest {
 
         o.setValue("test-value");
         assertEquals("test-value", o.getValue());
+
+        assertEquals("test-value", o.getString());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
