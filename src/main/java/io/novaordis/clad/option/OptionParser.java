@@ -191,6 +191,16 @@ public class OptionParser {
 
                     for(int j = 0; j < toRemoveCount; j ++) {
                         commandLineArguments.remove(index + 1);
+                        i--;
+                    }
+
+                    toRemoveCount = 0;
+
+                    if (doubleQuote) {
+                        doubleQuoted = null;
+                    }
+                    else {
+                        singleQuoted = null;
                     }
                 }
                 else if (doubleQuoted != null) {

@@ -346,6 +346,21 @@ public class OptionParserTest {
         assertEquals("b c d", args.get(1));
     }
 
+    @Test
+    public void parse_TwoQuotedStrings() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-f \"a b c\" --format \"x y\"");
+
+        OptionParser.handleQuotes(0, args);
+
+        assertEquals(4, args.size());
+
+        assertEquals("-f", args.get(0));
+        assertEquals("a b c", args.get(1));
+        assertEquals("--format", args.get(2));
+        assertEquals("x y", args.get(3));
+    }
+
     // typeHeuristics() ------------------------------------------------------------------------------------------------
 
     @Test
