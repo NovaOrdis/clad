@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -41,6 +42,7 @@ public class InstanceFactory {
     public static final String PATH_SEPARATOR_SYSTEM_PROPERTY_NAME = "path.separator";
 
     public static final int DIRECTORIES_ARE_SEARCHED_FIRST = 0;
+    @SuppressWarnings("unused")
     public static final int JARS_ARE_SEARCHED_FIRST = 1;
 
     // Static ----------------------------------------------------------------------------------------------------------
@@ -140,34 +142,56 @@ public class InstanceFactory {
         }
 
         String simpleClassName = toSimpleClassName(prefix, suffix);
-        String fullyQualifiedClassName;
+        String fullyQualifiedClassNameRegex = ".*\\." + simpleClassName;
+
+        List<String> fqcns;
 
         //
         // by default directories have priority in search
         //
 
-        if (searchOrder == DIRECTORIES_ARE_SEARCHED_FIRST) {
+        int so = searchOrder;
 
-            fullyQualifiedClassName = getFullyQualifiedClassNameFromDirectories(simpleClassName, directories);
-            if (fullyQualifiedClassName == null) {
-                fullyQualifiedClassName = getFullyQualifiedClassNameFromJars(simpleClassName, jarFiles);
+        for(int counter = 0; counter < 2; counter ++) {
+
+            if (so == DIRECTORIES_ARE_SEARCHED_FIRST) {
+
+                //
+                // Directories are searched now
+                //
+
+                fqcns = getFullyQualifiedClassNamesFromDirectories(fullyQualifiedClassNameRegex, directories);
+
             }
-        }
-        else if (searchOrder == JARS_ARE_SEARCHED_FIRST) {
+            else {
+
+                //
+                // JARs are searched now
+                //
+
+                fqcns = getFullyQualifiedClassNamesFromJars(fullyQualifiedClassNameRegex, jarFiles);
+            }
+
+            if (fqcns.size() > 1) {
+                throw new UserErrorException("more than one class matches " + simpleClassName + ": " + fqcns);
+            }
+
+            if (fqcns.size() == 1) {
+
+                //
+                // just one, found it
+                //
+                return fqcns.get(0);
+            }
 
             //
-            // reverse the search order
+            // we did not find it in directories/JAR, try to find it in JARs/directories by looping or exit
             //
-            fullyQualifiedClassName = getFullyQualifiedClassNameFromJars(simpleClassName, jarFiles);
-            if (fullyQualifiedClassName == null) {
-                fullyQualifiedClassName = getFullyQualifiedClassNameFromDirectories(simpleClassName, directories);
-            }
-        }
-        else {
-            throw new IllegalArgumentException("invalid search order " + searchOrder);
+
+            so = (so + 1) % 2;
         }
 
-        return fullyQualifiedClassName;
+        return null;
     }
 
     public static String toSimpleClassName(String prefix, String suffix) {
@@ -182,6 +206,82 @@ public class InstanceFactory {
 
 
         return Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1).toLowerCase() + suffix;
+    }
+
+    /**
+     * Recursively scan the given directories looking for files whose paths, relative to those directories, match
+     * the given pattern. Useful when looking for specific classes in a classpath directory.
+     *
+     * @param fullyQualifiedClassNameRegex the Java regular expression to match against the fully qualified name.
+     *                                     Must NOT include .class at the end, that is appended internally.
+     */
+    public static List<String> getFullyQualifiedClassNamesFromDirectories(
+            String fullyQualifiedClassNameRegex, List<File> dirs) {
+
+        if (fullyQualifiedClassNameRegex.endsWith(".class")) {
+            throw new IllegalArgumentException("the fully qualified class name regular expression must not end in '.class'");
+        }
+
+        Pattern pattern = Pattern.compile(fullyQualifiedClassNameRegex + "\\.class");
+
+        List<String> result = new ArrayList<>();
+
+        for(File dir: dirs) {
+
+            if (!dir.isDirectory()) {
+                continue;
+            }
+
+            String dirName = dir.getPath();
+
+            //noinspection Convert2streamapi
+            for(String fileName: getFileNames(dir.getPath(), dir)) {
+
+                String candidateClassName = fileName.substring(dirName.length() + 1);
+                candidateClassName = candidateClassName.replace(File.separator, ".");
+
+                if (pattern.matcher(candidateClassName).matches()) {
+                    candidateClassName =
+                            candidateClassName.substring(0, candidateClassName.length() - ".class".length());
+                    result.add(candidateClassName);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Recursively scan the given JAR files looking for embedded files whose paths, relative to those JARs, match
+     * the given pattern. Useful when looking for specific classes in classpath JAR.
+     *
+     * @param fullyQualifiedClassNameRegex the Java regular expression to match against the fully qualified name.
+     *                                     Must NOT include .class at the end, that is appended internally.
+     */
+    public static List<String> getFullyQualifiedClassNamesFromJars(
+            String fullyQualifiedClassNameRegex, List<JarFile> jarFiles) {
+
+        if (fullyQualifiedClassNameRegex.endsWith(".class")) {
+            throw new IllegalArgumentException("the fully qualified class name regular expression must not end in '.class'");
+        }
+
+        Pattern pattern = Pattern.compile(fullyQualifiedClassNameRegex + "\\.class");
+
+        List<String> result = new ArrayList<>();
+
+        for(JarFile jarFile: jarFiles) {
+
+            for(Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
+                JarEntry entry = entries.nextElement();
+                String className = entry.getName().replace(File.separatorChar, '.');
+                if (pattern.matcher(className).matches()) {
+                    className = className.substring(0, className.length() - ".class".length());
+                    result.add(className);
+                }
+            }
+        }
+
+        return result;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -225,56 +325,6 @@ public class InstanceFactory {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Static Private --------------------------------------------------------------------------------------------------
-
-    /**
-     * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
-     * The search is performed only in the specified directories. May return null if no such class is found.
-     */
-    private static String getFullyQualifiedClassNameFromDirectories(String simpleClassName, List<File> directories) {
-
-        for(File dir: directories) {
-
-            if (!dir.isDirectory()) {
-                continue;
-            }
-
-            //noinspection Convert2streamapi
-            for(String fileName: getFileNames(dir.getPath(), dir)) {
-
-                if (fileName.endsWith(File.separator + simpleClassName + ".class")) {
-
-                    String className = fileName.substring(dir.getPath().length() + 1);
-                    className = className.substring(0, className.length() - ".class".length());
-                    className = className.replace(File.separatorChar, '.');
-                    return className;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
-     * The search is performed only in the specified JAR files. May return null if no such class is found.
-     */
-    private static String getFullyQualifiedClassNameFromJars(String simpleClassName, List<JarFile> jarFiles) {
-
-        for(JarFile jarFile: jarFiles) {
-
-            for(Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
-                JarEntry entry = entries.nextElement();
-                String className = entry.getName();
-                if (className.endsWith(File.separator + simpleClassName + ".class")) {
-                    className = className.substring(0, className.length() - ".class".length());
-                    className = className.replace(File.separatorChar, '.');
-                    return className;
-                }
-            }
-        }
-
-        return null;
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

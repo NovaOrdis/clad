@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.jar.JarFile;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -68,15 +70,15 @@ public class InstanceFactoryTest {
         String basedir = System.getProperty("basedir");
         assertNotNull(basedir);
 
-        File data = new File(basedir, "src/test/resources/data");
-        assertTrue(data.isDirectory());
+        File testDir = new File(basedir, "src/test/resources/data/testDir");
+        assertTrue(testDir.isDirectory());
 
-        List<String> names = InstanceFactory.getFileNames(data.getPath(), data);
+        List<String> names = InstanceFactory.getFileNames(testDir.getPath(), testDir);
         assertEquals(2, names.size());
 
-        String name = data.getPath() + File.separator + "testDir" + File.separator  + "A.txt";
+        String name = testDir.getPath() + File.separator  + "A.txt";
         assertEquals(name, names.get(0));
-        name = data.getPath() + File.separator + "testDir" + File.separator  + "testSubDir" +  File.separator  + "B.txt";
+        name = testDir.getPath() + File.separator  + "testSubDir" +  File.separator  + "B.txt";
         assertEquals(name, names.get(1));
     }
 
@@ -135,6 +137,136 @@ public class InstanceFactoryTest {
 
         String s = InstanceFactory.toSimpleClassName("TEST", "ApplicationRuntime");
         assertEquals("TestApplicationRuntime", s);
+    }
+
+    // getFullyQualifiedClassNamesFromDirectories() --------------------------------------------------------------------
+
+    @Test
+    public void getFullyQualifiedClassNamesFromDirectories_InvalidPattern() throws Exception {
+
+        List<File> dirs = Collections.emptyList();
+
+        try {
+            InstanceFactory.getFullyQualifiedClassNamesFromDirectories(".*\\..*2\\.class", dirs);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromDirectories_NoSuchClass() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File dir = new File(s, "target/test-classes");
+        assertTrue(dir.isDirectory());
+
+        List<File> dirs = Collections.singletonList(dir);
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromDirectories(".*nosuchclass.*", dirs);
+
+        assertTrue(names.isEmpty());
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromDirectories_OneClassMatches() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File dir = new File(s, "target/test-classes");
+        assertTrue(dir.isDirectory());
+
+        List<File> dirs = Collections.singletonList(dir);
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromDirectories(".*\\..*2", dirs);
+
+        assertEquals(1, names.size());
+        assertEquals("b.test.Example2", names.get(0));
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromDirectories_MultipleClassesMatch() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File dir = new File(s, "target/test-classes");
+        assertTrue(dir.isDirectory());
+
+        List<File> dirs = Collections.singletonList(dir);
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromDirectories(".*\\.Example.", dirs);
+
+        assertEquals(3, names.size());
+        assertEquals("a.test.Example1", names.get(0));
+        assertEquals("b.test.Example2", names.get(1));
+        assertEquals("c.test.Example3", names.get(2));
+    }
+
+    // getFullyQualifiedClassNamesFromJARs() --------------------------------------------------------------------
+
+    @Test
+    public void getFullyQualifiedClassNamesFromJars_InvalidPattern() throws Exception {
+
+        List<JarFile> files = Collections.emptyList();
+
+        try {
+            InstanceFactory.getFullyQualifiedClassNamesFromJars(".*\\..*2\\.class", files);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromJars_NoSuchClass() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File jarFile = new File(s, "src/test/resources/data/test.jar");
+        assertTrue(jarFile.isFile());
+
+        List<JarFile> files = Collections.singletonList(new JarFile(jarFile));
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromJars(".*nosuchclass.*", files);
+
+        assertTrue(names.isEmpty());
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromJars_OneClassMatches() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File jarFile = new File(s, "src/test/resources/data/test.jar");
+        assertTrue(jarFile.isFile());
+
+        List<JarFile> files = Collections.singletonList(new JarFile(jarFile));
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromJars(".*\\..*2", files);
+
+        assertEquals(1, names.size());
+        assertEquals("b.test.Example2", names.get(0));
+    }
+
+    @Test
+    public void getFullyQualifiedClassNamesFromJars_MultipleClassesMatch() throws Exception {
+
+        String s = System.getProperty("basedir");
+        assertNotNull(s);
+        File jarFile = new File(s, "src/test/resources/data/test.jar");
+        assertTrue(jarFile.isFile());
+
+        List<JarFile> files = Collections.singletonList(new JarFile(jarFile));
+
+        List<String> names = InstanceFactory.getFullyQualifiedClassNamesFromJars(".*\\.Example.", files);
+
+        assertEquals(3, names.size());
+        assertEquals("a.test.Example1", names.get(0));
+        assertEquals("b.test.Example2", names.get(1));
+        assertEquals("c.test.Example3", names.get(2));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
