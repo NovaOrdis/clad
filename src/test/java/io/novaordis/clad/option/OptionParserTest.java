@@ -393,6 +393,38 @@ public class OptionParserTest {
         assertEquals("x y", args.get(3));
     }
 
+    @Test
+    public void handleDoubleQuotes_EscapedQuotes() throws Exception {
+
+        char[] arg0 = new char[] { '-', 'f' };
+        char[] arg1 = new char[] { '"', '\\', '"', '%', 'I', '\\', '"' };
+        char[] arg2 = new char[] { '%', 'h' };
+        char[] arg3 = new char[] { '%', 'u' };
+        char[] arg4 = new char[] { '[', '%', 't', ']' };
+        char[] arg5 = new char[] { '\\', '"', '%', 'r', '\\', '"' };
+        char[] arg6 = new char[] { '%', 's' };
+        char[] arg7 = new char[] { '%', 'b' };
+        char[] arg8 = new char[] { '%', 'D', '"' };
+
+        List<String> args = new ArrayList<>(Arrays.asList(
+                new String(arg0),
+                new String(arg1),
+                new String(arg2),
+                new String(arg3),
+                new String(arg4),
+                new String(arg5),
+                new String(arg6),
+                new String(arg7),
+                new String(arg8)));
+
+        OptionParser.handleQuotes(0, args);
+
+        assertEquals(2, args.size());
+
+        assertEquals("-f", args.get(0));
+        assertEquals("\"%I\" %h %u [%t] \"%r\" %s %b %D", args.get(1));
+    }
+
     // typeHeuristics() ------------------------------------------------------------------------------------------------
 
     @Test

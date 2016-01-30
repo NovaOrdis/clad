@@ -166,7 +166,12 @@ public class OptionParser {
 
                 toRemoveCount ++;
 
-                if (current.endsWith("\"") || current.endsWith("'")) {
+                if ((current.endsWith("\"") && current.charAt(current.length() - 2) != '\\') ||
+                    (current.endsWith("'") && current.charAt(current.length() - 2) != '\\'))
+                {
+                    //
+                    // end quote (but NOT escaped quote)
+                    //
 
                     boolean doubleQuote = current.endsWith("\"");
 
@@ -214,6 +219,18 @@ public class OptionParser {
                     }
             }
         }
+
+        //
+        // at this point the commandLineArguments list may contain escaped quotes - replace them with simple quotes
+        //
+
+        for(int i = from; i < commandLineArguments.size(); i++) {
+
+            String arg = commandLineArguments.get(i);
+            arg = arg.replaceAll("\\\\", "");
+            commandLineArguments.set(i, arg);
+        }
+
     }
 
     public static Object typeHeuristics(String value) {

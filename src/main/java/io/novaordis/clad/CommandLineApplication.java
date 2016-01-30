@@ -287,7 +287,7 @@ public class CommandLineApplication {
 
                 if (command == null) {
 
-                    throw new UserErrorException("...");
+                    throw new UserErrorException("no command specified and no default command configured");
                 }
             }
 
