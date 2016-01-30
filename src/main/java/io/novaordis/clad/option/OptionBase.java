@@ -16,8 +16,6 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.option.Option;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
@@ -61,16 +59,18 @@ public abstract class OptionBase implements Option {
     @Override
     public String toString() {
 
+        String value = getValue() == null ? "" : "\"" + getValue() + "\"";
+
         if (getShortLiteral() != null) {
 
             if (getLongLiteral() != null) {
 
-                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=\"" + getValue() + "\"";
+                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=" + value;
             }
-            return "-" + getShortLiteral() + " \"" + getValue() + "\"";
+            return "-" + getShortLiteral() + " " + value;
         }
         else {
-            return "--" + getLongLiteral() + "=\"" + getValue() + "\"";
+            return "--" + getLongLiteral() + "=" + value;
         }
     }
 

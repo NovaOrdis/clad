@@ -17,6 +17,8 @@
 package io.novaordis.clad;
 
 import io.novaordis.clad.option.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -27,6 +29,8 @@ import java.util.List;
 public class ConfigurationImpl implements Configuration {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(ConfigurationImpl.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -63,6 +67,28 @@ public class ConfigurationImpl implements Configuration {
     public List<Option> getGlobalOptions() {
 
         return globalOptions;
+    }
+
+    @Override
+    public Option getGlobalOption(Character shortLiteral, String longLiteral) {
+
+        Option result = null;
+
+        for(Option o: globalOptions) {
+
+            if (shortLiteral != null && shortLiteral.equals(o.getShortLiteral()) ||
+                    (longLiteral != null && longLiteral.equals(o.getLongLiteral()))) {
+
+                if (result != null) {
+                    // duplicate option
+                    log.warn("duplicate option for -" + shortLiteral + "|--" + longLiteral);
+                }
+
+                result = o;
+            }
+        }
+
+        return result;
     }
 
     @Override

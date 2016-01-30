@@ -19,11 +19,14 @@ package io.novaordis.clad;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,43 +50,44 @@ public abstract class ConfigurationTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    @Before
+    public void setup() {
+        System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "something");
+    }
+
+    @After
+    public void tearDown() {
+        System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Test
     public void initialization() throws Exception {
 
-        try {
+        StringOption gso = new StringOption('g');
+        gso.setValue("gval");
+        StringOption cso = new StringOption('c');
+        cso.setValue("cval");
 
-            System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "something");
+        Configuration c = getConfigurationToTest(
+                new ArrayList<>(Collections.singletonList(gso)),
+                new ArrayList<>(Collections.singletonList(cso)));
 
-            StringOption gso = new StringOption('g');
-            gso.setValue("gval");
-            StringOption cso = new StringOption('c');
-            cso.setValue("cval");
+        assertEquals(1, c.getGlobalOptions().size());
+        assertEquals(1, c.getCommandOptions().size());
 
-            Configuration c = getConfigurationToTest(
-                    new ArrayList<>(Collections.singletonList(gso)),
-                    new ArrayList<>(Collections.singletonList(cso)));
+        assertEquals("gval", ((StringOption) c.getGlobalOptions().get(0)).getValue());
+        assertEquals("cval", ((StringOption) c.getCommandOptions().get(0)).getValue());
 
-            assertEquals(1, c.getGlobalOptions().size());
-            assertEquals(1, c.getCommandOptions().size());
-
-            assertEquals("gval", ((StringOption) c.getGlobalOptions().get(0)).getValue());
-            assertEquals("cval", ((StringOption) c.getCommandOptions().get(0)).getValue());
-
-            assertEquals("something", c.getApplicationName());
-        }
-        finally {
-
-            System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
-        }
+        assertEquals("something", c.getApplicationName());
     }
 
     @Test
     public void noApplicationName() throws Exception {
 
         try {
-
+            System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
             getConfigurationToTest(Collections.emptyList(), Collections.emptyList());
             fail("should have thrown exception, no application name");
         }
@@ -109,6 +113,55 @@ public abstract class ConfigurationTest {
 
         HelpOption o = new HelpOption();
         assertEquals(o, Configuration.findHelpOption(Collections.singletonList(o)));
+    }
+
+    // getGlobalOption() -----------------------------------------------------------------------------------------------
+
+    @Test
+    public void getGlobalOption_EquivalentLiterals_NonePresent() throws Exception {
+
+        List<Option> global = Collections.emptyList();
+        List<Option> commandOptions = Collections.emptyList();
+        Configuration c = getConfigurationToTest(global, commandOptions);
+
+        assertNull(c.getGlobalOption('o', "option"));
+    }
+
+    @Test
+    public void getGlobalOption_EquivalentLiterals_ShortPresent() throws Exception {
+
+        StringOption so = new StringOption('o');
+        List<Option> global = Arrays.asList(new StringOption('a'), new StringOption('b'), so);
+        List<Option> commandOptions = Collections.emptyList();
+        Configuration c = getConfigurationToTest(global, commandOptions);
+
+        Option o = c.getGlobalOption('o', "option");
+        assertEquals(so, o);
+    }
+
+    @Test
+    public void getGlobalOption_EquivalentLiterals_LongPresent() throws Exception {
+
+        StringOption so = new StringOption("option");
+        List<Option> global = Arrays.asList(new StringOption("something"), new StringOption('b'), so);
+        List<Option> commandOptions = Collections.emptyList();
+        Configuration c = getConfigurationToTest(global, commandOptions);
+
+        Option o = c.getGlobalOption('o', "option");
+        assertEquals(so, o);
+    }
+
+    @Test
+    public void getGlobalOption_EquivalentLiterals_BothPresent() throws Exception {
+
+        StringOption so = new StringOption("option");
+        StringOption so2 = new StringOption('o');
+        List<Option> global = Arrays.asList(new StringOption("something"), so, so2);
+        List<Option> commandOptions = Collections.emptyList();
+        Configuration c = getConfigurationToTest(global, commandOptions);
+
+        Option o = c.getGlobalOption('o', "option");
+        assertEquals(so2, o);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

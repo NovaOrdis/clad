@@ -45,7 +45,7 @@ public class CommandLineApplication {
 
         //noinspection finally
         try {
-            exitCode = new CommandLineApplication().execute(args);
+            exitCode = new CommandLineApplication().run(args);
         }
         finally {
             System.exit(exitCode);
@@ -214,7 +214,7 @@ public class CommandLineApplication {
     /**
      * @return the exit code to be returned by the process on exit.
      */
-    int execute(String[] args) throws Exception {
+    int run(String[] args) throws Exception {
 
         try {
 

@@ -208,7 +208,7 @@ public class CommandLineApplicationTest {
                     };
 
 
-            int exitCode = new CommandLineApplication().execute(args);
+            int exitCode = new CommandLineApplication().run(args);
 
             assertEquals(0, exitCode);
 
@@ -265,7 +265,7 @@ public class CommandLineApplicationTest {
 
             String[] args = new String[] {"-g", "global-value"};
 
-            int exitCode = commandLineApplication.execute(args);
+            int exitCode = commandLineApplication.run(args);
 
             assertEquals(1, exitCode);
 
@@ -296,7 +296,7 @@ public class CommandLineApplicationTest {
 
             String[] args = new String[] {"something"};
 
-            int exitCode = commandLineApplication.execute(args);
+            int exitCode = commandLineApplication.run(args);
 
             assertEquals(1, exitCode);
 
@@ -322,7 +322,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"help", "test"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
@@ -342,7 +342,7 @@ public class CommandLineApplicationTest {
         // all commands help
         //
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
@@ -363,7 +363,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"--help", "test"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
@@ -379,7 +379,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"--help=test"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
@@ -395,7 +395,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"-h", "test"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
@@ -411,7 +411,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"help", "no-such-command"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(1, exitCode);
         String msg = mos.getWrittenString();
@@ -427,7 +427,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"--help", "no-such-command"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(1, exitCode);
         assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());
@@ -442,7 +442,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"--help=no-such-command"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(1, exitCode);
         assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());
@@ -457,7 +457,7 @@ public class CommandLineApplicationTest {
 
         String[] args = new String[] {"-h", "no-such-command"};
 
-        int exitCode = commandLineApplication.execute(args);
+        int exitCode = commandLineApplication.run(args);
 
         assertEquals(1, exitCode);
         assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());

@@ -66,6 +66,16 @@ public interface Configuration {
     List<Option> getGlobalOptions();
 
     /**
+     * Convenience method to query the global options list and return the option corresponding to an "equivalent" pair
+     * of short and long literals. If an option corresponding to either the short literal or the long literal is
+     * present, it will be returned. If more than one option corresponding to the short and the long literal specified
+     * as arguments are present, the last one will take precedence and a warning will be issued.
+     *
+     * @return the Option for the equivalent literals.
+     */
+    Option getGlobalOption(Character shortLiteral, String longLiteral);
+
+    /**
      * The command options specified as command line arguments, immediately following the command name.
      */
     List<Option> getCommandOptions();
