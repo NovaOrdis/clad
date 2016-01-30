@@ -196,6 +196,38 @@ public class OptionParserTest {
         }
     }
 
+    @Test
+    public void parse_Long() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-t 2");
+
+        List<Option> options = OptionParser.parse(0, args);
+
+        assertEquals(0, args.size());
+
+        assertEquals(1, options.size());
+
+        LongOption longOption = (LongOption)options.get(0);
+        assertEquals(2L, longOption.getLong().longValue());
+        assertEquals('t', longOption.getShortLiteral().charValue());
+    }
+
+    @Test
+    public void parse_Double() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-t 2.1");
+
+        List<Option> options = OptionParser.parse(0, args);
+
+        assertEquals(0, args.size());
+
+        assertEquals(1, options.size());
+
+        DoubleOption doubleOption = (DoubleOption)options.get(0);
+        assertEquals(2.1d, doubleOption.getDouble().doubleValue(), 0.00001);
+        assertEquals('t', doubleOption.getShortLiteral().charValue());
+    }
+
     // handleQuotes ----------------------------------------------------------------------------------------------------
 
     @Test
@@ -347,7 +379,7 @@ public class OptionParserTest {
     }
 
     @Test
-    public void parse_TwoQuotedStrings() throws Exception {
+    public void handleDoubleQuotes_TwoQuotedStrings() throws Exception {
 
         List<String> args = tokenizeCommandLine("-f \"a b c\" --format \"x y\"");
 

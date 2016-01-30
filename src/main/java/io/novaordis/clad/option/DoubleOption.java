@@ -53,6 +53,8 @@ public class DoubleOption extends OptionBase {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    public Double getDouble() { return getValue(); }
+
     public void setValue(Double d) {
         this.value = d;
     }

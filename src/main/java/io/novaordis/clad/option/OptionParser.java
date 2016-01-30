@@ -96,11 +96,13 @@ public class OptionParser {
 
                     }
                     else if (value instanceof Long) {
-                        throw new RuntimeException("NOT YET IMPLEMENTED " + value);
+                        option = new LongOption(shortLiteral);
+                        ((LongOption)option).setValue((Long)value);
 
                     }
                     else if (value instanceof Double) {
-                        throw new RuntimeException("NOT YET IMPLEMENTED " + value);
+                        option = new DoubleOption(shortLiteral);
+                        ((DoubleOption)option).setValue((Double)value);
                     }
                     else {
                         throw new RuntimeException("NOT YET IMPLEMENTED " + value);

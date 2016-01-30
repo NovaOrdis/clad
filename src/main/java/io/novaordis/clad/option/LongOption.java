@@ -53,6 +53,8 @@ public class LongOption extends OptionBase {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    public Long getLong() { return getValue(); }
+
     public void setValue(Long l) {
         this.value = l;
     }
