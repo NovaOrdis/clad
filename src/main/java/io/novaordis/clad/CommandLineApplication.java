@@ -47,6 +47,9 @@ public class CommandLineApplication {
         try {
             exitCode = new CommandLineApplication().run(args);
         }
+        catch(Throwable t) {
+            log.error("internal error", t);
+        }
         finally {
             System.exit(exitCode);
         }
