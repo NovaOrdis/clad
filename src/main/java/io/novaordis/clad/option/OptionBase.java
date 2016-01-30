@@ -54,8 +54,6 @@ public abstract class OptionBase implements Option {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public abstract Object getValue();
-
     @Override
     public String toString() {
 
