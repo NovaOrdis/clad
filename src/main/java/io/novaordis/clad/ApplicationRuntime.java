@@ -34,6 +34,6 @@ public interface ApplicationRuntime {
      */
     String getDefaultCommandName();
 
-    void init(Configuration configuration) throws UserErrorException;
+    void init(Configuration configuration) throws Exception;
 
 }
