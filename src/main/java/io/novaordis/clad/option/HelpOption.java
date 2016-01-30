@@ -141,6 +141,16 @@ public class HelpOption extends OptionBase {
         List<Command> commandList = new ArrayList<>(commands);
         Collections.sort(commandList);
 
+        //
+        // iterate over the list of commands and determine the max display width
+        //
+        int width = -1;
+        for(Command c: commandList) {
+            if (c.getName().length() > width) {
+                width = c.getName().length();
+            }
+        }
+
         outputStream.write("\n".getBytes());
         outputStream.write("Commands:\n".getBytes());
         outputStream.write("\n".getBytes());
@@ -149,16 +159,16 @@ public class HelpOption extends OptionBase {
 
             String helpFilePath = c.getHelpFilePath();
             InputStream is = getClass().getClassLoader().getResourceAsStream(helpFilePath);
+            boolean helpAvailable = is != null;
 
-            outputStream.write(("  " + c.getName()).getBytes());
+            String format = "  %1$-" + width + "s";
+            outputStream.write(String.format(format, c.getName()).getBytes());
 
-            if (is != null) {
-                outputStream.write("\n".getBytes());
+            if (!helpAvailable) {
+                outputStream.write(" (no in-line help found)".getBytes());
             }
-            else {
-                // no help file found
-                outputStream.write(" (no in-line help found)\n".getBytes());
-            }
+
+            outputStream.write("\n".getBytes());
         }
 
         outputStream.write("\n".getBytes());
