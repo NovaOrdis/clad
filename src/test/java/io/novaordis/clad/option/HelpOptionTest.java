@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -99,6 +100,8 @@ public class HelpOptionTest extends OptionTest {
     public void displayHelp_CommandDoesNotExist() throws Exception {
 
         HelpOption helpOption = new HelpOption();
+        assertNull(helpOption.getCommand());
+        assertNull(helpOption.getValue());
 
         MockOutputStream mos = new MockOutputStream();
 
@@ -109,7 +112,7 @@ public class HelpOptionTest extends OptionTest {
         catch (UserErrorException e) {
             String msg = e.getMessage();
             log.info(msg);
-            assertEquals("unknown command: '" + helpOption.getCommand().getName() + "'", msg);
+            assertEquals("no command specified", msg);
         }
     }
 
@@ -128,6 +131,23 @@ public class HelpOptionTest extends OptionTest {
         assertEquals(c, helpOption.getCommand());
 
         assertEquals("test", helpOption.getValue());
+    }
+
+    @Test
+    public void setCommand_CommandAlreadySet() throws Exception {
+
+        HelpOption helpOption = new HelpOption();
+        helpOption.setCommand(new TestCommand());
+
+        try {
+            helpOption.setCommand(new Test2Command());
+            fail("should throw exception");
+        }
+        catch(IllegalStateException e) {
+            log.info(e.getMessage());
+        }
+
+        assertTrue(helpOption.getCommand() instanceof TestCommand);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

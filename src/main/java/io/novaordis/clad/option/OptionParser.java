@@ -16,12 +16,9 @@
 
 package io.novaordis.clad.option;
 
+import io.novaordis.clad.Command;
 import io.novaordis.clad.UserErrorException;
-import io.novaordis.clad.option.BooleanOption;
-import io.novaordis.clad.option.DoubleOption;
-import io.novaordis.clad.option.LongOption;
-import io.novaordis.clad.option.Option;
-import io.novaordis.clad.option.StringOption;
+import io.novaordis.clad.InstanceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +36,14 @@ public class OptionParser {
     /**
      * @param commandLineArguments will remove all command line arguments that were parsed into Options
      */
-    public static List<Option> parse(int from, List<String> commandLineArguments) throws UserErrorException {
+    public static List<Option> parse(int from, List<String> commandLineArguments) throws Exception {
 
         //
         // pre-parse to handle single quotes and double quotes
         //
         handleQuotes(from, commandLineArguments);
 
-        List<Option> result = new ArrayList<>();
+        List<Option> options = new ArrayList<>();
 
         String current;
 
@@ -54,16 +51,20 @@ public class OptionParser {
 
             current = commandLineArguments.get(i);
 
-            if (("--" + HelpOption.LONG_LITERAL).equals(current)) {
+            if (handledHelpOption(i, commandLineArguments, options)) {
 
-                commandLineArguments.remove(current);
-                result.add(new HelpOption());
+                //
+                // handled as help option
+                //
+
+                //noinspection UnnecessaryContinue
+                continue;
             }
             else if (current.startsWith("--")) {
 
                 String longLiteralOptionString = commandLineArguments.remove(i--);
                 Option option = parseLongLiteralOption(longLiteralOptionString);
-                result.add(option);
+                options.add(option);
             }
             else if (current.startsWith("-")) {
 
@@ -83,7 +84,7 @@ public class OptionParser {
                 if (commandLineArguments.isEmpty() || commandLineArguments.get(i).startsWith("-")) {
 
                     // boolean option
-                    result.add(new BooleanOption(shortLiteral));
+                    options.add(new BooleanOption(shortLiteral));
                 }
                 else {
                     String valueAsString = commandLineArguments.get(i);
@@ -105,7 +106,7 @@ public class OptionParser {
                         throw new RuntimeException("NOT YET IMPLEMENTED " + value);
                     }
 
-                    result.add(option);
+                    options.add(option);
                     commandLineArguments.remove(i--);
                 }
             }
@@ -114,7 +115,7 @@ public class OptionParser {
             }
         }
 
-        return result;
+        return options;
     }
 
     /**
@@ -197,8 +198,8 @@ public class OptionParser {
                 }
                 else //noinspection ConstantConditions
                     if (singleQuoted != null) {
-                    singleQuoted.append(" ").append(current);
-                }
+                        singleQuoted.append(" ").append(current);
+                    }
             }
         }
     }
@@ -304,6 +305,50 @@ public class OptionParser {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Static Package protected ----------------------------------------------------------------------------------------
+
+    /**
+     * @return true if it detected and successfully handled a help option. If the option is detected, both the
+     * command line argument list and the option list are modified by side effect: the corresponding argument
+     * (arguments) are removed and the HelpOption instance is added to the options list.
+     */
+    static boolean handledHelpOption(int index, List<String> commandLineArguments, List<Option> options)
+            throws Exception {
+
+        int i = index;
+        for(; i < commandLineArguments.size(); i ++) {
+
+            String current = commandLineArguments.get(i);
+
+            if (("--" + HelpOption.LONG_LITERAL).equals(current) ||
+                    HelpOption.LONG_LITERAL.equals(current) ||
+                    ("-" + HelpOption.SHORT_LITERAL).equals(current))  {
+
+                commandLineArguments.remove(i);
+                options.add(new HelpOption());
+                return true;
+            }
+            else if (current.startsWith("--" + HelpOption.LONG_LITERAL + "=")) {
+                String commandName = current.substring(("--" + HelpOption.LONG_LITERAL + "=").length());
+
+                Command command = InstanceFactory.getCommand(commandName);
+
+                commandLineArguments.remove(i);
+
+                if (command == null) {
+                    throw new UserErrorException("unknown command: '" + commandName + "'");
+                }
+
+                HelpOption option = new HelpOption();
+                option.setCommand(command);
+                options.add(option);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

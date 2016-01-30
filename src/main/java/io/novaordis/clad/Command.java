@@ -34,7 +34,7 @@ public interface Command {
     /**
      * @return the name (literal) of the command, as specified on the command line.
      */
-    public String getName();
+    String getName();
 
     /**
      * @param configuration the command execution context configuration. Offers access to global options and command

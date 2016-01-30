@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -188,83 +187,6 @@ public class CommandLineApplicationTest {
 
         TestApplicationRuntime runtime = (TestApplicationRuntime)CommandLineApplication.identifyRuntime(configuration);
         assertNotNull(runtime);
-    }
-
-    // getFileNames() --------------------------------------------------------------------------------------------------
-
-    @Test
-    public void getFileNames() throws Exception {
-
-        String basedir = System.getProperty("basedir");
-        assertNotNull(basedir);
-
-        File data = new File(basedir, "src/test/resources/data");
-        assertTrue(data.isDirectory());
-
-        List<String> names = CommandLineApplication.getFileNames(data.getPath(), data);
-        assertEquals(2, names.size());
-
-        String name = data.getPath() + File.separator + "testDir" + File.separator  + "A.txt";
-        assertEquals(name, names.get(0));
-        name = data.getPath() + File.separator + "testDir" + File.separator  + "testSubDir" +  File.separator  + "B.txt";
-        assertEquals(name, names.get(1));
-    }
-
-    // toSimpleClassName() ---------------------------------------------------------------------------------------------
-
-    @Test
-    public void toSimpleClassName_Null() throws Exception {
-
-        try {
-            CommandLineApplication.toSimpleClassName(null, "Something");
-            fail("should have thrown IllegalArgumentException");
-        }
-        catch(IllegalArgumentException e) {
-            log.debug(e.getMessage());
-        }
-
-        try {
-            CommandLineApplication.toSimpleClassName("something", null);
-            fail("should have thrown IllegalArgumentException");
-        }
-        catch(IllegalArgumentException e) {
-            log.debug(e.getMessage());
-        }
-    }
-
-    @Test
-    public void toSimpleClassName() throws Exception {
-
-        String s = CommandLineApplication.toSimpleClassName("test", "Command");
-        assertEquals("TestCommand", s);
-    }
-
-    @Test
-    public void toSimpleClassName2() throws Exception {
-
-        String s = CommandLineApplication.toSimpleClassName("Test", "Command");
-        assertEquals("TestCommand", s);
-    }
-
-    @Test
-    public void toSimpleClassName3() throws Exception {
-
-        String s = CommandLineApplication.toSimpleClassName("TEST", "Command");
-        assertEquals("TestCommand", s);
-    }
-
-    @Test
-    public void toSimpleClassName4() throws Exception {
-
-        String s = CommandLineApplication.toSimpleClassName("test", "ApplicationRuntime");
-        assertEquals("TestApplicationRuntime", s);
-    }
-
-    @Test
-    public void toSimpleClassName5() throws Exception {
-
-        String s = CommandLineApplication.toSimpleClassName("TEST", "ApplicationRuntime");
-        assertEquals("TestApplicationRuntime", s);
     }
 
     // execute() -------------------------------------------------------------------------------------------------------
@@ -467,7 +389,8 @@ public class CommandLineApplicationTest {
         int exitCode = commandLineApplication.execute(args);
 
         assertEquals(1, exitCode);
-        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        String msg = mos.getWrittenString();
+        assertEquals("[error]: unknown command: 'no-such-command'\n", msg);
         assertFalse(TestApplicationRuntime.isInitialized());
     }
 
@@ -482,7 +405,7 @@ public class CommandLineApplicationTest {
         int exitCode = commandLineApplication.execute(args);
 
         assertEquals(1, exitCode);
-        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());
         assertFalse(TestApplicationRuntime.isInitialized());
     }
 
@@ -497,10 +420,9 @@ public class CommandLineApplicationTest {
         int exitCode = commandLineApplication.execute(args);
 
         assertEquals(1, exitCode);
-        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());
         assertFalse(TestApplicationRuntime.isInitialized());
     }
-
 
     @Test
     public void unknownCommandHelp4() throws Exception {
@@ -513,8 +435,28 @@ public class CommandLineApplicationTest {
         int exitCode = commandLineApplication.execute(args);
 
         assertEquals(1, exitCode);
-        assertEquals("[error]: unknown command: 'no-such-command\"'\n", mos.getWrittenString());
+        assertEquals("[error]: unknown command: 'no-such-command'\n", mos.getWrittenString());
         assertFalse(TestApplicationRuntime.isInitialized());
+    }
+
+    // streams ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void streams() throws Exception {
+
+        CommandLineApplication a = new CommandLineApplication();
+
+        assertEquals(System.out, a.getStdoutOutputStream());
+        assertEquals(System.err, a.getStderrOutputStream());
+
+        MockOutputStream mos = new MockOutputStream();
+
+        a.setStderrOutputStream(mos);
+        assertEquals(mos, a.getStderrOutputStream());
+
+        a.setStdoutOutputStream(mos);
+        assertEquals(mos, a.getStdoutOutputStream());
+
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

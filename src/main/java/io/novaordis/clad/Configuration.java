@@ -16,6 +16,7 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 
 import java.util.List;
@@ -30,16 +31,34 @@ public interface Configuration {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    public static final String APPLICATION_NAME_SYSTEM_PROPERTY_NAME = "application.name";
+    String APPLICATION_NAME_SYSTEM_PROPERTY_NAME = "application.name";
 
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * @return first Help option or null
+     */
+    static HelpOption findHelpOption(List<Option> options) {
+
+        if (options == null) {
+            return null;
+        }
+
+        for(Option o: options) {
+            if (o instanceof HelpOption) {
+                return ((HelpOption)o);
+            }
+        }
+
+        return null;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
      * The application name. The application runtime class must implement <tt>&lt;applicationName&gt;ApplicationRuntime</tt>.
      */
-    public String getApplicationName();
+    String getApplicationName();
 
     /**
      * The global configuration options specified as command line arguments, preceding the command name.

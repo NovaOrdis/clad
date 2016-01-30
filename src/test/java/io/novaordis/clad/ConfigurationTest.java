@@ -16,6 +16,7 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -88,6 +90,25 @@ public abstract class ConfigurationTest {
         catch(UserErrorException e) {
             log.info(e.getMessage());
         }
+    }
+
+    // findHelpOption() ------------------------------------------------------------------------------------------------
+
+    @Test
+    public void findHelpOption_Null() throws Exception {
+        assertNull(Configuration.findHelpOption(null));
+    }
+
+    @Test
+    public void findHelpOption_Empty() throws Exception {
+        assertNull(Configuration.findHelpOption(Collections.emptyList()));
+    }
+
+    @Test
+    public void findHelpOption() throws Exception {
+
+        HelpOption o = new HelpOption();
+        assertEquals(o, Configuration.findHelpOption(Collections.singletonList(o)));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

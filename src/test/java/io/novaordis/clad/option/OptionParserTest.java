@@ -16,18 +16,22 @@
 
 package io.novaordis.clad.option;
 
+import io.novaordis.clad.Command;
+import io.novaordis.clad.TestCommand;
 import io.novaordis.clad.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -437,6 +441,92 @@ public class OptionParserTest {
         assertEquals("option", option.getLongLiteral());
         assertNull(option.getShortLiteral());
         assertEquals("option-value", option.getValue());
+    }
+
+    // handledHelpOption() ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void handledHelpOption() throws Exception {
+
+        List<Option> options = new ArrayList<>();
+        List<String> args = new ArrayList<>(Arrays.asList("help", "test"));
+        assertTrue(OptionParser.handledHelpOption(0, args, options));
+        assertEquals(1, options.size());
+        assertTrue(options.get(0) instanceof HelpOption);
+        assertEquals(1, args.size());
+        assertEquals("test", args.get(0));
+
+        HelpOption helpOption = (HelpOption)options.get(0);
+        Command command = helpOption.getCommand();
+        assertNull(command);
+    }
+
+    @Test
+    public void handledHelpOption2() throws Exception {
+
+        List<Option> options = new ArrayList<>();
+        List<String> args = new ArrayList<>(Arrays.asList("--help", "test"));
+        assertTrue(OptionParser.handledHelpOption(0, args, options));
+        assertEquals(1, options.size());
+        assertTrue(options.get(0) instanceof HelpOption);
+        assertEquals(1, args.size());
+        assertEquals("test", args.get(0));
+
+        HelpOption helpOption = (HelpOption)options.get(0);
+        Command command = helpOption.getCommand();
+        assertNull(command);
+    }
+
+    @Test
+    public void handledHelpOption3() throws Exception {
+
+        List<Option> options = new ArrayList<>();
+        List<String> args = new ArrayList<>(Arrays.asList("--help=test", "somethingelse"));
+        assertTrue(OptionParser.handledHelpOption(0, args, options));
+        assertEquals(1, options.size());
+        assertTrue(options.get(0) instanceof HelpOption);
+        assertEquals(1, args.size());
+        assertEquals("somethingelse", args.get(0));
+
+        HelpOption helpOption = (HelpOption)options.get(0);
+        Command command = helpOption.getCommand();
+        assertNotNull(command);
+        assertTrue(command instanceof TestCommand);
+    }
+
+    @Test
+    public void handledHelpOption4_UnknownCommand() throws Exception {
+
+        List<Option> options = new ArrayList<>();
+        List<String> args = new ArrayList<>(Arrays.asList("--help=no-such-command", "somethingelse"));
+
+        try {
+            assertTrue(OptionParser.handledHelpOption(0, args, options));
+        }
+        catch(UserErrorException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("unknown command: 'no-such-command'", msg);
+        }
+        assertEquals(0, options.size());
+        assertEquals(1, args.size());
+        assertEquals("somethingelse", args.get(0));
+    }
+
+    @Test
+    public void handledHelpOption5() throws Exception {
+
+        List<Option> options = new ArrayList<>();
+        List<String> args = new ArrayList<>(Arrays.asList("-h", "test"));
+        assertTrue(OptionParser.handledHelpOption(0, args, options));
+        assertEquals(1, options.size());
+        assertTrue(options.get(0) instanceof HelpOption);
+        assertEquals(1, args.size());
+        assertEquals("test", args.get(0));
+
+        HelpOption helpOption = (HelpOption)options.get(0);
+        Command command = helpOption.getCommand();
+        assertNull(command);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

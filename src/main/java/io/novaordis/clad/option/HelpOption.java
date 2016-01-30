@@ -17,6 +17,7 @@
 package io.novaordis.clad.option;
 
 import io.novaordis.clad.Command;
+import io.novaordis.clad.UserErrorException;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,6 +42,9 @@ public class HelpOption extends OptionBase {
 
     private Command command;
 
+    // if command is not null, it takes precedence
+    private String commandName;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public HelpOption() {
@@ -62,8 +66,11 @@ public class HelpOption extends OptionBase {
      *
      * @param command may be null.
      */
-    public void setCommand(Command command) {
+    public void setCommand(Command command) throws UserErrorException {
 
+        if (this.command != null) {
+            throw new IllegalStateException("command already set: " + this.command);
+        }
         this.command = command;
     }
 
@@ -71,11 +78,19 @@ public class HelpOption extends OptionBase {
         return command;
     }
 
+    /**
+     * If command is not null, it takes precedence over the command name.
+     */
+    public void setCommandName(String commandName) {
+        this.commandName = commandName;
+    }
+
     public void displayHelp(OutputStream outputStream) throws Exception {
 
         if (command == null) {
 
-            throw new RuntimeException("NOT YET IMPLEMENTED");
+            String message = commandName == null ? "no command specified" : "unknown command: '" + commandName + "'";
+            throw new UserErrorException(message);
         }
         else {
 

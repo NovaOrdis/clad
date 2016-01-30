@@ -22,15 +22,10 @@ import io.novaordis.clad.option.OptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -42,18 +37,7 @@ public class CommandLineApplication {
 
     private static final Logger log = LoggerFactory.getLogger(CommandLineApplication.class);
 
-    public static final String JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME = "java.class.path";
-    public static final String PATH_SEPARATOR_SYSTEM_PROPERTY_NAME = "path.separator";
-
-    public static final int DIRECTORIES_ARE_SEARCHED_FIRST = 0;
-    public static final int JARS_ARE_SEARCHED_FIRST = 1;
-
     // Static ----------------------------------------------------------------------------------------------------------
-
-    //
-    // whether directories or the JARs from the class path are searched first.
-    //
-    public static int searchOrder = DIRECTORIES_ARE_SEARCHED_FIRST;
 
     public static void main(String[] args) throws Exception {
 
@@ -89,7 +73,8 @@ public class CommandLineApplication {
 
         log.debug("application name: \"" + applicationName + "\"");
 
-        String applicationRuntimeClassName = getFullyQualifiedClassName(applicationName, "ApplicationRuntime");
+        String applicationRuntimeClassName =
+                InstanceFactory.getFullyQualifiedClassName(applicationName, "ApplicationRuntime");
 
         if (applicationRuntimeClassName != null) {
 
@@ -140,7 +125,7 @@ public class CommandLineApplication {
         for(int i = 0; i < commandLineArguments.size(); i++) {
 
             String commandCandidateName = commandLineArguments.get(i);
-            command = getCommand(commandCandidateName);
+            command = InstanceFactory.getCommand(commandCandidateName);
 
             if (command != null) {
 
@@ -156,220 +141,6 @@ public class CommandLineApplication {
         }
 
         return command;
-    }
-
-    /**
-     * @return a non-initialized Command instance if the corresponding command implementation class was found on the
-     * class path and the no-argument constructor instantiation went well.
-     */
-    static Command getCommand(String commandName) throws Exception {
-
-        String commandClassName = getFullyQualifiedClassName(commandName, "Command");
-
-        if (commandClassName == null) {
-            return null;
-        }
-
-        //
-        // we identified a class file in the class path whose name matches a command class file pattern, so try to load
-        // it
-        //
-
-        Class commandClass;
-
-        try {
-            commandClass = CommandLineApplication.class.getClassLoader().loadClass(commandClassName);
-        }
-        catch(Exception e) {
-            throw new IllegalStateException("failed to load Command class " + commandClassName);
-        }
-
-        try {
-            return (Command)commandClass.newInstance();
-        }
-        catch(Exception e) {
-            throw new IllegalStateException("failed to instantiate Command class " + commandClass);
-        }
-    }
-
-    /**
-     * @return the fully qualified class name of the class that corresponds to the given prefix (which will be
-     * camel-cased) and the given suffix (currently Command or ApplicationRuntime). It will return null if no such
-     * class is detected on the classpath.
-     */
-    static String getFullyQualifiedClassName(String prefix, String suffix) throws Exception {
-
-        //
-        // scan the classpath and look for classes named camelCased(prefix) + suffix.
-        //
-
-        String classPath = System.getProperty(JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME);
-
-        if (classPath == null) {
-            throw new IllegalArgumentException(
-                    "no value found for system property '" + JAVA_CLASS_PATH_SYSTEM_PROPERTY_NAME + "'");
-        }
-
-        String pathSeparator = System.getProperty(PATH_SEPARATOR_SYSTEM_PROPERTY_NAME);
-
-        if (pathSeparator == null) {
-            throw new IllegalArgumentException(
-                    "no value found for system property '" + PATH_SEPARATOR_SYSTEM_PROPERTY_NAME + "'");
-        }
-
-        List<File> directories = new ArrayList<>();
-        List<JarFile> jarFiles = new ArrayList<>();
-
-        for(StringTokenizer st = new StringTokenizer(classPath, pathSeparator); st.hasMoreTokens(); ) {
-
-            String path = st.nextToken();
-            log.debug("path: " + path);
-            File f = new File(path);
-            if (f.isDirectory()) {
-
-                //
-                // directory containing classes, possibly commands
-                //
-
-                log.debug("directory: " + path);
-                directories.add(f);
-
-            }
-            else if (f.isFile()) {
-
-                //
-                // we assume it's a JAR
-                //
-
-                JarFile jarFile = new JarFile(f.getPath());
-                log.debug("JAR file: " + jarFile);
-                jarFiles.add(jarFile);
-            }
-        }
-
-        String simpleClassName = toSimpleClassName(prefix, suffix);
-        String fullyQualifiedClassName;
-
-        //
-        // by default directories have priority in search
-        //
-
-        if (searchOrder == DIRECTORIES_ARE_SEARCHED_FIRST) {
-
-            fullyQualifiedClassName = getFullyQualifiedClassNameFromDirectories(simpleClassName, directories);
-            if (fullyQualifiedClassName == null) {
-                fullyQualifiedClassName = getFullyQualifiedClassNameFromJars(simpleClassName, jarFiles);
-            }
-        }
-        else if (searchOrder == JARS_ARE_SEARCHED_FIRST) {
-
-            //
-            // reverse the search order
-            //
-            fullyQualifiedClassName = getFullyQualifiedClassNameFromJars(simpleClassName, jarFiles);
-            if (fullyQualifiedClassName == null) {
-                fullyQualifiedClassName = getFullyQualifiedClassNameFromDirectories(simpleClassName, directories);
-            }
-        }
-        else {
-            throw new IllegalArgumentException("invalid search order " + searchOrder);
-        }
-
-        return fullyQualifiedClassName;
-    }
-
-    static String toSimpleClassName(String prefix, String suffix) {
-
-        if (prefix == null) {
-            throw new IllegalArgumentException("null prefix");
-        }
-
-        if (suffix == null) {
-            throw new IllegalArgumentException("null suffix");
-        }
-
-
-        return Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1).toLowerCase() + suffix;
-    }
-
-    /**
-     * @return all files contained by the given directory. The file name is relative to the given directory.
-     */
-    static List<String> getFileNames(String relativePath, File dir) {
-
-        List<String> result = new ArrayList<>();
-
-        if (!dir.isDirectory()) {
-            throw new IllegalArgumentException(dir + " is not a directory");
-        }
-
-        File[] content = dir.listFiles();
-
-        if (content != null) {
-
-            for (File f : content) {
-
-                if (f.isFile()) {
-                    result.add(relativePath + File.separator + f.getName());
-                } else if (f.isDirectory()) {
-                    result.addAll(getFileNames(relativePath + File.separator + f.getName(), f));
-                }
-            }
-        }
-
-        return result;
-    }
-
-    // Static Private --------------------------------------------------------------------------------------------------
-
-    /**
-     * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
-     * The search is performed only in the specified directories. May return null if no such class is found.
-     */
-    private static String getFullyQualifiedClassNameFromDirectories(String simpleClassName, List<File> directories) {
-
-        for(File dir: directories) {
-
-            if (!dir.isDirectory()) {
-                continue;
-            }
-
-            //noinspection Convert2streamapi
-            for(String fileName: getFileNames(dir.getPath(), dir)) {
-
-                if (fileName.endsWith(File.separator + simpleClassName + ".class")) {
-
-                    String className = fileName.substring(dir.getPath().length() + 1);
-                    className = className.substring(0, className.length() - ".class".length());
-                    className = className.replace(File.separatorChar, '.');
-                    return className;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return the fully qualified class name corresponding to the class whose simple name is provided as argument.
-     * The search is performed only in the specified JAR files. May return null if no such class is found.
-     */
-    private static String getFullyQualifiedClassNameFromJars(String simpleClassName, List<JarFile> jarFiles) {
-
-        for(JarFile jarFile: jarFiles) {
-
-            for(Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
-                JarEntry entry = entries.nextElement();
-                String className = entry.getName();
-                if (className.endsWith(File.separator + simpleClassName + ".class")) {
-                    className = className.substring(0, className.length() - ".class".length());
-                    className = className.replace(File.separatorChar, '.');
-                    return className;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -478,6 +249,18 @@ public class CommandLineApplication {
 
             if (command == null) {
 
+                // a special case is when we execute --help=<command-name>. In this case we don't look for a default
+                // command but attempt to execute the in-line help request
+
+                HelpOption helpOption = Configuration.findHelpOption(globalOptions);
+                if (helpOption != null) {
+                    if (helpOption.getCommand() == null) {
+                        helpOption.setCommandName(commandLineArguments.get(0));
+                    }
+                    helpOption.displayHelp(getStdoutOutputStream());
+                    return 0;
+                }
+
                 //
                 // try to figure out the default command
                 //
@@ -491,7 +274,7 @@ public class CommandLineApplication {
                 }
 
                 // attempt to instantiate the default command and execute it
-                command = getCommand(defaultCommandName);
+                command = InstanceFactory.getCommand(defaultCommandName);
 
                 if (command == null) {
 
@@ -503,20 +286,14 @@ public class CommandLineApplication {
             // handle special situations
             //
 
-            for(Option o: getConfiguration().getGlobalOptions()) {
+            HelpOption helpOption = Configuration.findHelpOption(globalOptions);
+            if (helpOption != null) {
 
-                if (o instanceof HelpOption) {
+                // inject the current command, if any - this will fail if the help is already configured with a command
 
-                    //
-                    // handle help requests
-                    //
-
-                    HelpOption helpOption = (HelpOption)o;
-                    // inject the current command, if any
-                    helpOption.setCommand(command);
-                    helpOption.displayHelp(getStdoutOutputStream());
-                    return 0;
-                }
+                helpOption.setCommand(command);
+                helpOption.displayHelp(getStdoutOutputStream());
+                return 0;
             }
 
             //
