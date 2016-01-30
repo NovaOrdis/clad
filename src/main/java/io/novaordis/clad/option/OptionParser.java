@@ -280,7 +280,7 @@ public class OptionParser {
         int i = longLiteralOptionString.indexOf('=');
 
         if (i == -1) {
-            throw new IllegalArgumentException("argument does not contain '=':" + original);
+            throw new UserErrorException("--" + longLiteralOptionString + " option does not contain '='");
         }
 
         String optionName = longLiteralOptionString.substring(0, i);

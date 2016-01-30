@@ -458,6 +458,18 @@ public class OptionParserTest {
         assertEquals("option-value", option.getValue());
     }
 
+    @Test
+    public void pastLongLiteralOption_NoEqualSign() throws Exception {
+
+        try {
+            OptionParser.parseLongLiteralOption("--option");
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+            log.info(e.getMessage());
+        }
+    }
+
     // handledHelpOption() ---------------------------------------------------------------------------------------------
 
     @Test
