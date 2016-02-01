@@ -62,6 +62,8 @@ public class OptionParserTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    // parse() ---------------------------------------------------------------------------------------------------------
+
     @Test
     public void parse() throws Exception {
 
@@ -226,6 +228,58 @@ public class OptionParserTest {
         DoubleOption doubleOption = (DoubleOption)options.get(0);
         assertEquals(2.1d, doubleOption.getDouble().doubleValue(), 0.00001);
         assertEquals('t', doubleOption.getShortLiteral().charValue());
+    }
+
+    // parse(), VerboseOption ------------------------------------------------------------------------------------------
+
+    @Test
+    public void parse_VerboseOption_ShortLiteral() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--something=somethingelse", "-v"));
+
+        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+
+        assertEquals(2, globalOptions.size());
+
+        StringOption so = (StringOption)globalOptions.get(0);
+        assertEquals("something", so.getLongLiteral());
+        assertEquals("somethingelse", so.getValue());
+
+        VerboseOption verboseOption = (VerboseOption)globalOptions.get(1);
+        assertNotNull(verboseOption);
+        assertTrue(verboseOption.getValue());
+    }
+
+    @Test
+    public void parse_VerboseOption_LongLiteral_OneArgument() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--verbose"));
+
+        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+
+        assertEquals(1, globalOptions.size());
+
+        VerboseOption verboseOption = (VerboseOption)globalOptions.get(0);
+        assertNotNull(verboseOption);
+        assertTrue(verboseOption.getValue());
+    }
+
+    @Test
+    public void parse_VerboseOption_LongLiteral_TwoArguments() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--verbose", "--something=somethingelse"));
+
+        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+
+        assertEquals(2, globalOptions.size());
+
+        VerboseOption verboseOption = (VerboseOption)globalOptions.get(0);
+        assertNotNull(verboseOption);
+        assertTrue(verboseOption.getValue());
+
+        StringOption so = (StringOption)globalOptions.get(1);
+        assertEquals("something", so.getLongLiteral());
+        assertEquals("somethingelse", so.getValue());
     }
 
     // handleQuotes ----------------------------------------------------------------------------------------------------

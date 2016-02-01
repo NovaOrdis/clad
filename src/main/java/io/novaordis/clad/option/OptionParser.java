@@ -51,7 +51,13 @@ public class OptionParser {
 
             current = commandLineArguments.get(i);
 
-            if (handledHelpOption(i, commandLineArguments, options)) {
+            if (("--" + VerboseOption.LONG_LITERAL).equals(current) ||
+                    ("-" + VerboseOption.SHORT_LITERAL).equals(current)) {
+
+                commandLineArguments.remove(i--);
+                options.add(new VerboseOption());
+            }
+            else if (handledHelpOption(i, commandLineArguments, options)) {
 
                 //
                 // handled as help option

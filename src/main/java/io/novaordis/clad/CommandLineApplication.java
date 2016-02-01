@@ -23,8 +23,12 @@ import io.novaordis.clad.configuration.ConfigurationImpl;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.OptionParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.novaordis.clad.option.VerboseOption;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Category;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ public class CommandLineApplication {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(CommandLineApplication.class);
+    private static final Logger log = Logger.getLogger(CommandLineApplication.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -246,10 +250,11 @@ public class CommandLineApplication {
 
             Command command = identifyCommand(commandLineArguments, configuration);
 
-            log.debug("command: " + command);
-
             List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
 
+            actOnVerboseOption(globalOptions);
+
+            log.debug("command: " + command);
             log.debug("global options: " + globalOptions);
 
             // place global options in configuration
@@ -348,6 +353,45 @@ public class CommandLineApplication {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * Scans the global option list and turns DEBUG on the underlying logging system, so CONSOLE displays everything
+     * DEBUG. The method does not remove the option from the list.
+     */
+    private void actOnVerboseOption(List<Option> globalOptions) {
+
+        boolean verboseLogging = false;
+
+        for(Option o: globalOptions) {
+
+            if (o instanceof VerboseOption) {
+
+                verboseLogging = true;
+                break;
+            }
+        }
+
+        if (verboseLogging) {
+
+            //
+            // Turn DEBUG on CONSOLE
+            //
+
+            Category c = (Category)log;
+            Category root = c;
+            if ((c = c.getParent()) != null) {
+                root = c;
+            }
+
+            Appender appender = root.getAppender("CONSOLE");
+
+            if (appender != null) {
+
+                ConsoleAppender console = (ConsoleAppender) appender;
+                console.setThreshold(Priority.DEBUG);
+            }
+        }
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 
