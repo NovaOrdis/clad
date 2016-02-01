@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
 

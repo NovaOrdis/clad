@@ -16,6 +16,7 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.configuration.ConfigurationImpl;
