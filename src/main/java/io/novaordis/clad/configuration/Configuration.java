@@ -57,9 +57,16 @@ public interface Configuration {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * The application name. The application runtime class must implement <tt>&lt;applicationName&gt;ApplicationRuntime</tt>.
+     * The application name. The application runtime class must implement
+     * <tt>&lt;application-name&gt;ApplicationRuntime</tt>.
      */
     String getApplicationName();
+
+    /**
+     * @return the default command name. The command implementation must exist somewhere on the classpath. May
+     * return null.
+     */
+    String getDefaultCommandName();
 
     /**
      * The global configuration options specified as command line arguments, preceding the command name.

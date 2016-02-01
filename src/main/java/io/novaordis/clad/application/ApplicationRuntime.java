@@ -19,6 +19,11 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.configuration.Configuration;
 
 /**
+ * The command line applications wishing to use the framework must expose a class implementing ApplicationRuntime.
+ *
+ * The "official" name of the application will be inferred from the prefix of that simple class name. Example: If
+ * MockApplicationRuntime is found on the classpath, then the application name is assumed to be "mock".
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
@@ -29,14 +34,6 @@ public interface ApplicationRuntime {
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
-
-    //String getApplicationName();
-
-    /**
-     * @return the default command name. The command implementation must exist somewhere on the classpath. May
-     * return null.
-     */
-    String getDefaultCommandName();
 
     void init(Configuration configuration) throws Exception;
 

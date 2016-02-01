@@ -48,11 +48,6 @@ public class TestApplicationRuntime implements ApplicationRuntime {
     // ApplicationRuntime implementation -------------------------------------------------------------------------------
 
     @Override
-    public String getDefaultCommandName() {
-        return null;
-    }
-
-    @Override
     public void init(Configuration configuration) throws UserErrorException {
 
         this.initialized = true;
