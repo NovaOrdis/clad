@@ -46,6 +46,14 @@ public interface Command extends Comparable<Command> {
     String getHelpFilePath();
 
     /**
+     * Specifies whether the command needs the runtime (and specifically, the runtime initialized) to execute. This
+     * piece of information is important to the framework because runtime initialization is application-specific and
+     * may throw application-specific exception that have nothing to do with the command's execution. In general,
+     * a command "needs" the runtime.
+     */
+    boolean needsRuntime();
+
+    /**
      * @param configuration the command execution context configuration. Offers access to global options and command
      *                      options.
      *

@@ -14,57 +14,50 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad.command;
+package io.novaordis.clad;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/29/16
+ * @since 1/31/16
  */
-public abstract class CommandBase implements Command {
+public class Util {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * Normalizes an external label (command name, application name) by eliminating dashes, camel-casing, etc.
+     * For example, "app-one" becomes "appOne" after normalization.
+     */
+    public static String normalizeLabel(String name) {
+
+        String result = "";
+        for(int i = 0; i < name.length(); i ++) {
+
+            if (i == 0) {
+
+                result += Character.toUpperCase(name.charAt(i));
+            }
+            else if (name.charAt(i) == '-') {
+
+                if (i < name.length() - 1) {
+                    result += Character.toUpperCase(name.charAt(++i));
+                }
+            }
+            else {
+                result += name.charAt(i);
+            }
+        }
+
+        return result;
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Command implementation ------------------------------------------------------------------------------------------
-
-    @Override
-    public int compareTo(Command o) {
-
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        return getName().compareTo(o.getName());
-    }
-
-    @Override
-    public String getName() {
-
-        String s = getClass().getSimpleName();
-        return s.replaceAll("Command", "").toLowerCase();
-    }
-
-    @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
-    }
-
-    @Override
-    public boolean needsRuntime() {
-
-        //
-        // usually all application commands need the runtime
-        //
-
-        return true;
+    private Util() {
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

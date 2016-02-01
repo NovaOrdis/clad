@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad.command;
+package io.novaordis.clad.application;
+
+import io.novaordis.clad.configuration.Configuration;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/29/16
+ * @since 1/31/16
  */
-public abstract class CommandBase implements Command {
+public class ExceptionOnInitializationApplicationRuntime implements ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,41 +32,17 @@ public abstract class CommandBase implements Command {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Command implementation ------------------------------------------------------------------------------------------
+    // ApplicationRuntime implementation -------------------------------------------------------------------------------
 
     @Override
-    public int compareTo(Command o) {
-
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        return getName().compareTo(o.getName());
+    public String getDefaultCommandName() {
+        return null;
     }
 
     @Override
-    public String getName() {
+    public void init(Configuration configuration) throws Exception {
 
-        String s = getClass().getSimpleName();
-        return s.replaceAll("Command", "").toLowerCase();
-    }
-
-    @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
-    }
-
-    @Override
-    public boolean needsRuntime() {
-
-        //
-        // usually all application commands need the runtime
-        //
-
-        return true;
+        throw new SyntheticException("SYNTHETIC");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

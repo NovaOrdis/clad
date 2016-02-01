@@ -57,12 +57,15 @@ public class InstanceFactory<I> {
     public static int searchOrder = DIRECTORIES_ARE_SEARCHED_FIRST;
 
     /**
+     * @param name the name of the Command as specified on command line. May contain dashes, etc.
+     *
      * @return a non-initialized Command instance if the corresponding command implementation class was found on the
      * class path and the no-argument constructor instantiation went well.
      */
     public static Command getCommand(String name) throws Exception {
 
-        String commandClassName = getFullyQualifiedClassName(name, "Command");
+        String normalizedName = Util.normalizeLabel(name);
+        String commandClassName = getFullyQualifiedClassName(normalizedName, "Command");
 
         if (commandClassName == null) {
             return null;
@@ -164,7 +167,7 @@ public class InstanceFactory<I> {
         }
 
 
-        return Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1).toLowerCase() + suffix;
+        return Character.toUpperCase(prefix.charAt(0)) + prefix.substring(1) + suffix;
     }
 
     /**

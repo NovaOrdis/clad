@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad.command;
+package io.novaordis.clad;
+
+import io.novaordis.clad.application.ApplicationRuntime;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/29/16
+ * @since 1/31/16
  */
-public abstract class CommandBase implements Command {
+public class UtilTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,48 +36,39 @@ public abstract class CommandBase implements Command {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Command implementation ------------------------------------------------------------------------------------------
-
-    @Override
-    public int compareTo(Command o) {
-
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        return getName().compareTo(o.getName());
-    }
-
-    @Override
-    public String getName() {
-
-        String s = getClass().getSimpleName();
-        return s.replaceAll("Command", "").toLowerCase();
-    }
-
-    @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
-    }
-
-    @Override
-    public boolean needsRuntime() {
-
-        //
-        // usually all application commands need the runtime
-        //
-
-        return true;
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // normalizeApplicationName() --------------------------------------------------------------------------------------
+
+    @Test
+    public void normalizeApplicationName() throws Exception {
+
+        Assert.assertEquals("Test", Util.normalizeLabel("test"));
+    }
+
+    @Test
+    public void normalizeApplicationName_Dash() throws Exception {
+
+        assertEquals("AppOne", Util.normalizeLabel("app-one"));
+    }
+
+    @Test
+    public void normalizeApplicationName_DashAtTheEnd() throws Exception {
+
+        assertEquals("App", Util.normalizeLabel("app-"));
+    }
+
+    @Test
+    public void normalizeApplicationName_TwoDashes() throws Exception {
+
+        assertEquals("AppOneTwo", Util.normalizeLabel("app-one-two"));
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    //protected abstract ApplicationRuntime getApplicationRuntimeToTest() throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 

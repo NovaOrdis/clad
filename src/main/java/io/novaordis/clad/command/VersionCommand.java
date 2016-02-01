@@ -47,6 +47,11 @@ public class VersionCommand extends CommandBase {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
+    public boolean needsRuntime() {
+        return false;
+    }
+
+    @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
 
         String version = VersionUtilities.getVersion();

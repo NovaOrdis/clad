@@ -16,13 +16,20 @@
 
 package io.novaordis.clad.command;
 
+import io.novaordis.clad.application.ApplicationRuntime;
+import io.novaordis.clad.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/29/16
+ * @since 1/31/16
  */
-public abstract class CommandBase implements Command {
+public class DoesNotNeedRuntimeCommand extends CommandBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(DoesNotNeedRuntimeCommand.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -33,38 +40,15 @@ public abstract class CommandBase implements Command {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public int compareTo(Command o) {
-
-        if (o == null) {
-            throw new NullPointerException();
-        }
-        return getName().compareTo(o.getName());
+    public boolean needsRuntime()  {
+        return false;
     }
 
     @Override
-    public String getName() {
+    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
 
-        String s = getClass().getSimpleName();
-        return s.replaceAll("Command", "").toLowerCase();
-    }
-
-    @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
-    }
-
-    @Override
-    public boolean needsRuntime() {
-
-        //
-        // usually all application commands need the runtime
-        //
-
-        return true;
+        log.info(this + " executed");
+        System.setProperty("DoesNotNeedRuntimeCommand.executed", "true");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

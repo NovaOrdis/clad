@@ -16,6 +16,7 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.application.SyntheticException;
 import io.novaordis.clad.application.TestApplicationRuntime;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.command.TestCommand;
@@ -68,6 +69,7 @@ public class CommandLineApplicationTest {
     @After
     public void tearDown() {
         System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
+        System.clearProperty("DoesNotNeedRuntimeCommand.executed");
     }
 
     @Test
@@ -487,6 +489,49 @@ public class CommandLineApplicationTest {
         a.setStdoutOutputStream(mos);
         assertEquals(mos, a.getStdoutOutputStream());
 
+    }
+
+    // run() -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void run_RuntimeThrowsExceptionOnInitialization_CommandNeedsRuntime() throws Exception {
+
+        //
+        // force an application runtime that throws exception on initialization
+        //
+
+        System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "exception-on-initialization");
+
+        CommandLineApplication cla = new CommandLineApplication();
+
+        try {
+            cla.run(new String[]{"needs-runtime"});
+            fail("should have thrown exception because the runtime initialization fails");
+        }
+        catch(SyntheticException e) {
+            String msg = e.getMessage();
+            assertEquals("SYNTHETIC", msg);
+        }
+    }
+
+    @Test
+    public void run_RuntimeThrowsExceptionOnInitialization_CommandDoesNotNeedRuntime() throws Exception {
+
+        //
+        // force an application runtime that throws exception on initialization
+        //
+
+        System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "exception-on-initialization");
+
+        CommandLineApplication cla = new CommandLineApplication();
+
+        cla.run(new String[] {"does-not-need-runtime"});
+
+        //
+        // if we get here we're fine
+        //
+
+        assertEquals("true", System.getProperty("DoesNotNeedRuntimeCommand.executed"));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

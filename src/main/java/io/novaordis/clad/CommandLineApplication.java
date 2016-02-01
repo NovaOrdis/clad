@@ -80,8 +80,10 @@ public class CommandLineApplication {
 
         log.debug("application name: \"" + applicationName + "\"");
 
+        String normalizedApplicationName = Util.normalizeLabel(applicationName);
+
         String applicationRuntimeClassName =
-                InstanceFactory.getFullyQualifiedClassName(applicationName, "ApplicationRuntime");
+                InstanceFactory.getFullyQualifiedClassName(normalizedApplicationName, "ApplicationRuntime");
 
         if (applicationRuntimeClassName != null) {
 
@@ -313,11 +315,20 @@ public class CommandLineApplication {
             // not a special situation, execute the command
             //
 
-            log.debug("initializing the runtime");
+            //
+            // for some basic commands (like "version") we don't want to initialize the runtime, because initialization
+            // is application-specific and may throw application-specific exception that have nothing to do with
+            // those basic commands. All commands "need runtime" by default, with the exception of the basic ones
+            //
 
-            runtime.init(configuration);
+            if (command.needsRuntime()) {
 
-            log.debug("runtime initialized");
+                log.debug("initializing the runtime");
+
+                runtime.init(configuration);
+
+                log.debug("runtime initialized");
+            }
 
             command.execute(configuration, runtime);
 
