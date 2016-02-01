@@ -16,8 +16,8 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.Command;
-import io.novaordis.clad.TestCommand;
+import io.novaordis.clad.command.Command;
+import io.novaordis.clad.command.TestCommand;
 import io.novaordis.clad.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;

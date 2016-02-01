@@ -16,10 +16,10 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.Command;
+import io.novaordis.clad.command.Command;
 import io.novaordis.clad.MockOutputStream;
-import io.novaordis.clad.Test2Command;
-import io.novaordis.clad.TestCommand;
+import io.novaordis.clad.command.Test2Command;
+import io.novaordis.clad.command.TestCommand;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

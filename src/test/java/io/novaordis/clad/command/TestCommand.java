@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.command;
 
+import io.novaordis.clad.ApplicationRuntime;
+import io.novaordis.clad.Configuration;
+import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.command.CommandBase;
 import io.novaordis.clad.option.Option;
 

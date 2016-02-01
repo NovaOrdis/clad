@@ -16,6 +16,7 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.command.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

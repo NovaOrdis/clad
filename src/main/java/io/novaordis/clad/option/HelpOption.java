@@ -16,7 +16,7 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.Command;
+import io.novaordis.clad.command.Command;
 import io.novaordis.clad.InstanceFactory;
 import io.novaordis.clad.UserErrorException;
 

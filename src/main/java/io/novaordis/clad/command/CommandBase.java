@@ -16,8 +16,6 @@
 
 package io.novaordis.clad.command;
 
-import io.novaordis.clad.Command;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/29/16

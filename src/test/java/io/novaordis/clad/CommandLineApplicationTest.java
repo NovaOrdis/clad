@@ -16,6 +16,8 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.command.Command;
+import io.novaordis.clad.command.TestCommand;
 import io.novaordis.clad.option.BooleanOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;

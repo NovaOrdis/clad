@@ -28,6 +28,8 @@ public interface ApplicationRuntime {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    //String getApplicationName();
+
     /**
      * @return the default command name. The command implementation must exist somewhere on the classpath. May
      * return null.

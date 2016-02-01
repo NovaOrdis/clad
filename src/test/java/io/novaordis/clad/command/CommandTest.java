@@ -16,10 +16,7 @@
 
 package io.novaordis.clad.command;
 
-import io.novaordis.clad.Command;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

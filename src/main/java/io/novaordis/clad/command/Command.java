@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.command;
+
+import io.novaordis.clad.ApplicationRuntime;
+import io.novaordis.clad.Configuration;
+import io.novaordis.clad.UserErrorException;
 
 /**
  * A command implementation must have a non-argument public constructor, this is how the command line application

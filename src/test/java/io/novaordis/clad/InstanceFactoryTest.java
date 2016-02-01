@@ -19,6 +19,9 @@ package io.novaordis.clad;
 import a.test.Sample1Command;
 import b.test.Sample2Command;
 import c.test.Sample3Command;
+import io.novaordis.clad.command.Command;
+import io.novaordis.clad.command.Test2Command;
+import io.novaordis.clad.command.TestCommand;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -285,6 +288,8 @@ public class InstanceFactoryTest {
         List<JarFile> files = Collections.singletonList(new JarFile(jarFile));
 
         Set<Command> commands = commandFactory.instances(Command.class, files, Collections.emptyList());
+
+        log.info("" + commands);
 
         assertEquals(5, commands.size());
         boolean sample1found = false;
