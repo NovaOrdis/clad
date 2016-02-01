@@ -17,7 +17,7 @@
 package io.novaordis.clad.command;
 
 import io.novaordis.clad.ApplicationRuntime;
-import io.novaordis.clad.Configuration;
+import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.UserErrorException;
 import io.novaordis.utilities.VersionUtilities;
 import org.slf4j.Logger;

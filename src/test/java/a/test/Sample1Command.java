@@ -17,7 +17,7 @@
 package a.test;
 
 import io.novaordis.clad.ApplicationRuntime;
-import io.novaordis.clad.Configuration;
+import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.command.CommandBase;
 
 /**

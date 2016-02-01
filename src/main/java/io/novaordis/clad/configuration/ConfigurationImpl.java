@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad;
+package io.novaordis.clad.configuration;
 
+import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.option.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class ConfigurationImpl implements Configuration {
         if (applicationName == null) {
             throw new UserErrorException("no '" + APPLICATION_NAME_SYSTEM_PROPERTY_NAME + "' system property set");
         }
+
+        log.debug(this + " constructed");
     }
 
     // Configuration implementation ------------------------------------------------------------------------------------
@@ -98,19 +101,19 @@ public class ConfigurationImpl implements Configuration {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Package protected -----------------------------------------------------------------------------------------------
-
-    void setGlobalOptions(List<Option> globalOptions) {
-        this.globalOptions = globalOptions;
-    }
-
-    void setCommandOptions(List<Option> commandOptions) {
+    public void setCommandOptions(List<Option> commandOptions) {
         this.commandOptions = commandOptions;
     }
 
-    void setApplicationName(String applicationName) {
+    public void setGlobalOptions(List<Option> globalOptions) {
+        this.globalOptions = globalOptions;
+    }
+
+    public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
+
+    // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 

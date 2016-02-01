@@ -17,6 +17,8 @@
 package io.novaordis.clad;
 
 import io.novaordis.clad.command.Command;
+import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.configuration.ConfigurationImpl;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.OptionParser;
