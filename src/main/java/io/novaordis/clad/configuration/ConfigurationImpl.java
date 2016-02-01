@@ -67,11 +67,6 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public String getDefaultCommandName() {
-        return null;
-    }
-
-    @Override
     public List<Option> getGlobalOptions() {
 
         return globalOptions;

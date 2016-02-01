@@ -278,7 +278,7 @@ public class CommandLineApplication {
                 // try to figure out the default command
                 //
 
-                String defaultCommandName = configuration.getDefaultCommandName();
+                String defaultCommandName = runtime.getDefaultCommandName();
 
                 if (defaultCommandName == null) {
 

@@ -63,12 +63,6 @@ public interface Configuration {
     String getApplicationName();
 
     /**
-     * @return the default command name. The command implementation must exist somewhere on the classpath. May
-     * return null.
-     */
-    String getDefaultCommandName();
-
-    /**
      * The global configuration options specified as command line arguments, preceding the command name.
      */
     List<Option> getGlobalOptions();
