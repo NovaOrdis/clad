@@ -287,6 +287,8 @@ public class CommandLineApplication {
 
                 String defaultCommandName = runtime.getDefaultCommandName();
 
+                log.debug(runtime + "'s default command name: " + (defaultCommandName == null ? null : "\"" + defaultCommandName + "\""));
+
                 if (defaultCommandName == null) {
 
                     throw new UserErrorException(
@@ -295,6 +297,8 @@ public class CommandLineApplication {
 
                 // attempt to instantiate the default command and execute it
                 command = InstanceFactory.getCommand(defaultCommandName);
+
+                log.debug(runtime + "'s default command: " +  command);
 
                 if (command == null) {
 
