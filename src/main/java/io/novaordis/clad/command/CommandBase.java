@@ -16,6 +16,12 @@
 
 package io.novaordis.clad.command;
 
+import io.novaordis.clad.UserErrorException;
+import io.novaordis.clad.option.Option;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/29/16
@@ -28,7 +34,14 @@ public abstract class CommandBase implements Command {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private List<Option> options;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    protected CommandBase() {
+
+        this.options = new ArrayList<>();
+    }
 
     // Command implementation ------------------------------------------------------------------------------------------
 
@@ -65,6 +78,21 @@ public abstract class CommandBase implements Command {
         //
 
         return true;
+    }
+
+    /**
+     * Returns the underlying storage.
+     */
+    @Override
+    public List<Option> getOptions() {
+        return options;
+    }
+
+    /**
+     * The default implementation is a noop, subclasses will override.
+     */
+    @Override
+    public void configure(int from, List<String> commandLineArguments) throws UserErrorException {
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

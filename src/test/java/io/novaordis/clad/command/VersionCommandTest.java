@@ -16,6 +16,7 @@
 
 package io.novaordis.clad.command;
 
+import io.novaordis.clad.MockOutputStream;
 import io.novaordis.utilities.Files;
 import io.novaordis.utilities.VersionUtilities;
 import org.junit.Test;
@@ -24,9 +25,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -108,6 +113,42 @@ public class VersionCommandTest extends CommandTest {
 
             assertTrue(versionFile.delete());
         }
+    }
+
+    @Test
+    public void outputStream() throws Exception {
+
+        VersionCommand c = getCommandToTest();
+
+        assertNull(c.getOutputStream());
+
+        MockOutputStream mos = new MockOutputStream();
+        c.setOutputStream(mos);
+        assertEquals(mos, c.getOutputStream());
+    }
+
+    @Test
+    public void configure_getOptions() throws Exception {
+
+        VersionCommand c = getCommandToTest();
+
+        assertTrue(c.getOptions().isEmpty());
+
+        //
+        // feed it random stuff, it should be ignored
+        //
+
+        List<String> args = new ArrayList<>(Arrays.asList(
+                "-a", "--something=somethingelse", "-c", "--output=something"));
+
+        c.configure(1, args);
+        assertTrue(c.getOptions().isEmpty());
+
+        assertEquals(4, args.size());
+        assertEquals("-a", args.get(0));
+        assertEquals("--something=somethingelse", args.get(1));
+        assertEquals("-c", args.get(2));
+        assertEquals("--output=something", args.get(3));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

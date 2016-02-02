@@ -63,7 +63,8 @@ public interface Configuration {
     String getApplicationName();
 
     /**
-     * The global configuration options specified as command line arguments, preceding the command name.
+     * The global configuration options specified as command line arguments, preceding the command name. They are
+     * returned in the order they show up on command line.
      */
     List<Option> getGlobalOptions();
 

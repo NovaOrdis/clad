@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -37,8 +38,6 @@ public abstract class CommandTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // getName() -------------------------------------------------------------------------------------------------------
-
     @Test
     public void getName() throws Exception {
 
@@ -50,8 +49,6 @@ public abstract class CommandTest {
         s = s.replaceAll("Command", "").toLowerCase();
         assertEquals(s, name);
     }
-
-    // getHelpFilePath() -----------------------------------------------------------------------------------------------
 
     @Test
     public void getHelpFilePath() throws Exception {
@@ -65,6 +62,18 @@ public abstract class CommandTest {
         s = s.replace('.', '/');
         s = s + "/" + c.getName() + ".txt";
         assertEquals(s, helpFilePath);
+    }
+
+    @Test
+    public void getOptions() throws Exception {
+
+        Command c = getCommandToTest();
+
+        //
+        // no options without configuration
+        //
+
+        assertTrue(c.getOptions().isEmpty());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

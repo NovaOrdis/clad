@@ -19,6 +19,9 @@ package io.novaordis.clad.command;
 import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.UserErrorException;
+import io.novaordis.clad.option.Option;
+
+import java.util.List;
 
 /**
  * A command implementation must have a non-argument public constructor, this is how the command line application
@@ -52,6 +55,21 @@ public interface Command extends Comparable<Command> {
      * a command "needs" the runtime.
      */
     boolean needsRuntime();
+
+    /**
+     * All command line arguments remaining after global option processing are fed into the command so the command
+     * instance has a chance to identify the options that belong to it and configure itself.
+     *
+     * The method will remove the known arguments from the list.
+     *
+     * @throws UserErrorException
+     */
+    void configure(int from, List<String> commandLineArgs) throws UserErrorException;
+
+    /**
+     * @return the command options in the order they show up on command line.
+     */
+    List<Option> getOptions();
 
     /**
      * @param configuration the command execution context configuration. Offers access to global options and command

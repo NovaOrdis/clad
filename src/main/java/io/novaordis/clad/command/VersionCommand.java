@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -49,6 +50,11 @@ public class VersionCommand extends CommandBase {
     @Override
     public boolean needsRuntime() {
         return false;
+    }
+
+    @Override
+    public void configure(int from, List<String> commandLineArguments) {
+        // ignore everything, we don't have any options
     }
 
     @Override
