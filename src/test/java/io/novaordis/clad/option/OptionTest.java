@@ -16,11 +16,15 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.option.Option;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -29,6 +33,8 @@ import static org.junit.Assert.assertNull;
 public abstract class OptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(OptionTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -65,6 +71,254 @@ public abstract class OptionTest {
         assertEquals("option", option.getLongLiteral());
     }
 
+    // equals() --------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void equals() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+        assertEquals(o, o);
+    }
+
+    @Test
+    public void equals2() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+        //noinspection ObjectEqualsNull
+        assertFalse(o.equals(null));
+    }
+
+    @Test
+    public void equals3() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        MockOption mo = new MockOption('t');
+
+        assertFalse(o.equals(mo));
+        assertFalse(mo.equals(o));
+    }
+
+    @Test
+    public void equals_SameShortLiteral_NoValue() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        assertNull(o.getValue());
+
+        Option o2 = getOptionToTest('t', null);
+
+        assertNull(o2.getValue());
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_SameShortLiteral_SameValue() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest('t', null);
+        o2.setValue(value);
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_SameShortLiteral_DifferentValues() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest('t', null);
+        o2.setValue(generateDifferentValue(value));
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_SameLongLiteral_NoValue() throws Exception {
+
+        Option o = getOptionToTest(null, "test");
+
+        assertNull(o.getValue());
+
+        Option o2 = getOptionToTest(null, "test");
+
+        assertNull(o2.getValue());
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_SameLongLiteral_SameValue() throws Exception {
+
+        Option o = getOptionToTest(null, "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest(null, "test");
+        o2.setValue(value);
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_SameLongLiteral_DifferentValues() throws Exception {
+
+        Option o = getOptionToTest(null, "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest(null, "test");
+        o2.setValue(generateDifferentValue(value));
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_ShortMatches_NoValue() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        assertNull(o.getValue());
+
+        Option o2 = getOptionToTest('t', null);
+
+        assertNull(o2.getValue());
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_ShortMatches_SameValue() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest('t', null);
+        o2.setValue(value);
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_ShortMatches_DifferentValues() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest('t', null);
+        o2.setValue(generateDifferentValue(value));
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_LongMatches_NoValue() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        assertNull(o.getValue());
+
+        Option o2 = getOptionToTest(null, "test");
+
+        assertNull(o2.getValue());
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_LongMatches_SameValue() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest(null, "test");
+        o2.setValue(value);
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    @Test
+    public void equals_LongMatches_DifferentValues() throws Exception {
+
+        Option o = getOptionToTest('t', "test");
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+
+        Option o2 = getOptionToTest(null, "test");
+        o2.setValue(generateDifferentValue(value));
+
+        assertTrue(o.equals(o2));
+        assertTrue(o2.equals(o));
+    }
+
+    // setValue() ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void setValue_Null() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        o.setValue(null);
+        assertNull(o.getValue());
+    }
+
+    @Test
+    public void setValue() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+        assertNull(o.getValue());
+
+        Object value = getAppropriateValueForOptionToTest();
+        o.setValue(value);
+        assertEquals(value, o.getValue());
+    }
+
+    @Test
+    public void setValue_WrongType() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+        assertNull(o.getValue());
+
+        Object value = getAppropriateValueForOptionToTest();
+        Object wrongType = generateDifferentType(value);
+
+        try {
+            o.setValue(wrongType);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
@@ -75,7 +329,53 @@ public abstract class OptionTest {
      */
     protected abstract Option getOptionToTest(Character shortLiteral, String longLiteral);
 
+    protected abstract Object getAppropriateValueForOptionToTest();
+
     // Private ---------------------------------------------------------------------------------------------------------
+
+    private Object generateDifferentValue(Object value) {
+
+        if (value instanceof String) {
+            return "different " + ((String)value);
+        }
+        else if (value instanceof Integer) {
+            return ((Integer)value) + 1;
+        }
+        else if (value instanceof Long) {
+            return ((Long)value) + 1L;
+        }
+        else if (value instanceof Double) {
+            return ((Double)value) + 1.0;
+        }
+        else if (value instanceof Boolean) {
+            return !(Boolean)value;
+        }
+        else {
+            throw new RuntimeException("NOT YET IMPLEMENTED: " + value);
+        }
+    }
+
+    private Object generateDifferentType(Object value) {
+
+        if (value instanceof String) {
+            return 1;
+        }
+        else if (value instanceof Integer) {
+            return 1L;
+        }
+        else if (value instanceof Long) {
+            return 1.1d;
+        }
+        else if (value instanceof Double) {
+            return true;
+        }
+        else if (value instanceof Boolean) {
+            return "string";
+        }
+        else {
+            throw new RuntimeException("NOT YET IMPLEMENTED: " + value);
+        }
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

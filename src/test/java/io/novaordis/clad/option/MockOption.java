@@ -16,15 +16,11 @@
 
 package io.novaordis.clad.option;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 2/2/16
  */
-public class VerboseOptionTest extends BooleanOptionTest {
+public class MockOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -34,51 +30,30 @@ public class VerboseOptionTest extends BooleanOptionTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    protected MockOption(Character shortLiteral, String longLiteral) {
+        super(shortLiteral, longLiteral);
+    }
+
+    protected MockOption(Character shortLiteral) {
+        super(shortLiteral, null);
+    }
+
+    @Override
+    public void setValue(Object o) {
+
+        throw new RuntimeException("NOT YET IMPLEMENTED");
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
-    @Test
-    public void bothLiterals() throws Exception {
-
-        VerboseOption verboseOption = getOptionToTest(null, null);
-        assertEquals(VerboseOption.SHORT_LITERAL, verboseOption.getShortLiteral());
-        assertEquals(VerboseOption.LONG_LITERAL, verboseOption.getLongLiteral());
-    }
-
-    @Test
-    public void shortLiteral() throws Exception {
-
-        VerboseOption verboseOption = getOptionToTest(null, null);
-        assertEquals(VerboseOption.SHORT_LITERAL, verboseOption.getShortLiteral());
-    }
-
-    @Test
-    public void longLiteral() throws Exception {
-
-        VerboseOption verboseOption = getOptionToTest(null, null);
-        assertEquals(VerboseOption.LONG_LITERAL, verboseOption.getLongLiteral());
-    }
-
-    // equals() --------------------------------------------------------------------------------------------------------
-
-    @Test
-    public void equals() throws Exception {
-
-        VerboseOption o = new VerboseOption();
-        VerboseOption o2 = new VerboseOption();
-
-        assertEquals(o, o2);
-        assertEquals(o2, o);
+    @Override
+    public Object getValue() {
+        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected VerboseOption getOptionToTest(Character shortLiteral, String longLiteral) {
-
-        return new VerboseOption();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

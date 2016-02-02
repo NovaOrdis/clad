@@ -41,11 +41,10 @@ public class ConfigurationImplTest extends ConfigurationTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected ConfigurationImpl getConfigurationToTest(List<Option> global, List<Option> command) throws Exception {
+    protected ConfigurationImpl getConfigurationToTest(List<Option> global) throws Exception {
 
         ConfigurationImpl c = new ConfigurationImpl();
         c.setGlobalOptions(global);
-        c.setCommandOptions(command);
         return c;
     }
 

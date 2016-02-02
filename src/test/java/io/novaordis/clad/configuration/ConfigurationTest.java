@@ -68,18 +68,12 @@ public abstract class ConfigurationTest {
 
         StringOption gso = new StringOption('g');
         gso.setValue("gval");
-        StringOption cso = new StringOption('c');
-        cso.setValue("cval");
 
-        Configuration c = getConfigurationToTest(
-                new ArrayList<>(Collections.singletonList(gso)),
-                new ArrayList<>(Collections.singletonList(cso)));
+        Configuration c = getConfigurationToTest(new ArrayList<>(Collections.singletonList(gso)));
 
         assertEquals(1, c.getGlobalOptions().size());
-        assertEquals(1, c.getCommandOptions().size());
 
         assertEquals("gval", ((StringOption) c.getGlobalOptions().get(0)).getValue());
-        assertEquals("cval", ((StringOption) c.getCommandOptions().get(0)).getValue());
 
         assertEquals("something", c.getApplicationName());
     }
@@ -89,7 +83,7 @@ public abstract class ConfigurationTest {
 
         try {
             System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
-            getConfigurationToTest(Collections.emptyList(), Collections.emptyList());
+            getConfigurationToTest(Collections.emptyList());
             fail("should have thrown exception, no application name");
         }
         catch(UserErrorException e) {
@@ -122,8 +116,7 @@ public abstract class ConfigurationTest {
     public void getGlobalOption_EquivalentLiterals_NonePresent() throws Exception {
 
         List<Option> global = Collections.emptyList();
-        List<Option> commandOptions = Collections.emptyList();
-        Configuration c = getConfigurationToTest(global, commandOptions);
+        Configuration c = getConfigurationToTest(global);
 
         assertNull(c.getGlobalOption('o', "option"));
     }
@@ -133,8 +126,7 @@ public abstract class ConfigurationTest {
 
         StringOption so = new StringOption('o');
         List<Option> global = Arrays.asList(new StringOption('a'), new StringOption('b'), so);
-        List<Option> commandOptions = Collections.emptyList();
-        Configuration c = getConfigurationToTest(global, commandOptions);
+        Configuration c = getConfigurationToTest(global);
 
         Option o = c.getGlobalOption('o', "option");
         assertEquals(so, o);
@@ -145,8 +137,7 @@ public abstract class ConfigurationTest {
 
         StringOption so = new StringOption("option");
         List<Option> global = Arrays.asList(new StringOption("something"), new StringOption('b'), so);
-        List<Option> commandOptions = Collections.emptyList();
-        Configuration c = getConfigurationToTest(global, commandOptions);
+        Configuration c = getConfigurationToTest(global);
 
         Option o = c.getGlobalOption('o', "option");
         assertEquals(so, o);
@@ -158,8 +149,7 @@ public abstract class ConfigurationTest {
         StringOption so = new StringOption("option");
         StringOption so2 = new StringOption('o');
         List<Option> global = Arrays.asList(new StringOption("something"), so, so2);
-        List<Option> commandOptions = Collections.emptyList();
-        Configuration c = getConfigurationToTest(global, commandOptions);
+        Configuration c = getConfigurationToTest(global);
 
         try {
             c.getGlobalOption('o', "option");
@@ -174,7 +164,7 @@ public abstract class ConfigurationTest {
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected abstract Configuration getConfigurationToTest(List<Option> global, List<Option> command) throws Exception;
+    protected abstract Configuration getConfigurationToTest(List<Option> global) throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 

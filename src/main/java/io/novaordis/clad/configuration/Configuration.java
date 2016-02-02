@@ -81,9 +81,4 @@ public interface Configuration {
      */
     Option getGlobalOption(Character shortLiteral, String longLiteral) throws UserErrorException;
 
-    /**
-     * The command options specified as command line arguments, immediately following the command name.
-     */
-    List<Option> getCommandOptions();
-
 }

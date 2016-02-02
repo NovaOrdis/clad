@@ -43,12 +43,12 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     }
 
     @Override
-    public Set<Option> getRequiredGlobalOptions() {
+    public Set<Option> requiredGlobalOptions() {
         throw new RuntimeException("getRequiredGlobalOptions() NOT YET IMPLEMENTED");
     }
 
     @Override
-    public Set<Option> getOptionalGlobalOptions() {
+    public Set<Option> optionalGlobalOptions() {
         throw new RuntimeException("getOptionalGlobalOptions() NOT YET IMPLEMENTED");
     }
 

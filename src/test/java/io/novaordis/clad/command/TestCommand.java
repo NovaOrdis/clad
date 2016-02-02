@@ -20,9 +20,13 @@ import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.StringOption;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -35,20 +39,14 @@ public class TestCommand extends CommandBase {
     // Static ----------------------------------------------------------------------------------------------------------
 
     private static final List<Option> globalOptionsInjectedByExecution = new ArrayList<>();
-    private static final List<Option> commandOptionsInjectedByExecution = new ArrayList<>();
 
     public static List<Option> getGlobalOptionsInjectedByExecution() {
         return globalOptionsInjectedByExecution;
     }
 
-    public static List<Option> getCommandOptionsInjectedByExecution() {
-        return commandOptionsInjectedByExecution;
-    }
-
     public static void clear() {
 
         globalOptionsInjectedByExecution.clear();
-        commandOptionsInjectedByExecution.clear();
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -58,6 +56,18 @@ public class TestCommand extends CommandBase {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
+    public Set<Option> requiredOptions() {
+
+        return new HashSet<>(Collections.singletonList(new StringOption("test-command-option")));
+    }
+
+    @Override
+    public Set<Option> optionalOptions() {
+
+        return new HashSet<>(Collections.singletonList(new StringOption('t')));
+    }
+
+    @Override
     public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
 
         //
@@ -65,7 +75,6 @@ public class TestCommand extends CommandBase {
         //
 
         globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
-        commandOptionsInjectedByExecution.addAll(configuration.getCommandOptions());
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

@@ -55,6 +55,35 @@ public abstract class OptionBase implements Option {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Override
+    public boolean equals(Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null) {
+            return false;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (!this.getClass().equals(o.getClass())) {
+            return false;
+        }
+
+        return
+                shortLiteral != null && shortLiteral.equals(((OptionBase)o).shortLiteral) ||
+                        longLiteral != null && longLiteral.equals(((OptionBase)o).longLiteral);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return
+                (shortLiteral != null ? shortLiteral.hashCode() : 0) +
+                        17 * (longLiteral != null ? longLiteral.hashCode() : 0);
+    }
+
+    @Override
     public String toString() {
 
         String value = getValue() == null ? "" : "\"" + getValue() + "\"";

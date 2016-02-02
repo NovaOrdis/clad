@@ -42,6 +42,11 @@ public class BooleanOptionTest extends OptionTest {
         return new BooleanOption(shortLiteral, longLiteral);
     }
 
+    @Override
+    protected Boolean getAppropriateValueForOptionToTest() {
+        return true;
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------

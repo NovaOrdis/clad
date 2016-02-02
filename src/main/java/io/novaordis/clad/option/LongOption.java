@@ -44,6 +44,18 @@ public class LongOption extends OptionBase {
         super(shortLiteral, longLiteral);
     }
 
+    // Option implementation -------------------------------------------------------------------------------------------
+
+    @Override
+    public void setValue(Object o) {
+
+        if (o != null && !(o instanceof Long)) {
+            throw new IllegalArgumentException(o + " is not a Long");
+        }
+
+        this.value = (Long)o;
+    }
+
     // OptionBase override ---------------------------------------------------------------------------------------------
 
     @Override

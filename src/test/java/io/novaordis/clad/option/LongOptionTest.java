@@ -58,6 +58,11 @@ public class LongOptionTest extends OptionTest {
         return new LongOption(shortLiteral, longLiteral);
     }
 
+    @Override
+    protected Long getAppropriateValueForOptionToTest() {
+        return 1L;
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------

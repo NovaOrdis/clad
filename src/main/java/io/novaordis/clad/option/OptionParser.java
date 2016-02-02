@@ -22,6 +22,7 @@ import io.novaordis.clad.InstanceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -34,13 +35,19 @@ public class OptionParser {
     // Static ----------------------------------------------------------------------------------------------------------
 
     /**
+     * Process the command line arguments looking for required options and accepting optional options if present.
+     *
      * @param commandLineArguments will remove all command line arguments that were parsed into Options
+     *
+     * @exception UserErrorException if a required option is not found.
      */
-    public static List<Option> parse(int from, List<String> commandLineArguments) throws Exception {
+    public static List<Option> parse(int from, List<String> commandLineArguments,
+                                     Set<Option> required, Set<Option> optional) throws Exception {
 
         //
         // pre-parse to handle single quotes and double quotes
         //
+
         handleQuotes(from, commandLineArguments);
 
         List<Option> options = new ArrayList<>();
@@ -54,8 +61,11 @@ public class OptionParser {
             if (("--" + VerboseOption.LONG_LITERAL).equals(current) ||
                     ("-" + VerboseOption.SHORT_LITERAL).equals(current)) {
 
-                commandLineArguments.remove(i--);
-                options.add(new VerboseOption());
+                VerboseOption verboseOption = new VerboseOption();
+                if(required.contains(verboseOption) || optional.contains(verboseOption)) {
+                    commandLineArguments.remove(i--);
+                    options.add(verboseOption);
+                }
             }
             else if (handledHelpOption(i, commandLineArguments, options)) {
 
@@ -68,9 +78,13 @@ public class OptionParser {
             }
             else if (current.startsWith("--")) {
 
-                String longLiteralOptionString = commandLineArguments.remove(i--);
+                String longLiteralOptionString = commandLineArguments.get(i);
                 Option option = parseLongLiteralOption(longLiteralOptionString);
-                options.add(option);
+
+                if (required.contains(option) || optional.contains(option)) {
+                    commandLineArguments.remove(i--);
+                    options.add(option);
+                }
             }
             else if (current.startsWith("-")) {
 
@@ -80,42 +94,57 @@ public class OptionParser {
                 }
 
                 //
-                // short option - we only use the character following '-' and we ignore the rest
+                // short option candidate - we only use the character following '-' and we ignore the rest
                 //
-
-                commandLineArguments.remove(current);
 
                 char shortLiteral = current.charAt(1);
 
-                if (commandLineArguments.isEmpty() || commandLineArguments.get(i).startsWith("-")) {
+                Option candidateOption = null;
+
+                if (i == (commandLineArguments.size() - 1) || commandLineArguments.get(i + 1).startsWith("-")) {
 
                     // boolean option
-                    options.add(new BooleanOption(shortLiteral));
+                    candidateOption = new BooleanOption(shortLiteral);
                 }
                 else {
-                    String valueAsString = commandLineArguments.get(i);
+
+                    String valueAsString = commandLineArguments.get(i + 1);
                     Object value = typeHeuristics(valueAsString);
-                    Option option;
                     if (value instanceof String) {
-                        option = new StringOption(shortLiteral);
-                        ((StringOption)option).setValue((String)value);
+                        candidateOption = new StringOption(shortLiteral);
+                        ((StringOption)candidateOption).setValue((String)value);
 
                     }
                     else if (value instanceof Long) {
-                        option = new LongOption(shortLiteral);
-                        ((LongOption)option).setValue((Long)value);
+                        candidateOption = new LongOption(shortLiteral);
+                        ((LongOption)candidateOption).setValue((Long)value);
 
                     }
                     else if (value instanceof Double) {
-                        option = new DoubleOption(shortLiteral);
-                        ((DoubleOption)option).setValue((Double)value);
+                        candidateOption = new DoubleOption(shortLiteral);
+                        ((DoubleOption)candidateOption).setValue((Double)value);
                     }
                     else {
                         throw new RuntimeException("NOT YET IMPLEMENTED " + value);
                     }
+                }
 
-                    options.add(option);
-                    commandLineArguments.remove(i--);
+                if (required.contains(candidateOption) || optional.contains(candidateOption)) {
+
+                    //
+                    // only add if we know about it
+                    //
+
+                    options.add(candidateOption);
+                    if (candidateOption instanceof BooleanOption) {
+                        // remove one
+                        commandLineArguments.remove(i);
+                    }
+                    else {
+                        // remove two
+                        commandLineArguments.remove(i);
+                        commandLineArguments.remove(i--);
+                    }
                 }
             }
             else {

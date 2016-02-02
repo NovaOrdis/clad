@@ -40,6 +40,18 @@ public class VerboseOption extends BooleanOption {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Override
+    public boolean equals(Object o) {
+
+        return o instanceof VerboseOption;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 1;
+    }
+
+    @Override
     public String toString() {
 
         return "-" + SHORT_LITERAL + "|--" + LONG_LITERAL;

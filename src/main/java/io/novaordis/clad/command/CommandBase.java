@@ -18,9 +18,12 @@ package io.novaordis.clad.command;
 
 import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.OptionParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -81,6 +84,22 @@ public abstract class CommandBase implements Command {
     }
 
     /**
+     * By default, the base does not declare any required options.
+     */
+    @Override
+    public Set<Option> requiredOptions() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * By default, the base does not declare any optional options.
+     */
+    @Override
+    public Set<Option> optionalOptions() {
+        return Collections.emptySet();
+    }
+
+    /**
      * Returns the underlying storage.
      */
     @Override
@@ -89,10 +108,12 @@ public abstract class CommandBase implements Command {
     }
 
     /**
-     * The default implementation is a noop, subclasses will override.
+     * The default implementation does everything that needs to be done, in most cases the subclasses should use this.
      */
     @Override
-    public void configure(int from, List<String> commandLineArguments) throws UserErrorException {
+    public void configure(int from, List<String> commandLineArguments) throws Exception {
+
+        this.options = OptionParser.parse(from, commandLineArguments, requiredOptions(), optionalOptions());
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

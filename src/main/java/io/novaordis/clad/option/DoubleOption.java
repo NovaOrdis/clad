@@ -44,6 +44,18 @@ public class DoubleOption extends OptionBase {
         super(shortLiteral, longLiteral);
     }
 
+    // Option implementation -------------------------------------------------------------------------------------------
+
+    @Override
+    public void setValue(Object o) {
+
+        if (o != null && !(o instanceof Double)) {
+            throw new IllegalArgumentException(o + " is not a Double");
+        }
+
+        this.value = (Double)o;
+    }
+
     // OptionBase override ---------------------------------------------------------------------------------------------
 
     @Override

@@ -44,6 +44,16 @@ public class StringOption extends OptionBase {
         super(shortLiteral, longLiteral);
     }
 
+    @Override
+    public void setValue(Object o) {
+
+        if (o != null && !(o instanceof String)) {
+            throw new IllegalArgumentException(o + " is not a String");
+        }
+
+        this.value = (String)o;
+    }
+
     // OptionBase overrides --------------------------------------------------------------------------------------------
 
     @Override

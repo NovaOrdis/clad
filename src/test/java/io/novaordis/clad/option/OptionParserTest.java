@@ -26,7 +26,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import static org.junit.Assert.assertEquals;
@@ -67,7 +69,10 @@ public class OptionParserTest {
     @Test
     public void parse() throws Exception {
 
-        List<Option> options = OptionParser.parse(0, Collections.emptyList());
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.emptySet();
+
+        List<Option> options = OptionParser.parse(0, Collections.emptyList(), required, optional);
         assertTrue(options.isEmpty());
     }
 
@@ -76,9 +81,12 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-");
 
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.emptySet();
+
         try {
 
-            OptionParser.parse(0, args);
+            OptionParser.parse(0, args, required, optional);
             fail("should have thrown UserErrorException");
         }
         catch(UserErrorException e) {
@@ -93,7 +101,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-t");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new BooleanOption('t'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertTrue(args.isEmpty());
 
@@ -113,7 +124,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-t test");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('t'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertTrue(args.isEmpty());
 
@@ -127,11 +141,61 @@ public class OptionParserTest {
     }
 
     @Test
+    public void parse_ShortLiteral_DoubleValue() throws Exception {
+
+        List<String> args = tokenizeCommandLine("something -l 2.0 -x --y=somethingelse");
+
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new DoubleOption('l', "length"));
+
+        List<Option> options = OptionParser.parse(1, args, required, optional);
+
+        assertEquals(3, args.size());
+        assertEquals("something", args.get(0));
+        assertEquals("-x", args.get(1));
+        assertEquals("--y=somethingelse", args.get(2));
+
+        assertEquals(1, options.size());
+
+        DoubleOption so = (DoubleOption)options.get(0);
+
+        assertEquals('l', so.getShortLiteral().charValue());
+
+        assertEquals(2.0, so.getValue(), 0.00001);
+    }
+
+    @Test
+    public void parse_LongLiteral_DoubleValue() throws Exception {
+
+        List<String> args = tokenizeCommandLine("something --length=2.0 -x --y=somethingelse");
+
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new DoubleOption("length"));
+
+        List<Option> options = OptionParser.parse(1, args, required, optional);
+
+        assertEquals(3, args.size());
+        assertEquals("something", args.get(0));
+        assertEquals("-x", args.get(1));
+        assertEquals("--y=somethingelse", args.get(2));
+
+        assertEquals(1, options.size());
+
+        DoubleOption so = (DoubleOption)options.get(0);
+
+        assertEquals("length", so.getLongLiteral());
+
+        assertEquals(2.0, so.getValue(), 0.00001);
+    }
+
+    @Test
     public void parseOptions() throws Exception {
 
         List<String> args = tokenizeCommandLine("global1 global2 -c command-value --command2=command2-value");
 
-        List<Option> options = OptionParser.parse(2, args);
+        Set<Option> required = Collections.singleton(new StringOption('c'));
+        Set<Option> optional = Collections.singleton(new StringOption("command2"));
+        List<Option> options = OptionParser.parse(2, args, required, optional);
 
         assertEquals(2, args.size());
         assertEquals("global1", args.get(0));
@@ -157,7 +221,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-f \"something something else\"");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('f'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertTrue(args.isEmpty());
 
@@ -173,7 +240,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-f 'something something else'");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('f'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertTrue(args.isEmpty());
 
@@ -189,8 +259,11 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("something");
 
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('f'));
+
         try {
-            OptionParser.parse(0, args);
+            OptionParser.parse(0, args, required, optional);
         }
         catch(UserErrorException e) {
 
@@ -203,7 +276,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-t 2");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new LongOption('t'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertEquals(0, args.size());
 
@@ -219,7 +295,10 @@ public class OptionParserTest {
 
         List<String> args = tokenizeCommandLine("-t 2.1");
 
-        List<Option> options = OptionParser.parse(0, args);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new DoubleOption('t'));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
 
         assertEquals(0, args.size());
 
@@ -230,6 +309,58 @@ public class OptionParserTest {
         assertEquals('t', doubleOption.getShortLiteral().charValue());
     }
 
+    @Test
+    public void parse_optionGetsBothLiteralsFromReference() throws Exception {
+
+        List<String> args = tokenizeCommandLine("-t something");
+
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('t', "test"));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
+
+        assertEquals(0, args.size());
+
+        assertEquals(1, options.size());
+
+        StringOption so = (StringOption)options.get(0);
+
+        assertEquals("test", so.getLongLiteral());
+        assertEquals('t', so.getShortLiteral().charValue());
+        assertEquals("something", so.getString());
+    }
+
+    @Test
+    public void parse_optionGetsBothLiteralsFromReference2() throws Exception {
+
+        List<String> args = tokenizeCommandLine("--test=something");
+
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = Collections.singleton(new StringOption('t', "test"));
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
+
+        assertEquals(0, args.size());
+
+        assertEquals(1, options.size());
+
+        StringOption so = (StringOption)options.get(0);
+
+        assertEquals("test", so.getLongLiteral());
+        assertEquals('t', so.getShortLiteral().charValue());
+        assertEquals("something", so.getString());
+    }
+
+    @Test
+    public void parse_missingRequiredOption() throws Exception {
+        fail("return here");
+    }
+
+    @Test
+    public void parse_notOnAnyList() throws Exception {
+        fail("return here");
+    }
+
     // parse(), VerboseOption ------------------------------------------------------------------------------------------
 
     @Test
@@ -237,31 +368,41 @@ public class OptionParserTest {
 
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--something=somethingelse", "-v"));
 
-        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = new HashSet<>(Arrays.asList(new StringOption("something"), new VerboseOption()));
 
-        assertEquals(2, globalOptions.size());
+        List<Option> options = OptionParser.parse(0, commandLineArguments, required, optional);
 
-        StringOption so = (StringOption)globalOptions.get(0);
+        assertEquals(2, options.size());
+
+        StringOption so = (StringOption) options.get(0);
         assertEquals("something", so.getLongLiteral());
         assertEquals("somethingelse", so.getValue());
 
-        VerboseOption verboseOption = (VerboseOption)globalOptions.get(1);
+        VerboseOption verboseOption = (VerboseOption) options.get(1);
         assertNotNull(verboseOption);
         assertTrue(verboseOption.getValue());
+
+        assertEquals(0, commandLineArguments.size());
     }
 
     @Test
     public void parse_VerboseOption_LongLiteral_OneArgument() throws Exception {
 
-        List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--verbose"));
+        List<String> commandLineArguments = new ArrayList<>(Collections.singletonList("--verbose"));
 
-        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = new HashSet<>(Collections.singletonList(new VerboseOption()));
+
+        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments, required, optional);
 
         assertEquals(1, globalOptions.size());
 
         VerboseOption verboseOption = (VerboseOption)globalOptions.get(0);
         assertNotNull(verboseOption);
         assertTrue(verboseOption.getValue());
+
+        assertEquals(0, commandLineArguments.size());
     }
 
     @Test
@@ -269,7 +410,10 @@ public class OptionParserTest {
 
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList("--verbose", "--something=somethingelse"));
 
-        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+        Set<Option> required = Collections.emptySet();
+        Set<Option> optional = new HashSet<>(Arrays.asList(new StringOption("something"), new VerboseOption()));
+
+        List<Option> globalOptions = OptionParser.parse(0, commandLineArguments, required, optional);
 
         assertEquals(2, globalOptions.size());
 
@@ -280,6 +424,35 @@ public class OptionParserTest {
         StringOption so = (StringOption)globalOptions.get(1);
         assertEquals("something", so.getLongLiteral());
         assertEquals("somethingelse", so.getValue());
+
+        assertEquals(0, commandLineArguments.size());
+    }
+
+    @Test
+    public void parse_VerboseNotAmongOptionals_LeaveItOut() throws Exception {
+
+        List<String> args = tokenizeCommandLine("--verbose");
+
+        List<Option> options = OptionParser.parse(0, args, Collections.emptySet(), Collections.emptySet());
+
+        assertEquals(1, args.size());
+        assertEquals("--verbose", args.get(0));
+
+        assertEquals(0, options.size());
+    }
+
+    @Test
+    public void parse_VerboseAmongOptionals() throws Exception {
+
+        List<String> args = tokenizeCommandLine("--verbose");
+
+        List<Option> options = OptionParser.
+                parse(0, args, Collections.emptySet(), new HashSet<>(Collections.singleton(new VerboseOption())));
+
+        assertEquals(0, args.size());
+
+        assertEquals(1, options.size());
+        assertEquals(new VerboseOption(), options.iterator().next());
     }
 
     // handleQuotes ----------------------------------------------------------------------------------------------------

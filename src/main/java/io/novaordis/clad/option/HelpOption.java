@@ -63,6 +63,12 @@ public class HelpOption extends OptionBase {
         return command == null ? null : command.getName();
     }
 
+    @Override
+    public void setValue(Object o) {
+
+        // noop
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**

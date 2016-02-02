@@ -60,6 +60,11 @@ public class StringOptionTest extends OptionTest {
         return new StringOption(shortLiteral, longLiteral);
     }
 
+    @Override
+    protected String getAppropriateValueForOptionToTest() {
+        return "test";
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------

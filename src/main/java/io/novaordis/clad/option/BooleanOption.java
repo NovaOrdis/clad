@@ -45,6 +45,18 @@ public class BooleanOption extends OptionBase {
         value = true;
     }
 
+    // Option implementation -------------------------------------------------------------------------------------------
+
+    @Override
+    public void setValue(Object o) {
+
+        if (o != null && !(o instanceof Boolean)) {
+            throw new IllegalArgumentException(o + " is not a Boolean");
+        }
+
+        this.value = (Boolean)o;
+    }
+
     // OptionBase overrides --------------------------------------------------------------------------------------------
 
     @Override

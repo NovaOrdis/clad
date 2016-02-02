@@ -156,6 +156,11 @@ public class HelpOptionTest extends OptionTest {
         return new HelpOption();
     }
 
+    @Override
+    protected Object getAppropriateValueForOptionToTest() {
+        throw new RuntimeException("getAppropriateValueForOptionToTest() NOT YET IMPLEMENTED");
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------

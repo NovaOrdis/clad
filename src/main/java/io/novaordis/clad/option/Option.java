@@ -48,6 +48,19 @@ public interface Option {
 
     Object getValue();
 
+    void setValue(Object o);
+
+    /**
+     * Must correctly implement equals() because we are relying on it on set operations. Two options are equal if
+     * they have the same definition (for example -v is equal with --verbose). The value is not factored in.
+     */
+    boolean equals(Object o);
+
+    /**
+     * Must correctly implement hashCode() because we are relying on equals() on set operations.
+     */
+    int hashCode();
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

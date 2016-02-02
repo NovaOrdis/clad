@@ -39,7 +39,6 @@ public class ConfigurationImpl implements Configuration {
 
     private String applicationName;
     private List<Option> globalOptions;
-    private List<Option> commandOptions;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -93,17 +92,7 @@ public class ConfigurationImpl implements Configuration {
         return result;
     }
 
-    @Override
-    public List<Option> getCommandOptions() {
-
-        return commandOptions;
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
-
-    public void setCommandOptions(List<Option> commandOptions) {
-        this.commandOptions = commandOptions;
-    }
 
     public void setGlobalOptions(List<Option> globalOptions) {
         this.globalOptions = globalOptions;

@@ -33,7 +33,9 @@ import org.apache.log4j.Priority;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -130,8 +132,7 @@ public class CommandLineApplication {
      *
      * @return the Command instance or null if no command was identified.
      */
-    static Command identifyCommand(List<String> commandLineArguments, ConfigurationImpl configuration)
-            throws Exception {
+    static Command identifyAndConfigureCommand(List<String> commandLineArguments) throws Exception {
 
         Command command = null;
 
@@ -148,22 +149,11 @@ public class CommandLineApplication {
                 //
 
                 commandLineArguments.remove(i);
-
-                injectCommandOptionsIntoConfiguration(configuration, i, commandLineArguments);
+                command.configure(i, commandLineArguments);
             }
         }
 
         return command;
-    }
-
-    /**
-     * @param commandLineArguments will remove all command line arguments accepted by the command
-     */
-    private static void injectCommandOptionsIntoConfiguration(
-            ConfigurationImpl configuration, int from, List<String> commandLineArguments) throws Exception {
-
-        List<Option> options = OptionParser.parse(from, commandLineArguments);
-        configuration.setCommandOptions(options);
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -171,6 +161,7 @@ public class CommandLineApplication {
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
     private ConfigurationImpl configuration;
+    private Command command;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -248,9 +239,16 @@ public class CommandLineApplication {
 
             List<String> commandLineArguments = new ArrayList<>(Arrays.asList(args));
 
-            Command command = identifyCommand(commandLineArguments, configuration);
+            command = identifyAndConfigureCommand(commandLineArguments);
 
-            List<Option> globalOptions = OptionParser.parse(0, commandLineArguments);
+            Set<Option> requiredGlobalOptions = runtime.requiredGlobalOptions();
+            Set<Option> optionalGlobalOptions = runtime.optionalGlobalOptions();
+            // --verbose is always an optional option
+            optionalGlobalOptions = new HashSet<>(optionalGlobalOptions);
+            optionalGlobalOptions.add(new VerboseOption());
+
+            List<Option> globalOptions =
+                    OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
 
             actOnVerboseOption(globalOptions);
 
@@ -356,6 +354,14 @@ public class CommandLineApplication {
 
     // Protected -------------------------------------------------------------------------------------------------------
 
+    /**
+     * May return null.
+     */
+    Command getCommand() {
+
+        return command;
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     /**
@@ -381,7 +387,7 @@ public class CommandLineApplication {
             // Turn DEBUG on CONSOLE
             //
 
-            Category c = (Category)log;
+            Category c = log;
             Category root = c;
             if ((c = c.getParent()) != null) {
                 root = c;
@@ -392,6 +398,7 @@ public class CommandLineApplication {
             if (appender != null) {
 
                 ConsoleAppender console = (ConsoleAppender) appender;
+                //noinspection deprecation
                 console.setThreshold(Priority.DEBUG);
             }
         }

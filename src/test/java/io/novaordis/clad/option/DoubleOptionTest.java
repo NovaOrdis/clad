@@ -58,6 +58,11 @@ public class DoubleOptionTest extends OptionTest {
         return new DoubleOption(shortLiteral, longLiteral);
     }
 
+    @Override
+    protected Double getAppropriateValueForOptionToTest() {
+        return 1.1d;
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------
