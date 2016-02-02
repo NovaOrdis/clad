@@ -18,6 +18,9 @@ package io.novaordis.clad.application;
 
 import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.option.Option;
+
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -50,6 +53,16 @@ public class TestApplicationRuntime implements ApplicationRuntime {
     @Override
     public String getDefaultCommandName() {
         return null;
+    }
+
+    @Override
+    public Set<Option> getRequiredGlobalOptions() {
+        throw new RuntimeException("getRequiredGlobalOptions() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public Set<Option> getOptionalGlobalOptions() {
+        throw new RuntimeException("getOptionalGlobalOptions() NOT YET IMPLEMENTED");
     }
 
     @Override

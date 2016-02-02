@@ -17,6 +17,9 @@
 package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.option.Option;
+
+import java.util.Set;
 
 /**
  * The command line applications wishing to use the framework must expose a class implementing ApplicationRuntime.
@@ -40,6 +43,20 @@ public interface ApplicationRuntime {
      * return null.
      */
     String getDefaultCommandName();
+
+    /**
+     * This is how an application declares its required global options. The command line application framework will
+     * parse the command line and throw an UserErrorException if any of the required global options are not found
+     * either on the command line or in the configuration file.
+     */
+    Set<Option> getRequiredGlobalOptions();
+
+    /**
+     * This is how an application declares its optional global options. The command line application framework will
+     * parse the command line and the associated configuration file and throw an UserErrorException it finds a global
+     * option that is not among the required global options or optional global options.
+     */
+    Set<Option> getOptionalGlobalOptions();
 
     void init(Configuration configuration) throws Exception;
 
