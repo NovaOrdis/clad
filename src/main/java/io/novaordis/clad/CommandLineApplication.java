@@ -300,9 +300,11 @@ public class CommandLineApplication {
                 log.debug(runtime + "'s default command: " +  command);
 
                 if (command == null) {
-
                     throw new UserErrorException("no command specified and no default command configured");
                 }
+
+                log.debug("configuring the default command " + command);
+                command.configure(0, commandLineArguments);
             }
 
             //
