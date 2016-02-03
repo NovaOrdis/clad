@@ -71,27 +71,6 @@ public class ConfigurationImpl implements Configuration {
         return globalOptions;
     }
 
-    @Override
-    public Option getGlobalOption(Character shortLiteral, String longLiteral) throws UserErrorException {
-
-        Option result = null;
-
-        for(Option o: globalOptions) {
-
-            if (shortLiteral != null && shortLiteral.equals(o.getShortLiteral()) ||
-                    (longLiteral != null && longLiteral.equals(o.getLongLiteral()))) {
-
-                if (result != null) {
-                    throw new UserErrorException("duplicate option -" + shortLiteral + "|--" + longLiteral);
-                }
-
-                result = o;
-            }
-        }
-
-        return result;
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
 
     public void setGlobalOptions(List<Option> globalOptions) {
@@ -100,6 +79,11 @@ public class ConfigurationImpl implements Configuration {
 
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigurationImpl[" + Integer.toHexString(System.identityHashCode(this)) + "]";
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

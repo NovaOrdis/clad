@@ -32,7 +32,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -113,23 +115,22 @@ public abstract class ConfigurationTest {
     // getGlobalOption() -----------------------------------------------------------------------------------------------
 
     @Test
-    public void getGlobalOption_EquivalentLiterals_NonePresent() throws Exception {
+    public void getGlobalOptions() throws Exception {
 
         List<Option> global = Collections.emptyList();
         Configuration c = getConfigurationToTest(global);
-
-        assertNull(c.getGlobalOption('o', "option"));
+        assertFalse(c.getGlobalOptions().contains(new StringOption('o')));
     }
 
     @Test
-    public void getGlobalOption_EquivalentLiterals_ShortPresent() throws Exception {
+    public void getGlobalOptions2() throws Exception {
 
         StringOption so = new StringOption('o');
         List<Option> global = Arrays.asList(new StringOption('a'), new StringOption('b'), so);
         Configuration c = getConfigurationToTest(global);
 
-        Option o = c.getGlobalOption('o', "option");
-        assertEquals(so, o);
+        assertTrue(c.getGlobalOptions().contains(new StringOption('o')));
+        assertTrue(c.getGlobalOptions().contains(new StringOption('o', "option")));
     }
 
     @Test
@@ -139,25 +140,8 @@ public abstract class ConfigurationTest {
         List<Option> global = Arrays.asList(new StringOption("something"), new StringOption('b'), so);
         Configuration c = getConfigurationToTest(global);
 
-        Option o = c.getGlobalOption('o', "option");
-        assertEquals(so, o);
-    }
-
-    @Test
-    public void getGlobalOption_EquivalentLiterals_BothPresent() throws Exception {
-
-        StringOption so = new StringOption("option");
-        StringOption so2 = new StringOption('o');
-        List<Option> global = Arrays.asList(new StringOption("something"), so, so2);
-        Configuration c = getConfigurationToTest(global);
-
-        try {
-            c.getGlobalOption('o', "option");
-            fail("should have thrown exception");
-        }
-        catch(UserErrorException e) {
-            log.info(e.getMessage());
-        }
+        assertTrue(c.getGlobalOptions().contains(new StringOption("option")));
+        assertTrue(c.getGlobalOptions().contains(new StringOption('o', "option")));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

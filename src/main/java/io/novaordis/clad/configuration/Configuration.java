@@ -68,17 +68,4 @@ public interface Configuration {
      */
     List<Option> getGlobalOptions();
 
-    /**
-     * Convenience method to query the global options list and return the option corresponding to an "equivalent" pair
-     * of short and long literals. If an option corresponding to either the short literal or the long literal is
-     * present, it will be returned. If more than one option corresponding to the short and the long literal specified
-     * as arguments are present, the last one will take precedence and a warning will be issued.
-     *
-     * @return the Option for the equivalent literals.
-     *
-     * @exception UserErrorException this is the first time when we tell the configuration instance that two literal
-     * (short and long) are equivalent, so if we have two different values for the same option, complain and stop.
-     */
-    Option getGlobalOption(Character shortLiteral, String longLiteral) throws UserErrorException;
-
 }
