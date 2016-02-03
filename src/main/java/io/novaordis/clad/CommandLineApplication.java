@@ -417,7 +417,8 @@ public class CommandLineApplication {
         Set<Option> requiredOptions = command.requiredOptions();
         for(Option o: requiredOptions) {
             if (!options.contains(o)) {
-                throw new UserErrorException("required command option \"" + o.getLabel() + "\" is missing");
+                throw new UserErrorException(
+                        "required \"" + command.getName() + "\" command option \"" + o.getLabel() + "\" is missing");
             }
         }
     }

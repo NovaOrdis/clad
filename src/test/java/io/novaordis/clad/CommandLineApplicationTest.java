@@ -572,7 +572,7 @@ public class CommandLineApplicationTest {
 
         assertEquals(1, exitCode);
         String s = mos.getWrittenString();
-        assertEquals("[error]: required command option \"--required-test-command-option\" is missing\n", s);
+        assertEquals("[error]: required \"test\" command option \"--required-test-command-option\" is missing\n", s);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
