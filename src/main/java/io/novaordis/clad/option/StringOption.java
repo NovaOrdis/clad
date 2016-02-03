@@ -33,15 +33,20 @@ public class StringOption extends OptionBase {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public StringOption(Character shortLiteral) {
-        this(shortLiteral, null);
+        this(shortLiteral, null, null);
     }
 
     public StringOption(String longLiteral) {
-        this(null, longLiteral);
+        this(null, longLiteral, null);
     }
 
     public StringOption(Character shortLiteral, String longLiteral) {
+        this(shortLiteral, longLiteral, null);
+    }
+
+    public StringOption(Character shortLiteral, String longLiteral, String value) {
         super(shortLiteral, longLiteral);
+        this.value = value;
     }
 
     @Override

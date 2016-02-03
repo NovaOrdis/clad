@@ -86,6 +86,13 @@ public interface Command extends Comparable<Command> {
     List<Option> getOptions();
 
     /**
+     * May return null if not such option exists.
+     */
+    Option getOption(Option model);
+
+    void setOption(Option o);
+
+    /**
      * @param configuration the command execution context configuration. Offers access to global options and command
      *                      options.
      *

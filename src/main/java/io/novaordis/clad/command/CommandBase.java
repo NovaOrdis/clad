@@ -16,7 +16,6 @@
 
 package io.novaordis.clad.command;
 
-import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.OptionParser;
 
@@ -105,6 +104,28 @@ public abstract class CommandBase implements Command {
     @Override
     public List<Option> getOptions() {
         return options;
+    }
+
+    @Override
+    public Option getOption(Option model) {
+
+        if (model == null) {
+            return null;
+        }
+
+        for(Option o: options) {
+            if (model.equals(o)) {
+                return o;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void setOption(Option o) {
+
+        options.add(o);
     }
 
     /**

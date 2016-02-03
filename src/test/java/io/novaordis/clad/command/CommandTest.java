@@ -16,10 +16,13 @@
 
 package io.novaordis.clad.command;
 
+import io.novaordis.clad.option.BooleanOption;
+import io.novaordis.clad.option.StringOption;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -74,6 +77,30 @@ public abstract class CommandTest {
         //
 
         assertTrue(c.getOptions().isEmpty());
+    }
+
+    @Test
+    public void getOption_Null() throws Exception {
+
+        Command c = getCommandToTest();
+        assertNull(c.getOption(null));
+    }
+
+    @Test
+    public void getOption() throws Exception {
+
+        Command c = getCommandToTest();
+
+        StringOption o = new StringOption('t', "test", "test-value");
+
+        c.setOption(o);
+
+        assertNull(c.getOption(new BooleanOption('t')));
+
+        StringOption o2 = (StringOption)c.getOption(new StringOption('t'));
+
+        assertEquals(o, o2);
+        assertEquals("test-value", o2.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
