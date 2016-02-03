@@ -17,6 +17,7 @@
 package io.novaordis.clad.configuration;
 
 import io.novaordis.clad.UserErrorException;
+import io.novaordis.clad.option.BooleanOption;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;
@@ -112,7 +113,7 @@ public abstract class ConfigurationTest {
         assertEquals(o, Configuration.findHelpOption(Collections.singletonList(o)));
     }
 
-    // getGlobalOption() -----------------------------------------------------------------------------------------------
+    // getGlobalOptions() ----------------------------------------------------------------------------------------------
 
     @Test
     public void getGlobalOptions() throws Exception {
@@ -142,6 +143,24 @@ public abstract class ConfigurationTest {
 
         assertTrue(c.getGlobalOptions().contains(new StringOption("option")));
         assertTrue(c.getGlobalOptions().contains(new StringOption('o', "option")));
+    }
+
+    // getGlobalOption() -----------------------------------------------------------------------------------------------
+
+    @Test
+    public void getGlobalOption() throws Exception {
+
+        StringOption so = new StringOption('o');
+        so.setValue("test");
+        List<Option> global = Collections.singletonList(so);
+        Configuration c = getConfigurationToTest(global);
+
+        assertNull(c.getGlobalOption(new BooleanOption('o')));
+
+        StringOption so2 = (StringOption)c.getGlobalOption(new StringOption('o'));
+
+        assertEquals(so, so2);
+        assertEquals("test", so2.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

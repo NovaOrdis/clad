@@ -71,6 +71,24 @@ public class ConfigurationImpl implements Configuration {
         return globalOptions;
     }
 
+    @Override
+    public Option getGlobalOption(Option model) {
+
+        if (model == null) {
+            return null;
+        }
+
+        for(Option o: globalOptions) {
+
+            if (model.equals(o)) {
+                return o;
+            }
+        }
+
+        return null;
+    }
+
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     public void setGlobalOptions(List<Option> globalOptions) {

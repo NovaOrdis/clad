@@ -16,7 +16,6 @@
 
 package io.novaordis.clad.configuration;
 
-import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 
@@ -67,5 +66,10 @@ public interface Configuration {
      * returned in the order they show up on command line.
      */
     List<Option> getGlobalOptions();
+
+    /**
+     * @return may return null if no option that matches the definition is found.
+     */
+    Option getGlobalOption(Option definition);
 
 }
