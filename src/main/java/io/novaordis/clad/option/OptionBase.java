@@ -64,6 +64,23 @@ public abstract class OptionBase implements Option {
         this.longLiteral = s;
     }
 
+    @Override
+    public String getLabel() {
+
+        String s = null;
+
+        if (shortLiteral != null) {
+            s = "-" + shortLiteral;
+        }
+
+        if (s == null) {
+            return "--" + longLiteral;
+        }
+        else {
+            return s + (longLiteral == null ? "" : "|--" + longLiteral);
+        }
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Override

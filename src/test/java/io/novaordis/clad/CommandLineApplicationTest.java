@@ -129,7 +129,7 @@ public class CommandLineApplicationTest {
     public void identifyAndConfigureCommand_testCommand_OneKnownArgument() throws Exception {
 
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList(
-                "test", "--test-command-option=test-value"));
+                "test", "--required-test-command-option=test-value"));
 
         Command c = CommandLineApplication.identifyAndConfigureCommand(commandLineArguments);
 
@@ -137,7 +137,7 @@ public class CommandLineApplicationTest {
         assertNotNull(testCommand);
         assertEquals(1, testCommand.getOptions().size());
         StringOption so = (StringOption)testCommand.getOptions().get(0);
-        assertEquals("test-command-option", so.getLongLiteral());
+        assertEquals("required-test-command-option", so.getLongLiteral());
         assertNull(so.getShortLiteral());
         assertEquals("test-value", so.getString());
 
@@ -149,7 +149,7 @@ public class CommandLineApplicationTest {
     public void identifyAndConfigureCommand_testCommand_OneKnownArgumentAndOneUnknownArgument() throws Exception {
 
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList(
-                "test", "-x", "--test-command-option=test-value"));
+                "test", "-x", "--required-test-command-option=test-value"));
 
         Command c = CommandLineApplication.identifyAndConfigureCommand(commandLineArguments);
 
@@ -157,7 +157,7 @@ public class CommandLineApplicationTest {
         assertNotNull(testCommand);
         assertEquals(1, testCommand.getOptions().size());
         StringOption so = (StringOption)testCommand.getOptions().get(0);
-        assertEquals("test-command-option", so.getLongLiteral());
+        assertEquals("required-test-command-option", so.getLongLiteral());
         assertNull(so.getShortLiteral());
         assertEquals("test-value", so.getString());
 
@@ -170,7 +170,7 @@ public class CommandLineApplicationTest {
     public void identifyAndConfigureCommand_testCommand_TwoKnownArguments_TwoUnknownArguments() throws Exception {
 
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList(
-                "test", "--test-command-option=test-value", "-x", "blah", "-t", "test-value-2", "-y"));
+                "test", "--required-test-command-option=test-value", "-x", "blah", "-t", "test-value-2", "-y"));
 
         Command c = CommandLineApplication.identifyAndConfigureCommand(commandLineArguments);
 
@@ -180,7 +180,7 @@ public class CommandLineApplicationTest {
         assertEquals(2, testCommand.getOptions().size());
 
         StringOption so = (StringOption)testCommand.getOptions().get(0);
-        assertEquals("test-command-option", so.getLongLiteral());
+        assertEquals("required-test-command-option", so.getLongLiteral());
         assertNull(so.getShortLiteral());
         assertEquals("test-value", so.getString());
 
@@ -238,7 +238,7 @@ public class CommandLineApplicationTest {
                     {
                             "-g", "global-value", "--global2=global2-value",
                             "test",
-                            "--test-command-option=test-command-value",
+                            "--required-test-command-option=test-command-value",
                             "something",
                             "-t", "test-command-value-2"
                     };
@@ -272,7 +272,7 @@ public class CommandLineApplicationTest {
 
             option = (StringOption)commandOptions.get(0);
             assertNull(option.getShortLiteral());
-            assertEquals("test-command-option", option.getLongLiteral());
+            assertEquals("required-test-command-option", option.getLongLiteral());
             assertEquals("test-command-value", option.getValue());
 
             option = (StringOption)commandOptions.get(1);
@@ -558,6 +558,21 @@ public class CommandLineApplicationTest {
         //
 
         assertEquals("true", System.getProperty("DoesNotNeedRuntimeCommand.executed"));
+    }
+
+    @Test
+    public void run_RequiredCommandOptionMissing() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        String[] args = new String[] {"test"};
+
+        int exitCode = commandLineApplication.run(args);
+
+        assertEquals(1, exitCode);
+        String s = mos.getWrittenString();
+        assertEquals("[error]: required command option \"--required-test-command-option\" is missing\n", s);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

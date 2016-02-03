@@ -58,7 +58,7 @@ public class TestCommand extends CommandBase {
     @Override
     public Set<Option> requiredOptions() {
 
-        return new HashSet<>(Collections.singletonList(new StringOption("test-command-option")));
+        return new HashSet<>(Collections.singletonList(new StringOption("required-test-command-option")));
     }
 
     @Override

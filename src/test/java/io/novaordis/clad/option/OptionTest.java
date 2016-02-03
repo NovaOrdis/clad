@@ -53,6 +53,8 @@ public abstract class OptionTest {
 
         assertEquals(new Character('o'), option.getShortLiteral());
         assertEquals("option", option.getLongLiteral());
+
+        assertEquals("-o|--option", option.getLabel());
     }
 
     @Test
@@ -62,6 +64,8 @@ public abstract class OptionTest {
 
         assertEquals(new Character('o'), option.getShortLiteral());
         assertNull(option.getLongLiteral());
+
+        assertEquals("-o", option.getLabel());
     }
 
     @Test
@@ -71,6 +75,8 @@ public abstract class OptionTest {
 
         assertNull(option.getShortLiteral());
         assertEquals("option", option.getLongLiteral());
+
+        assertEquals("--option", option.getLabel());
     }
 
     // equals() --------------------------------------------------------------------------------------------------------

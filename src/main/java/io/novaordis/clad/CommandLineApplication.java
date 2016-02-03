@@ -338,6 +338,8 @@ public class CommandLineApplication {
                 log.debug("runtime initialized");
             }
 
+            insureRequiredCommandOptionsArePresent(command);
+
             command.execute(configuration, runtime);
 
             log.debug("command successfully executed");
@@ -401,6 +403,21 @@ public class CommandLineApplication {
                 ConsoleAppender console = (ConsoleAppender) appender;
                 //noinspection deprecation
                 console.setThreshold(Priority.DEBUG);
+            }
+        }
+    }
+
+    private void insureRequiredCommandOptionsArePresent(Command command) throws UserErrorException {
+
+        if (command == null) {
+            return;
+        }
+
+        List<Option> options = command.getOptions();
+        Set<Option> requiredOptions = command.requiredOptions();
+        for(Option o: requiredOptions) {
+            if (!options.contains(o)) {
+                throw new UserErrorException("required command option \"" + o.getLabel() + "\" is missing");
             }
         }
     }

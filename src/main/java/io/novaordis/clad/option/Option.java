@@ -50,6 +50,13 @@ public interface Option {
 
     void setLongLiteral(String longLiteral);
 
+    /**
+     * @return a human readable label, consisting in the long literal, short literal or both if both are present:
+     *
+     * "--long", "-s" or "-s|--long".
+     */
+    String getLabel();
+
     Object getValue();
 
     void setValue(Object o);
