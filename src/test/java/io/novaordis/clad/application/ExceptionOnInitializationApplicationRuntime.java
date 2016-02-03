@@ -19,6 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -44,12 +45,12 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public Set<Option> requiredGlobalOptions() {
-        throw new RuntimeException("getRequiredGlobalOptions() NOT YET IMPLEMENTED");
+        return Collections.emptySet();
     }
 
     @Override
     public Set<Option> optionalGlobalOptions() {
-        throw new RuntimeException("getOptionalGlobalOptions() NOT YET IMPLEMENTED");
+        return Collections.emptySet();
     }
 
     @Override

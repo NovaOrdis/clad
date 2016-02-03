@@ -41,10 +41,14 @@ public interface Option {
      */
     Character getShortLiteral();
 
+    void setShortLiteral(Character c);
+
     /**
      * The long form literal character (--option=<value>). May return null.
      */
     String getLongLiteral();
+
+    void setLongLiteral(String longLiteral);
 
     Object getValue();
 

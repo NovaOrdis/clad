@@ -20,6 +20,8 @@ import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -34,6 +36,8 @@ public class TestApplicationRuntime implements ApplicationRuntime {
 
     private static boolean initialized = false;
 
+    private static Set<Option> optionalGlobalOptions = new HashSet<>();
+
     public static boolean isInitialized() {
 
         return initialized;
@@ -42,6 +46,11 @@ public class TestApplicationRuntime implements ApplicationRuntime {
     public static void clear() {
 
         initialized = false;
+        optionalGlobalOptions.clear();
+    }
+
+    public static void addOptionalGlobalOption(Option option) {
+        optionalGlobalOptions.add(option);
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -57,12 +66,12 @@ public class TestApplicationRuntime implements ApplicationRuntime {
 
     @Override
     public Set<Option> requiredGlobalOptions() {
-        throw new RuntimeException("getRequiredGlobalOptions() NOT YET IMPLEMENTED");
+        return Collections.emptySet();
     }
 
     @Override
     public Set<Option> optionalGlobalOptions() {
-        throw new RuntimeException("getOptionalGlobalOptions() NOT YET IMPLEMENTED");
+        return optionalGlobalOptions;
     }
 
     @Override

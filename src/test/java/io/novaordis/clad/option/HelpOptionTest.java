@@ -46,6 +46,22 @@ public class HelpOptionTest extends OptionTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    // Overrides -------------------------------------------------------------------------------------------------------
+
+    @Override
+    @Test
+    public void setValue_WrongType() throws Exception {
+
+        // noop - there are no wrong values for Help option
+    }
+
+    @Override
+    @Test
+    public void setValue() throws Exception {
+
+        // noop - setValue() means nothing to HelpOption
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Test
@@ -158,7 +174,9 @@ public class HelpOptionTest extends OptionTest {
 
     @Override
     protected Object getAppropriateValueForOptionToTest() {
-        throw new RuntimeException("getAppropriateValueForOptionToTest() NOT YET IMPLEMENTED");
+
+        // any object
+        return new Object();
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

@@ -19,6 +19,7 @@ package io.novaordis.clad.option;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.InstanceFactory;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +33,15 @@ public class OptionParser {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = Logger.getLogger(OptionParser.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Process the command line arguments looking for required options and accepting optional options if present.
+     * Process the command line arguments looking for known (required and optional) options. The method does not
+     * check whether the required options are present, that check belongs in the application or command.
      *
      * @param commandLineArguments will remove all command line arguments that were parsed into Options
-     *
-     * @exception UserErrorException if a required option is not found.
      */
     public static List<Option> parse(int from, List<String> commandLineArguments,
                                      Set<Option> required, Set<Option> optional) throws Exception {
@@ -70,7 +72,8 @@ public class OptionParser {
             else if (handledHelpOption(i, commandLineArguments, options)) {
 
                 //
-                // handled as help option
+                // handled as help option - this is handled out-of-band and the list of required and optional options
+                // is not consulted
                 //
 
                 //noinspection UnnecessaryContinue
@@ -84,6 +87,7 @@ public class OptionParser {
                 if (required.contains(option) || optional.contains(option)) {
                     commandLineArguments.remove(i--);
                     options.add(option);
+                    copyLiterals(option, required, optional);
                 }
             }
             else if (current.startsWith("-")) {
@@ -99,7 +103,7 @@ public class OptionParser {
 
                 char shortLiteral = current.charAt(1);
 
-                Option candidateOption = null;
+                Option candidateOption;
 
                 if (i == (commandLineArguments.size() - 1) || commandLineArguments.get(i + 1).startsWith("-")) {
 
@@ -136,6 +140,7 @@ public class OptionParser {
                     //
 
                     options.add(candidateOption);
+                    copyLiterals(candidateOption, required, optional);
                     if (candidateOption instanceof BooleanOption) {
                         // remove one
                         commandLineArguments.remove(i);
@@ -148,9 +153,14 @@ public class OptionParser {
                 }
             }
             else {
-                throw new UserErrorException("unknown option: '" + current + "'");
+
+                log.debug("unknown option, ignoring it \"" + current + "\"");
             }
         }
+
+        //
+        // Do not check for required options yet, that check belongs in the command or application.
+        //
 
         return options;
     }
@@ -419,6 +429,39 @@ public class OptionParser {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    // Private Static --------------------------------------------------------------------------------------------------
+
+    private static void copyLiterals(Option option, Set<Option> required, Set<Option> optional) {
+
+        for(Option o: required) {
+            if (o.equals(option)) {
+                Character shortLiteral = o.getShortLiteral();
+                if (shortLiteral != null) {
+                    option.setShortLiteral(shortLiteral);
+                }
+                String longLiteral = o.getLongLiteral();
+                if (longLiteral != null) {
+                    option.setLongLiteral(longLiteral);
+                }
+                break;
+            }
+        }
+
+        for(Option o: optional) {
+            if (o.equals(option)) {
+                Character shortLiteral = o.getShortLiteral();
+                if (shortLiteral != null) {
+                    option.setShortLiteral(shortLiteral);
+                }
+                String longLiteral = o.getLongLiteral();
+                if (longLiteral != null) {
+                    option.setLongLiteral(longLiteral);
+                }
+                break;
+            }
+        }
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

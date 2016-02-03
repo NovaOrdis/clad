@@ -67,6 +67,7 @@ public class CommandLineApplicationTest {
 
     @After
     public void tearDown() {
+        TestApplicationRuntime.clear();
         System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
         System.clearProperty("DoesNotNeedRuntimeCommand.executed");
     }
@@ -168,8 +169,6 @@ public class CommandLineApplicationTest {
     @Test
     public void identifyAndConfigureCommand_testCommand_TwoKnownArguments_TwoUnknownArguments() throws Exception {
 
-        fail("return here");
-
         List<String> commandLineArguments = new ArrayList<>(Arrays.asList(
                 "test", "--test-command-option=test-value", "-x", "blah", "-t", "test-value-2", "-y"));
 
@@ -232,6 +231,8 @@ public class CommandLineApplicationTest {
 
             assertFalse(TestApplicationRuntime.isInitialized());
             assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
+            TestApplicationRuntime.addOptionalGlobalOption(new StringOption('g'));
+            TestApplicationRuntime.addOptionalGlobalOption(new StringOption("global2"));
 
             String[] args = new String[]
                     {
@@ -277,8 +278,6 @@ public class CommandLineApplicationTest {
             option = (StringOption)commandOptions.get(1);
             assertEquals('t', option.getShortLiteral().charValue());
             assertEquals("test-command-value-2", option.getValue());
-
-            fail("make sure that 'something' remains in the arguments");
         }
         finally {
 
@@ -292,32 +291,27 @@ public class CommandLineApplicationTest {
     @Test
     public void main_NoDefaultCommand() throws Exception {
 
-        try {
+        assertFalse(TestApplicationRuntime.isInitialized());
 
-            assertFalse(TestApplicationRuntime.isInitialized());
+        CommandLineApplication commandLineApplication = new CommandLineApplication();
 
-            CommandLineApplication commandLineApplication = new CommandLineApplication();
+        MockOutputStream mos = new MockOutputStream();
 
-            MockOutputStream mos = new MockOutputStream();
+        commandLineApplication.setStderrOutputStream(mos);
 
-            commandLineApplication.setStderrOutputStream(mos);
+        String[] args = new String[] {"-g", "global-value"};
 
-            String[] args = new String[] {"-g", "global-value"};
+        TestApplicationRuntime.addOptionalGlobalOption(new StringOption('g'));
 
-            int exitCode = commandLineApplication.run(args);
+        int exitCode = commandLineApplication.run(args);
 
-            assertEquals(1, exitCode);
+        assertEquals(1, exitCode);
 
-            byte[] bytes = mos.getWrittenBytes();
-            String msg = new String(bytes);
-            assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
+        byte[] bytes = mos.getWrittenBytes();
+        String msg = new String(bytes);
+        assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
 
-            assertFalse(TestApplicationRuntime.isInitialized());
-        }
-        finally {
-            TestApplicationRuntime.clear();
-            assertFalse(TestApplicationRuntime.isInitialized());
-        }
+        assertFalse(TestApplicationRuntime.isInitialized());
     }
 
     @Test
@@ -341,7 +335,7 @@ public class CommandLineApplicationTest {
 
             byte[] bytes = mos.getWrittenBytes();
             String msg = new String(bytes);
-            assertEquals("[error]: unknown option: 'something'\n", msg);
+            assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
 
             assertFalse(TestApplicationRuntime.isInitialized());
         }

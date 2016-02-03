@@ -353,12 +353,31 @@ public class OptionParserTest {
 
     @Test
     public void parse_missingRequiredOption() throws Exception {
-        fail("return here");
+
+        List<String> args = tokenizeCommandLine("--test=something");
+
+        Set<Option> required = Collections.singleton(new StringOption("option1"));
+        Set<Option> optional = Collections.emptySet();
+
+        // this makes sure parse() does not react to missing options
+        List<Option> result = OptionParser.parse(0, args, required, optional);
+        assertEquals(0, result.size());
     }
 
     @Test
     public void parse_notOnAnyList() throws Exception {
-        fail("return here");
+
+        List<String> args = tokenizeCommandLine("--test=something -x");
+
+        Set<Option> required = Collections.singleton(new BooleanOption('x'));
+        Set<Option> optional = Collections.emptySet();
+
+        List<Option> options = OptionParser.parse(0, args, required, optional);
+        assertEquals(1, options.size());
+        assertTrue(options.contains(new BooleanOption('x')));
+
+        assertEquals(1, args.size());
+        assertEquals("--test=something", args.get(0));
     }
 
     // parse(), VerboseOption ------------------------------------------------------------------------------------------

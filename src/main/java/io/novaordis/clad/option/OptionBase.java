@@ -47,9 +47,21 @@ public abstract class OptionBase implements Option {
     }
 
     @Override
+    public void setShortLiteral(Character c)
+    {
+        this.shortLiteral = c;
+    }
+
+    @Override
     public String getLongLiteral()
     {
         return longLiteral;
+    }
+
+    @Override
+    public void setLongLiteral(String s)
+    {
+        this.longLiteral = s;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

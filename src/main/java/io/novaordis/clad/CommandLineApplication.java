@@ -150,6 +150,7 @@ public class CommandLineApplication {
 
                 commandLineArguments.remove(i);
                 command.configure(i, commandLineArguments);
+                break;
             }
         }
 
@@ -243,7 +244,7 @@ public class CommandLineApplication {
 
             Set<Option> requiredGlobalOptions = runtime.requiredGlobalOptions();
             Set<Option> optionalGlobalOptions = runtime.optionalGlobalOptions();
-            // --verbose is always an optional option
+            // --verbose, --help are always optional options
             optionalGlobalOptions = new HashSet<>(optionalGlobalOptions);
             optionalGlobalOptions.add(new VerboseOption());
 

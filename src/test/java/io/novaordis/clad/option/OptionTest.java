@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -351,7 +353,9 @@ public abstract class OptionTest {
             return !(Boolean)value;
         }
         else {
-            throw new RuntimeException("NOT YET IMPLEMENTED: " + value);
+
+            // object, return a different object
+            return new Object();
         }
     }
 
