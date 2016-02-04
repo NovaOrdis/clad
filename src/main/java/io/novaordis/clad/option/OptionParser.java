@@ -154,7 +154,7 @@ public class OptionParser {
             }
             else {
 
-                log.debug("unknown option, ignoring it \"" + current + "\"");
+                log.debug("unknown option \"" + current + "\", ignoring it");
             }
         }
 

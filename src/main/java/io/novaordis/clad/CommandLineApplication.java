@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -322,6 +323,12 @@ public class CommandLineApplication {
             }
 
             //
+            // at this point we should not have unrecognized command line arguments, if we do, fail
+            //
+
+            failOnUnknownCommandOrOptions(commandLineArguments);
+
+            //
             // not a special situation, execute the command
             //
 
@@ -423,6 +430,28 @@ public class CommandLineApplication {
                         "required \"" + command.getName() + "\" command option \"" + o.getLabel() + "\" is missing");
             }
         }
+    }
+
+    private void failOnUnknownCommandOrOptions(List<String> unprocessedCommandLineArguments) throws UserErrorException {
+
+        if (unprocessedCommandLineArguments.isEmpty()) {
+
+            // we're good
+            return;
+        }
+
+        String s = "";
+
+        for(Iterator<String> i = unprocessedCommandLineArguments.iterator(); i.hasNext(); ) {
+
+            s += i.next();
+
+            if (i.hasNext()) {
+                s += ", ";
+            }
+        }
+
+        throw new UserErrorException("unknown command(s) or option(s): " + s);
     }
 
     // Inner classes ---------------------------------------------------------------------------------------------------

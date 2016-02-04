@@ -67,6 +67,8 @@ public class CommandLineApplicationTest {
 
     @After
     public void tearDown() {
+
+        TestCommand.clear();
         TestApplicationRuntime.clear();
         System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
         System.clearProperty("DoesNotNeedRuntimeCommand.executed");
@@ -225,6 +227,38 @@ public class CommandLineApplicationTest {
     // execute() -------------------------------------------------------------------------------------------------------
 
     @Test
+    public void unknownCommandLineArgument() throws Exception {
+
+        assertFalse(TestApplicationRuntime.isInitialized());
+        assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
+        TestApplicationRuntime.addOptionalGlobalOption(new StringOption('g'));
+        TestApplicationRuntime.addOptionalGlobalOption(new StringOption("global2"));
+
+        String[] args = new String[]
+                {
+                        "-g", "global-value", "--global2=global2-value",
+                        "test",
+                        "--required-test-command-option=test-command-value",
+                        "bananas",
+                        "-t", "test-command-value-2"
+                };
+
+        MockOutputStream mos = new MockOutputStream();
+
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        int exitCode = commandLineApplication.run(args);
+
+        assertEquals(1, exitCode);
+
+        assertFalse(TestApplicationRuntime.isInitialized());
+
+        String s = mos.getWrittenString();
+        log.info(s);
+        assertEquals("[error]: unknown command(s) or option(s): bananas\n", s);
+    }
+
+    @Test
     public void execute() throws Exception {
 
         try {
@@ -239,7 +273,6 @@ public class CommandLineApplicationTest {
                             "-g", "global-value", "--global2=global2-value",
                             "test",
                             "--required-test-command-option=test-command-value",
-                            "something",
                             "-t", "test-command-value-2"
                     };
 
