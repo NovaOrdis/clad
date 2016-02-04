@@ -50,7 +50,7 @@ public class OptionParser {
         // pre-parse to handle single quotes and double quotes
         //
 
-        handleQuotes(from, commandLineArguments);
+        coalesceQuotedSections(from, commandLineArguments);
 
         List<Option> options = new ArrayList<>();
 
@@ -169,7 +169,7 @@ public class OptionParser {
      * Coalesces strings between single and double quotes in place withing the argument list. Works by side-effect.
      * @param from - only start from 'from', leave the first arguments untouched.
      */
-    public static void handleQuotes(int from, List<String> commandLineArguments) throws UserErrorException {
+    public static void coalesceQuotedSections(int from, List<String> commandLineArguments) throws UserErrorException {
 
         StringBuilder doubleQuoted = null;
         StringBuilder singleQuoted = null;

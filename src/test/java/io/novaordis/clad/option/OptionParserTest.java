@@ -474,15 +474,15 @@ public class OptionParserTest {
         assertEquals(new VerboseOption(), options.iterator().next());
     }
 
-    // handleQuotes ----------------------------------------------------------------------------------------------------
+    // coalesceQuotedSections ------------------------------------------------------------------------------------------
 
     @Test
-    public void handleDoubleQuotes_UnbalancedDoubleQuotes() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes_UnbalancedDoubleQuotes() throws Exception {
 
         List<String> args = tokenizeCommandLine("a \"b \"c");
 
         try {
-            OptionParser.handleQuotes(1, args);
+            OptionParser.coalesceQuotedSections(1, args);
             fail("should have thrown exception");
         }
         catch(UserErrorException e) {
@@ -496,12 +496,12 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleSingleQuotes_UnbalancedSingleQuotes() throws Exception {
+    public void coalesceQuotedSections_handleSingleQuotes_UnbalancedSingleQuotes() throws Exception {
 
         List<String> args = tokenizeCommandLine("a 'b 'c");
 
         try {
-            OptionParser.handleQuotes(1, args);
+            OptionParser.coalesceQuotedSections(1, args);
             fail("should have thrown exception");
         }
         catch(UserErrorException e) {
@@ -515,12 +515,12 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes_UnbalancedDoubleQuotes2() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes_UnbalancedDoubleQuotes2() throws Exception {
 
         List<String> args = tokenizeCommandLine("a \"b c \"d");
 
         try {
-            OptionParser.handleQuotes(1, args);
+            OptionParser.coalesceQuotedSections(1, args);
             fail("should have thrown exception");
         }
         catch(UserErrorException e) {
@@ -535,12 +535,12 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleSingleQuotes_UnbalancedSingleQuotes2() throws Exception {
+    public void coalesceQuotedSections_handleSingleQuotes_UnbalancedSingleQuotes2() throws Exception {
 
         List<String> args = tokenizeCommandLine("a 'b c 'd");
 
         try {
-            OptionParser.handleQuotes(1, args);
+            OptionParser.coalesceQuotedSections(1, args);
             fail("should have thrown exception");
         }
         catch(UserErrorException e) {
@@ -555,11 +555,11 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes() throws Exception {
 
         List<String> args = tokenizeCommandLine("a \"b c\"");
 
-        OptionParser.handleQuotes(0, args);
+        OptionParser.coalesceQuotedSections(0, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -567,11 +567,11 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleSingleQuotes() throws Exception {
+    public void coalesceQuotedSections_handleSingleQuotes() throws Exception {
 
         List<String> args = tokenizeCommandLine("a 'b c'");
 
-        OptionParser.handleQuotes(0, args);
+        OptionParser.coalesceQuotedSections(0, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -579,10 +579,10 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes2() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes2() throws Exception {
 
         List<String> args = tokenizeCommandLine("a \"b c\"");
-        OptionParser.handleQuotes(1, args);
+        OptionParser.coalesceQuotedSections(1, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -590,10 +590,10 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleSingleQuotes2() throws Exception {
+    public void coalesceQuotedSections_handleSingleQuotes2() throws Exception {
 
         List<String> args = tokenizeCommandLine("a 'b c'");
-        OptionParser.handleQuotes(1, args);
+        OptionParser.coalesceQuotedSections(1, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -601,11 +601,11 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes3() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes3() throws Exception {
 
         List<String> args = tokenizeCommandLine("a \"b c d\"");
 
-        OptionParser.handleQuotes(1, args);
+        OptionParser.coalesceQuotedSections(1, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -613,11 +613,11 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleSingleQuotes3() throws Exception {
+    public void coalesceQuotedSections_handleSingleQuotes3() throws Exception {
 
         List<String> args = tokenizeCommandLine("a 'b c d'");
 
-        OptionParser.handleQuotes(1, args);
+        OptionParser.coalesceQuotedSections(1, args);
 
         assertEquals(2, args.size());
         assertEquals("a", args.get(0));
@@ -625,11 +625,11 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes_TwoQuotedStrings() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes_TwoQuotedStrings() throws Exception {
 
         List<String> args = tokenizeCommandLine("-f \"a b c\" --format \"x y\"");
 
-        OptionParser.handleQuotes(0, args);
+        OptionParser.coalesceQuotedSections(0, args);
 
         assertEquals(4, args.size());
 
@@ -640,7 +640,7 @@ public class OptionParserTest {
     }
 
     @Test
-    public void handleDoubleQuotes_EscapedQuotes() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes_EscapedQuotes() throws Exception {
 
         char[] arg0 = new char[] { '-', 'f' };
         char[] arg1 = new char[] { '"', '\\', '"', '%', 'I', '\\', '"' };
@@ -663,7 +663,7 @@ public class OptionParserTest {
                 new String(arg7),
                 new String(arg8)));
 
-        OptionParser.handleQuotes(0, args);
+        OptionParser.coalesceQuotedSections(0, args);
 
         assertEquals(2, args.size());
 
