@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -59,14 +60,46 @@ public class InstanceFactoryTest {
     @Test
     public void getCommand() throws Exception {
 
+        Util.normalizeLabelInvoked = false;
         Command command = InstanceFactory.getCommand("test");
+        assertTrue(Util.normalizeLabelInvoked);
         assertNotNull(command);
         assertTrue(command instanceof TestCommand);
     }
 
     @Test
     public void getCommand_NoSuchCommand() throws Exception {
+
+        Util.normalizeLabelInvoked = false;
         assertNull(InstanceFactory.getCommand("no-such-command"));
+        assertTrue(Util.normalizeLabelInvoked);
+    }
+
+    @Test
+    public void getCommand_InvalidCandidate_SmallerThanA() throws Exception {
+
+        Util.normalizeLabelInvoked = false;
+        Command c = InstanceFactory.getCommand("@something");
+        assertFalse(Util.normalizeLabelInvoked);
+        assertNull(c);
+    }
+
+    @Test
+    public void getCommand_InvalidCandidate_BetweenZanda() throws Exception {
+
+        Util.normalizeLabelInvoked = false;
+        Command c = InstanceFactory.getCommand("{something");
+        assertFalse(Util.normalizeLabelInvoked);
+        assertNull(c);
+    }
+
+    @Test
+    public void getCommand_InvalidCandidate_BiggerThanz() throws Exception {
+
+        Util.normalizeLabelInvoked = false;
+        Command c = InstanceFactory.getCommand("-something");
+        assertFalse(Util.normalizeLabelInvoked);
+        assertNull(c);
     }
 
     // getFileNames() --------------------------------------------------------------------------------------------------

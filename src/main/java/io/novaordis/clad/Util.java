@@ -24,6 +24,10 @@ public class Util {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    // Static Attributes -----------------------------------------------------------------------------------------------
+
+    public static boolean normalizeLabelInvoked = false;
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     /**
@@ -31,6 +35,8 @@ public class Util {
      * For example, "app-one" becomes "appOne" after normalization.
      */
     public static String normalizeLabel(String name) {
+
+        normalizeLabelInvoked = true;
 
         String result = "";
         for(int i = 0; i < name.length(); i ++) {

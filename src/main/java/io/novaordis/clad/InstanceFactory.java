@@ -60,9 +60,21 @@ public class InstanceFactory<I> {
      * @param name the name of the Command as specified on command line. May contain dashes, etc.
      *
      * @return a non-initialized Command instance if the corresponding command implementation class was found on the
-     * class path and the no-argument constructor instantiation went well.
+     * class path and the no-argument constructor instantiation went well, or null otherwise.
      */
     public static Command getCommand(String name) throws Exception {
+
+        //
+        // optimization to avoid an expensive recursive descent for names that can never be command names: must be
+        // not null and must start with a legal class name character
+        //
+        if (name == null || name.length() == 0) {
+            return null;
+        }
+
+        if ((name.charAt(0) < 'A' || name.charAt(0) > 'Z') && (name.charAt(0) < 'a' || name.charAt(0) > 'z')) {
+            return null;
+        }
 
         String normalizedName = Util.normalizeLabel(name);
         String commandClassName = getFullyQualifiedClassName(normalizedName, "Command");
