@@ -218,7 +218,7 @@ public class CommandLineApplication {
     // Package protected -----------------------------------------------------------------------------------------------
 
     /**
-     * @return the exit code to be returned by the process on exit.
+     * @return the exit code to be returned by the process on exit. Zero means everything OK, non-zero means failure.
      */
     int run(String[] args) throws Exception {
 
@@ -230,9 +230,9 @@ public class CommandLineApplication {
             // identify and instantiate the runtime
             //
 
-            ApplicationRuntime runtime = identifyRuntime(configuration);
+            ApplicationRuntime application = identifyRuntime(configuration);
 
-            if (runtime == null) {
+            if (application == null) {
                 throw new UserErrorException("no application runtime");
             }
 
@@ -243,8 +243,8 @@ public class CommandLineApplication {
 
             command = identifyAndConfigureCommand(commandLineArguments);
 
-            Set<Option> requiredGlobalOptions = runtime.requiredGlobalOptions();
-            Set<Option> optionalGlobalOptions = runtime.optionalGlobalOptions();
+            Set<Option> requiredGlobalOptions = application.requiredGlobalOptions();
+            Set<Option> optionalGlobalOptions = application.optionalGlobalOptions();
             // --verbose, --help are always optional options
             optionalGlobalOptions = new HashSet<>(optionalGlobalOptions);
             optionalGlobalOptions.add(new VerboseOption());
@@ -277,6 +277,7 @@ public class CommandLineApplication {
                             helpOption.setCommandName(commandLineArguments.get(0));
                         }
                     }
+                    helpOption.setApplication(application);
                     helpOption.displayHelp(getStdoutOutputStream());
                     return 0;
                 }
@@ -285,9 +286,9 @@ public class CommandLineApplication {
                 // try to figure out the default command
                 //
 
-                String defaultCommandName = runtime.getDefaultCommandName();
+                String defaultCommandName = application.getDefaultCommandName();
 
-                log.debug(runtime + "'s default command name: " + (defaultCommandName == null ? null : "\"" + defaultCommandName + "\""));
+                log.debug(application + "'s default command name: " + (defaultCommandName == null ? null : "\"" + defaultCommandName + "\""));
 
                 if (defaultCommandName == null) {
 
@@ -298,7 +299,7 @@ public class CommandLineApplication {
                 // attempt to instantiate the default command and execute it
                 command = InstanceFactory.getCommand(defaultCommandName);
 
-                log.debug(runtime + "'s default command: " +  command);
+                log.debug(application + "'s default command: " +  command);
 
                 if (command == null) {
                     throw new UserErrorException("no command specified and no default command configured");
@@ -318,6 +319,7 @@ public class CommandLineApplication {
                 // inject the current command, if any - this will fail if the help is already configured with a command
 
                 helpOption.setCommand(command);
+                helpOption.setApplication(application);
                 helpOption.displayHelp(getStdoutOutputStream());
                 return 0;
             }
@@ -342,14 +344,14 @@ public class CommandLineApplication {
 
                 log.debug("initializing the runtime");
 
-                runtime.init(configuration);
+                application.init(configuration);
 
                 log.debug("runtime initialized");
             }
 
             insureRequiredCommandOptionsArePresent(command);
 
-            command.execute(configuration, runtime);
+            command.execute(configuration, application);
 
             log.debug("command successfully executed");
 

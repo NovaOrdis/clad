@@ -16,68 +16,42 @@
 
 package io.novaordis.clad.application;
 
-import io.novaordis.clad.UserErrorException;
-import io.novaordis.clad.configuration.Configuration;
-import io.novaordis.clad.option.Option;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 2/4/16
  */
-public class TestApplicationRuntime extends ApplicationRuntimeBase {
+public abstract  class ApplicationRuntimeBase implements ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    private static boolean initialized = false;
-
-    private static Set<Option> optionalGlobalOptions = new HashSet<>();
-
-    public static boolean isInitialized() {
-
-        return initialized;
-    }
-
-    public static void clear() {
-
-        initialized = false;
-        optionalGlobalOptions.clear();
-    }
-
-    public static void addOptionalGlobalOption(Option option) {
-        optionalGlobalOptions.add(option);
-    }
-
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // ApplicationRuntime implementation -------------------------------------------------------------------------------
+    // ApplicationRuntime overrides ------------------------------------------------------------------------------------
 
     @Override
-    public String getDefaultCommandName() {
-        return null;
+    public String getName() {
+
+        String simpleName = this.getClass().getSimpleName();
+
+        if (!simpleName.endsWith("ApplicationRuntime")) {
+            throw new IllegalStateException(
+                    "non-standard application class name " + simpleName + ", we don't know how to handle it");
+        }
+
+        return simpleName.substring(0, simpleName.length() - "ApplicationRuntime".length()).toLowerCase();
     }
 
     @Override
-    public Set<Option> requiredGlobalOptions() {
-        return Collections.emptySet();
-    }
+    public String getHelpFilePath() {
 
-    @Override
-    public Set<Option> optionalGlobalOptions() {
-        return optionalGlobalOptions;
-    }
-
-    @Override
-    public void init(Configuration configuration) throws UserErrorException {
-
-        initialized = true;
+        String s = getClass().getName();
+        s = s.substring(0, s.lastIndexOf('.'));
+        s = s.replace('.', '/');
+        return s + "/" + getName() + ".txt";
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

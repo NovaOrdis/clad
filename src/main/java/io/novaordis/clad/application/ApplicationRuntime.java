@@ -39,11 +39,18 @@ public interface ApplicationRuntime {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    String getName();
+
     /**
      * @return the default command name. The command implementation must exist somewhere on the classpath. May
      * return null.
      */
     String getDefaultCommandName();
+
+    /**
+     * @return the relative path of the help file associated with this application. The path is relative to classpath.
+     */
+    String getHelpFilePath();
 
     /**
      * This is how an application declares its required global options. The command line application framework will

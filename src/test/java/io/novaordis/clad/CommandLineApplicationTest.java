@@ -405,18 +405,19 @@ public class CommandLineApplicationTest {
         String[] args = new String[] { "help" };
 
         //
-        // all commands help
+        // generic help + all commands
         //
 
         int exitCode = commandLineApplication.run(args);
 
         assertEquals(0, exitCode);
 
-        String allCommandsHelp = mos.getWrittenString();
+        String applicationHelpAndAllCommands = mos.getWrittenString();
 
-        assertTrue(allCommandsHelp.contains("test"));
-        assertTrue(allCommandsHelp.contains("test2"));
-        assertTrue(allCommandsHelp.contains("version"));
+        assertTrue(applicationHelpAndAllCommands.contains("this is application help placeholder"));
+        assertTrue(applicationHelpAndAllCommands.contains("test"));
+        assertTrue(applicationHelpAndAllCommands.contains("test2"));
+        assertTrue(applicationHelpAndAllCommands.contains("version"));
 
         assertFalse(TestApplicationRuntime.isInitialized());
     }

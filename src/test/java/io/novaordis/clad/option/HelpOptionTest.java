@@ -16,6 +16,7 @@
 
 package io.novaordis.clad.option;
 
+import io.novaordis.clad.application.TestApplicationRuntime;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.MockOutputStream;
 import io.novaordis.clad.command.Test2Command;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -109,23 +109,23 @@ public class HelpOptionTest extends OptionTest {
         helpOption.displayHelp(mos);
 
         String s = mos.getWrittenString();
-        assertEquals(HelpOption.NO_HELP_FOUND_TEXT + " 'test2'\n", s);
+        assertEquals(HelpOption.NO_COMMAND_HELP_FOUND_TEXT + " 'test2'\n", s);
     }
 
     @Test
-    public void displayHelp_AllCommands() throws Exception {
+    public void displayHelp_GenericApplicationHelpAndAllCommands() throws Exception {
 
         HelpOption helpOption = new HelpOption();
         assertNull(helpOption.getCommand());
         assertNull(helpOption.getValue());
+        helpOption.setApplication(new TestApplicationRuntime());
 
         MockOutputStream mos = new MockOutputStream();
 
         helpOption.displayHelp(mos);
 
         String s = mos.getWrittenString();
-        assertNotNull(s);
-        assertTrue(s.trim().length() > 0);
+        assertTrue(s.contains("this is application help placeholder"));
     }
 
     // setCommand() ----------------------------------------------------------------------------------------------------
@@ -160,6 +160,22 @@ public class HelpOptionTest extends OptionTest {
         }
 
         assertTrue(helpOption.getCommand() instanceof TestCommand);
+    }
+
+    // getHelpContent() ------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getHelpContent() throws Exception {
+        String file = "data/help.txt"; // this is in the test classpath
+        byte[] result = HelpOption.getHelpContent(file);
+        assertEquals("test help\n", new String(result));
+    }
+
+    @Test
+    public void getHelpContent_NoNewLineAtTheEndOfStorage() throws Exception {
+        String file = "data/help-no-newline.txt"; // this is in the test classpath
+        byte[] result = HelpOption.getHelpContent(file);
+        assertEquals("test help\n", new String(result));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

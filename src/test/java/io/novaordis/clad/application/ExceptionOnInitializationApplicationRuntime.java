@@ -26,6 +26,7 @@ import java.util.Set;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/31/16
  */
+@SuppressWarnings("unused")
 public class ExceptionOnInitializationApplicationRuntime implements ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
@@ -39,8 +40,18 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     // ApplicationRuntime implementation -------------------------------------------------------------------------------
 
     @Override
+    public String getName() {
+        throw new RuntimeException("getName() NOT YET IMPLEMENTED");
+    }
+
+    @Override
     public String getDefaultCommandName() {
         return null;
+    }
+
+    @Override
+    public String getHelpFilePath() {
+        throw new RuntimeException("getHelpFilePath() NOT YET IMPLEMENTED");
     }
 
     @Override

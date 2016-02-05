@@ -16,10 +16,14 @@
 
 package io.novaordis.clad.option;
 
+import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.InstanceFactory;
 import io.novaordis.clad.UserErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -35,10 +39,13 @@ public class HelpOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = LoggerFactory.getLogger(HelpOption.class);
+
     public static final String LONG_LITERAL = "help";
     public static final Character SHORT_LITERAL = 'h';
 
-    public static final String NO_HELP_FOUND_TEXT = "[warn]: no in-line help found for command";
+    public static final String NO_COMMAND_HELP_FOUND_TEXT = "[warn]: no in-line help found for command";
+    public static final String NO_APPLICATION_HELP_FOUND_TEXT = "[warn]: no in-line application help found";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -48,6 +55,8 @@ public class HelpOption extends OptionBase {
 
     // if command is not null, it takes precedence
     private String commandName;
+
+    private ApplicationRuntime application;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -95,49 +104,50 @@ public class HelpOption extends OptionBase {
         this.commandName = commandName;
     }
 
+    /**
+     * Associates this help option with the application instance.
+     *
+     * @param application may be null.
+     */
+    public void setApplication(ApplicationRuntime application) {
+        this.application = application;
+    }
+
     public void displayHelp(OutputStream outputStream) throws Exception {
 
         if (command != null) {
 
-            // pull the help content
+            //
+            // a command name was specified after "help" on command line
+            //
+
             String helpFilePath = command.getHelpFilePath();
-
-            InputStream is = getClass().getClassLoader().getResourceAsStream(helpFilePath);
-
-            if (is == null) {
-                // help file not found
-                String msg = NO_HELP_FOUND_TEXT + " '" + command.getName() + "'\n";
-                outputStream.write(msg.getBytes());
-                outputStream.flush();
+            byte[] helpContent = getHelpContent(helpFilePath);
+            if (helpContent.length == 0) {
+                helpContent = (NO_COMMAND_HELP_FOUND_TEXT + " '" + command.getName() + "'\n").getBytes();
             }
-            else {
-                int r, last = -1;
-                while ((r = is.read()) != -1) {
-                    outputStream.write(r);
-                    last = r;
-                }
-
-                if (last != '\n') {
-                    outputStream.write('\n');
-                }
-                outputStream.flush();
-            }
+            outputStream.write(helpContent);
+            outputStream.flush();
         }
         else {
+
+            //
+            // no command name was specified after "help" on command line
+            //
 
             if (commandName != null) {
                 throw new UserErrorException("unknown command: '" + commandName + "'");
             }
 
             //
-            // all commands help
+            // generic application help + all commands
             //
 
-            displayAllCommandsHelp(outputStream);
+            displayGenericApplicationHelpAndAllCommands(outputStream);
         }
     }
 
-    public void displayAllCommandsHelp(OutputStream outputStream) throws Exception {
+    public void displayGenericApplicationHelpAndAllCommands(OutputStream outputStream) throws Exception {
 
         InstanceFactory<Command> i = new InstanceFactory<>();
 
@@ -148,14 +158,21 @@ public class HelpOption extends OptionBase {
         Collections.sort(commandList);
 
         //
+        // display generic application help
+        //
+
+        String helpFilePath = application.getHelpFilePath();
+        byte[] helpContent = getHelpContent(helpFilePath);
+        if (helpContent.length == 0) {
+            helpContent = (NO_APPLICATION_HELP_FOUND_TEXT + "'\n").getBytes();
+        }
+        outputStream.write(helpContent);
+        outputStream.flush();
+
+        //
         // iterate over the list of commands and determine the max display width
         //
-        int width = -1;
-        for(Command c: commandList) {
-            if (c.getName().length() > width) {
-                width = c.getName().length();
-            }
-        }
+        int width = maxDisplayWidth(commandList);
 
         outputStream.write("\n".getBytes());
         outputStream.write("Commands:\n".getBytes());
@@ -163,9 +180,9 @@ public class HelpOption extends OptionBase {
 
         for(Command c: commandList) {
 
-            String helpFilePath = c.getHelpFilePath();
-            InputStream is = getClass().getClassLoader().getResourceAsStream(helpFilePath);
-            boolean helpAvailable = is != null;
+            helpFilePath = c.getHelpFilePath();
+            helpContent = getHelpContent(helpFilePath);
+            boolean helpAvailable = helpContent.length > 0;
 
             String format = "  %1$-" + width + "s";
             outputStream.write(String.format(format, c.getName()).getBytes());
@@ -189,9 +206,52 @@ public class HelpOption extends OptionBase {
 
     // Package protected -----------------------------------------------------------------------------------------------
 
+    // Package Protected Static ----------------------------------------------------------------------------------------
+
+    /**
+     * @return empty byte[] if no help content was found. The byte[] will always end with a '\n'.
+     */
+    static byte[] getHelpContent(String helpFilePath) throws Exception {
+
+        InputStream is = HelpOption.class.getClassLoader().getResourceAsStream(helpFilePath);
+
+        if (is == null) {
+            //
+            // help file not found
+            //
+            log.debug("help file " + helpFilePath + " not found");
+            return new byte[0];
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int r, last = -1;
+        while ((r = is.read()) != -1) {
+            baos.write(r);
+            last = r;
+        }
+
+        if (last != '\n') {
+            baos.write('\n');
+        }
+
+        return baos.toByteArray();
+    }
+
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    // Private Static --------------------------------------------------------------------------------------------------
+
+    private static int maxDisplayWidth(List<Command> commandList) {
+        int width = -1;
+        for(Command c: commandList) {
+            if (c.getName().length() > width) {
+                width = c.getName().length();
+            }
+        }
+        return width;
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 
