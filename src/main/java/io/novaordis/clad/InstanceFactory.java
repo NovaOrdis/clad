@@ -68,11 +68,7 @@ public class InstanceFactory<I> {
         // optimization to avoid an expensive recursive descent for names that can never be command names: must be
         // not null and must start with a legal class name character
         //
-        if (name == null || name.length() == 0) {
-            return null;
-        }
-
-        if ((name.charAt(0) < 'A' || name.charAt(0) > 'Z') && (name.charAt(0) < 'a' || name.charAt(0) > 'z')) {
+        if (!canBePartOfAClassName(name)) {
             return null;
         }
 
@@ -339,6 +335,33 @@ public class InstanceFactory<I> {
         }
 
         return jarFiles;
+    }
+
+    // Package Protected Static ----------------------------------------------------------------------------------------
+
+    static boolean canBePartOfAClassName(String s) {
+
+        if (s == null || s.length() == 0) {
+            return false;
+        }
+
+        char firstChar = s.charAt(0);
+
+        if ((firstChar < 'A' || firstChar > 'Z') && (firstChar < 'a' || firstChar > 'z')) {
+            return false;
+        }
+
+        if (s.length() > 1) {
+            for(int i = 1; i < s.length(); i ++) {
+                char c = s.charAt(i);
+                if (c == '_' || c == '-' || (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                    continue;
+                }
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------

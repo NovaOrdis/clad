@@ -102,6 +102,15 @@ public class InstanceFactoryTest {
         assertNull(c);
     }
 
+    @Test
+    public void getCommand_InvalidCandidate_UnbecomingCharacters() throws Exception {
+
+        Util.normalizeLabelInvoked = false;
+        Command c = InstanceFactory.getCommand("timestamp(time:yy/MM/dd");
+        assertFalse(Util.normalizeLabelInvoked);
+        assertNull(c);
+    }
+
     // getFileNames() --------------------------------------------------------------------------------------------------
 
     @Test
