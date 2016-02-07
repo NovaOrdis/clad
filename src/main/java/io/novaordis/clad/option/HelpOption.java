@@ -18,7 +18,6 @@ package io.novaordis.clad.option;
 
 import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.command.Command;
-import io.novaordis.clad.InstanceFactory;
 import io.novaordis.clad.UserErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -47,7 +44,53 @@ public class HelpOption extends OptionBase {
     public static final String NO_COMMAND_HELP_FOUND_TEXT = "[warn]: no in-line help found for command";
     public static final String NO_APPLICATION_HELP_FOUND_TEXT = "[warn]: no in-line application help found";
 
+    private static final Pattern MACRO_PATTERN = Pattern.compile("@\\w+@");
+
     // Static ----------------------------------------------------------------------------------------------------------
+
+    // Package Protected Static ----------------------------------------------------------------------------------------
+
+    static byte[] resolveMacros(byte[] helpContent, MacroResolver macroResolver) throws Exception {
+
+        //
+        // look for macros and resolve them recursively
+        //
+
+        String resolvedContent = new String(helpContent);
+
+        while(true) {
+
+            Matcher m = MACRO_PATTERN.matcher(resolvedContent);
+
+            if (m.find()) {
+                //
+                // replace the macro and re-search
+                //
+                int start = m.start();
+                int end = m.end();
+                String macroName = resolvedContent.substring(start + 1, end - 1);
+                String resolvedMacro = macroResolver.resolveMacro(macroName);
+
+                if (resolvedMacro == null) {
+                    //
+                    // leave the macro in place so we know we couldn't resolve it
+                    //
+                    resolvedMacro = "@" + macroName + "@";
+                }
+
+                resolvedContent = resolvedContent.substring(0, start) + resolvedMacro + resolvedContent.substring(end);
+                continue;
+            }
+
+            //
+            // no more macros
+            //
+
+            break;
+        }
+
+        return resolvedContent.getBytes();
+    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -58,10 +101,13 @@ public class HelpOption extends OptionBase {
 
     private ApplicationRuntime application;
 
+    private MacroResolver dynamicMacroResolver;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public HelpOption() {
         super(SHORT_LITERAL, LONG_LITERAL);
+        dynamicMacroResolver = new DynamicMacroResolver();
     }
 
     // OptionBase overrides --------------------------------------------------------------------------------------------
@@ -143,22 +189,14 @@ public class HelpOption extends OptionBase {
             // generic application help + all commands
             //
 
-            displayGenericApplicationHelpAndAllCommands(outputStream);
+            displayGenericApplicationHelpAndResolveMacros(outputStream);
         }
     }
 
-    public void displayGenericApplicationHelpAndAllCommands(OutputStream outputStream) throws Exception {
-
-        InstanceFactory<Command> i = new InstanceFactory<>();
-
-        Set<Command> commands = i.instances(
-                Command.class, InstanceFactory.getClasspathJars(), InstanceFactory.getClasspathDirectories());
-
-        List<Command> commandList = new ArrayList<>(commands);
-        Collections.sort(commandList);
+    public void displayGenericApplicationHelpAndResolveMacros(OutputStream outputStream) throws Exception {
 
         //
-        // display generic application help
+        // display generic application help and resolve macros
         //
 
         String helpFilePath = application.getHelpFilePath();
@@ -166,35 +204,8 @@ public class HelpOption extends OptionBase {
         if (helpContent.length == 0) {
             helpContent = (NO_APPLICATION_HELP_FOUND_TEXT + "'\n").getBytes();
         }
+        helpContent = resolveMacros(helpContent, dynamicMacroResolver);
         outputStream.write(helpContent);
-        outputStream.flush();
-
-        //
-        // iterate over the list of commands and determine the max display width
-        //
-        int width = maxDisplayWidth(commandList);
-
-        outputStream.write("\n".getBytes());
-        outputStream.write("Commands:\n".getBytes());
-        outputStream.write("\n".getBytes());
-
-        for(Command c: commandList) {
-
-            helpFilePath = c.getHelpFilePath();
-            helpContent = getHelpContent(helpFilePath);
-            boolean helpAvailable = helpContent.length > 0;
-
-            String format = "  %1$-" + width + "s";
-            outputStream.write(String.format(format, c.getName()).getBytes());
-
-            if (!helpAvailable) {
-                outputStream.write(" (no in-line help found)".getBytes());
-            }
-
-            outputStream.write("\n".getBytes());
-        }
-
-        outputStream.write("\n".getBytes());
         outputStream.flush();
     }
 
@@ -240,18 +251,6 @@ public class HelpOption extends OptionBase {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
-
-    // Private Static --------------------------------------------------------------------------------------------------
-
-    private static int maxDisplayWidth(List<Command> commandList) {
-        int width = -1;
-        for(Command c: commandList) {
-            if (c.getName().length() > width) {
-                width = c.getName().length();
-            }
-        }
-        return width;
-    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

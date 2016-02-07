@@ -113,7 +113,7 @@ public class HelpOptionTest extends OptionTest {
     }
 
     @Test
-    public void displayHelp_GenericApplicationHelpAndAllCommands() throws Exception {
+    public void displayHelp_GenericApplicationHelpAndMacros() throws Exception {
 
         HelpOption helpOption = new HelpOption();
         assertNull(helpOption.getCommand());
@@ -176,6 +176,34 @@ public class HelpOptionTest extends OptionTest {
         String file = "data/help-no-newline.txt"; // this is in the test classpath
         byte[] result = HelpOption.getHelpContent(file);
         assertEquals("test help\n", new String(result));
+    }
+
+    // resolveMacros() -------------------------------------------------------------------------------------------------
+
+    @Test
+    public void resolveMacros_happyPath() throws Exception {
+
+        String s = "abc@TESTMACRO@xyz";
+
+        MockMacroResolver mmr = new MockMacroResolver();
+        mmr.addMacro("TESTMACRO", "123");
+
+        byte[] content = HelpOption.resolveMacros(s.getBytes(), mmr);
+
+        assertEquals("abc123xyz", new String(content));
+    }
+
+    @Test
+    public void resolveMacros_DifferentLines() throws Exception {
+
+        String s = "abc@TESTMACRO\n@xyz";
+
+        MockMacroResolver mmr = new MockMacroResolver();
+        mmr.addMacro("TESTMACRO", "123");
+
+        byte[] content = HelpOption.resolveMacros(s.getBytes(), mmr);
+
+        assertEquals("abc@TESTMACRO\n@xyz", new String(content));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

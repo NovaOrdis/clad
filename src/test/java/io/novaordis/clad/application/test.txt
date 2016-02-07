@@ -1,1 +1,3 @@
 this is application help placeholder
+
+@COMMANDS@
