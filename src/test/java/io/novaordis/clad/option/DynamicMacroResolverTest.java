@@ -49,7 +49,6 @@ public class DynamicMacroResolverTest extends MacroResolverTest {
 
         log.info(content);
 
-        assertTrue(content.contains("Commands:\n\n"));
         assertTrue(content.contains(" test "));
         assertTrue(content.contains(" test2 "));
         assertTrue(content.contains(" version "));

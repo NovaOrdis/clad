@@ -64,8 +64,6 @@ public class DynamicMacroResolver implements MacroResolver {
         //
         int width = maxDisplayWidth(commandList);
 
-        s += "Commands:\n\n";
-
         for(Command c: commandList) {
 
             String helpFilePath = c.getHelpFilePath();
