@@ -249,8 +249,8 @@ public class CommandLineApplication {
             optionalGlobalOptions = new HashSet<>(optionalGlobalOptions);
             optionalGlobalOptions.add(new VerboseOption());
 
-            List<Option> globalOptions =
-                    OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
+            List<Option> globalOptions = OptionParser.parse(
+                    0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
 
             actOnVerboseOption(globalOptions);
 

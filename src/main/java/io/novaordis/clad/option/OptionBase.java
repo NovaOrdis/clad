@@ -16,6 +16,9 @@
 
 package io.novaordis.clad.option;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
@@ -30,12 +33,14 @@ public abstract class OptionBase implements Option {
 
     private Character shortLiteral;
     private String longLiteral;
+    private Set<Option> equivalentOptions;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     protected OptionBase(Character shortLiteral, String longLiteral) {
         this.shortLiteral = shortLiteral;
         this.longLiteral = longLiteral;
+        this.equivalentOptions = new HashSet<>();
     }
 
     // Option implementation -------------------------------------------------------------------------------------------
@@ -79,6 +84,35 @@ public abstract class OptionBase implements Option {
         else {
             return s + (longLiteral == null ? "" : "|--" + longLiteral);
         }
+    }
+    //
+    // Equivalence -----------------------------------------------------------------------------------------------------
+    //
+
+    /**
+     * Returns the underlying storage, handle with care.
+     */
+    @Override
+    public Set<Option> getEquivalentOptions() {
+
+        return equivalentOptions;
+    }
+
+    @Override
+    public void addEquivalentOption(Option o) {
+
+        if (!equivalentOptions.contains(o)) {
+
+            equivalentOptions.add(o);
+            // insure symmetry
+            o.addEquivalentOption(this);
+        }
+    }
+
+    @Override
+    public boolean isEquivalentWith(Option o) {
+
+        return equivalentOptions.contains(o);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

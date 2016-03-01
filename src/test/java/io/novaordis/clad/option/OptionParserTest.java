@@ -866,6 +866,94 @@ public class OptionParserTest {
         assertNull(command);
     }
 
+    // isRequiredOption() ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void isRequiredOption_EmptySet() throws Exception {
+
+        assertFalse(OptionParser.isRequiredOption(new MockOption('t'), Collections.emptySet()));
+    }
+
+    @Test
+    public void isRequiredOption_NotInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+        options.add(new MockOption('c'));
+
+        assertFalse(OptionParser.isRequiredOption(new MockOption('t'), options));
+    }
+
+    @Test
+    public void isRequiredOption_ExactOptionInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+        options.add(new MockOption('t'));
+
+        assertTrue(OptionParser.isRequiredOption(new MockOption('t'), options));
+    }
+
+    @Test
+    public void isRequiredOption_EquivalentOptionInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+
+        MockOption mo = new MockOption('c');
+        mo.addEquivalentOption(new MockOption('t'));
+        options.add(mo);
+
+        assertTrue(OptionParser.isRequiredOption(new MockOption('t'), options));
+    }
+
+    // isOptionalOption() ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void isOptionalOption_EmptySet() throws Exception {
+
+        assertFalse(OptionParser.isOptionalOption(new MockOption('t'), Collections.emptySet()));
+    }
+
+    @Test
+    public void isOptionalOption_NotInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+        options.add(new MockOption('c'));
+
+        assertFalse(OptionParser.isOptionalOption(new MockOption('t'), options));
+    }
+
+    @Test
+    public void isOptionalOption_ExactOptionInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+        options.add(new MockOption('t'));
+
+        assertTrue(OptionParser.isOptionalOption(new MockOption('t'), options));
+    }
+
+    @Test
+    public void isOptionalOption_EquivalentOptionInSet() throws Exception {
+
+        Set<Option> options = new HashSet<>();
+        options.add(new MockOption('a'));
+        options.add(new MockOption('b'));
+
+        MockOption mo = new MockOption('c');
+        mo.addEquivalentOption(new MockOption('t'));
+        options.add(mo);
+
+        assertTrue(OptionParser.isOptionalOption(new MockOption('t'), options));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

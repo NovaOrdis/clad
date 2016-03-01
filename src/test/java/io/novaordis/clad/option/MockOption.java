@@ -28,6 +28,8 @@ public class MockOption extends OptionBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Object value;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     protected MockOption(Character shortLiteral, String longLiteral) {
@@ -48,7 +50,7 @@ public class MockOption extends OptionBase {
 
     @Override
     public Object getValue() {
-        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
+        return value;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

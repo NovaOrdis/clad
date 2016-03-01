@@ -84,7 +84,7 @@ public class OptionParser {
                 String longLiteralOptionString = commandLineArguments.get(i);
                 Option option = parseLongLiteralOption(longLiteralOptionString);
 
-                if (required.contains(option) || optional.contains(option)) {
+                if (isRequiredOption(option, required) || isOptionalOption(option, optional)) {
                     commandLineArguments.remove(i--);
                     options.add(option);
                     copyLiterals(option, required, optional);
@@ -163,6 +163,36 @@ public class OptionParser {
         //
 
         return options;
+    }
+
+    /**
+     * @return true if the option is a required option (is either in the required set, or is equivalent with an
+     * option in the required set)
+     */
+    public static boolean isRequiredOption(Option option, Set<Option> required) {
+
+        for(Option o: required) {
+            if (o.equals(option) || o.isEquivalentWith(option)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return true if the option is a optional option (is either in the optional set, or is equivalent with an
+     * option in the optional set)
+     */
+    public static boolean isOptionalOption(Option option, Set<Option> optional) {
+
+        for(Option o: optional) {
+            if (o.equals(option) || o.isEquivalentWith(option)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

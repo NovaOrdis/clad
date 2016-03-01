@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -325,6 +325,36 @@ public abstract class OptionTest {
         catch(IllegalArgumentException e) {
             log.info(e.getMessage());
         }
+    }
+
+    // equivalence() ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getEquivalentOptions_NoEquivalents() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+        assertTrue(o.getEquivalentOptions().isEmpty());
+    }
+
+    @Test
+    public void addEquivalentOption() throws Exception {
+
+        Option o = getOptionToTest('t', null);
+
+        MockOption mo = new MockOption('m');
+
+        o.addEquivalentOption(mo);
+
+        assertTrue(o.isEquivalentWith(mo));
+        assertTrue(mo.isEquivalentWith(o));
+
+        Set<Option> eo = o.getEquivalentOptions();
+        assertEquals(1, eo.size());
+        assertTrue(eo.contains(new MockOption('m')));
+
+        Set<Option> eo2 = mo.getEquivalentOptions();
+        assertEquals(1, eo2.size());
+        assertTrue(eo2.contains(o));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
