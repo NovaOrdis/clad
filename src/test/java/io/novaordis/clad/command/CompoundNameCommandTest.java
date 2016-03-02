@@ -16,22 +16,21 @@
 
 package io.novaordis.clad.command;
 
-import io.novaordis.clad.option.BooleanOption;
-import io.novaordis.clad.option.StringOption;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/29/16
+ * @since 1/27/16
  */
-public abstract class CommandTest {
+public class CompoundNameCommandTest extends CommandTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(VersionCommand.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -44,76 +43,47 @@ public abstract class CommandTest {
     // getName() -------------------------------------------------------------------------------------------------------
 
     @Test
+    @Override
     public void getName() throws Exception {
+
+        //
+        // command name should contain dashes
+        //
 
         Command c = getCommandToTest();
         String name = c.getName();
-        assertNotNull(name);
-
-        String s = c.getClass().getSimpleName();
-        s = s.replaceAll("Command", "").toLowerCase();
-        assertEquals(s, name);
+        assertEquals("compound-name", name);
     }
 
     // getHelpFilePath() -----------------------------------------------------------------------------------------------
 
     @Test
+    @Override
     public void getHelpFilePath() throws Exception {
+
+        //
+        // in-line help file name should contain dashes
+        //
 
         Command c = getCommandToTest();
         String helpFilePath = c.getHelpFilePath();
-        assertNotNull(helpFilePath);
+        log.info(helpFilePath);
 
         String s = c.getClass().getName();
         s = s.substring(0, s.lastIndexOf('.'));
         s = s.replace('.', '/');
-        s = s + "/" + c.getName() + ".txt";
+        s = s + "/compound-name.txt";
         assertEquals(s, helpFilePath);
-    }
-
-    // getOptions() ----------------------------------------------------------------------------------------------------
-
-    @Test
-    public void getOptions() throws Exception {
-
-        Command c = getCommandToTest();
-
-        //
-        // no options without configuration
-        //
-
-        assertTrue(c.getOptions().isEmpty());
-    }
-
-    @Test
-    public void getOption_Null() throws Exception {
-
-        Command c = getCommandToTest();
-        assertNull(c.getOption(null));
-    }
-
-    @Test
-    public void getOption() throws Exception {
-
-        Command c = getCommandToTest();
-
-        StringOption o = new StringOption('t', "test", "test-value");
-
-        c.setOption(o);
-
-        assertNull(c.getOption(new BooleanOption('t')));
-
-        StringOption o2 = (StringOption)c.getOption(new StringOption('t'));
-
-        assertEquals(o, o2);
-        assertEquals("test-value", o2.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected abstract Command getCommandToTest() throws Exception;
+    @Override
+    protected CompoundNameCommand getCommandToTest() throws Exception {
+        return new CompoundNameCommand();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

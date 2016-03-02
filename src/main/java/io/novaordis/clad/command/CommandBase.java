@@ -60,7 +60,23 @@ public abstract class CommandBase implements Command {
     public String getName() {
 
         String s = getClass().getSimpleName();
-        return s.replaceAll("Command", "").toLowerCase();
+        s = s.replaceAll("Command", "");
+        // detect camel case and inject dashes
+        String name = "";
+        for(int i = 0; i < s.length(); i ++) {
+
+            char c = s.charAt(i);
+
+            if (Character.isUpperCase(c)) {
+
+                c = Character.toLowerCase(c);
+                if (i > 0) {
+                    name += '-';
+                }
+            }
+            name += c;
+        }
+        return name;
     }
 
     @Override

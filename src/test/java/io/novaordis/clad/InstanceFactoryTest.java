@@ -379,7 +379,7 @@ public class InstanceFactoryTest {
 
         Set<Command> commands = commandFactory.instances(Command.class, Collections.emptyList(), directories);
 
-        assertEquals(7, commands.size());
+        assertEquals(8, commands.size());
         boolean sample1found = false;
         boolean sample2found = false;
         boolean sample3found = false;
