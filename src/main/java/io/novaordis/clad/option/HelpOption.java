@@ -220,6 +220,8 @@ public class HelpOption extends OptionBase {
     // Package Protected Static ----------------------------------------------------------------------------------------
 
     /**
+     * @param helpFilePath the name of the file, relative to the class path, which contains in-line help.
+     *
      * @return empty byte[] if no help content was found. The byte[] will always end with a '\n'.
      */
     static byte[] getHelpContent(String helpFilePath) throws Exception {
