@@ -58,14 +58,16 @@ public interface Command extends Comparable<Command> {
     boolean needsRuntime();
 
     /**
-     * The declaration of this command's required options.
+     * The declaration of this command's required options. These are option definitions only, the command instance
+     * is not expected to maintain any state inside the option instances, they can be recreated on each invocation.
      *
      * @see ApplicationRuntime#requiredGlobalOptions()
      */
     Set<Option> requiredOptions();
 
     /**
-     * The declaration of this command's optional options.
+     * The declaration of this command's optional options. These are option definitions only, the command instance
+     * is not expected to maintain any state inside the option instances, they can be recreated on each invocation.
      *
      * @see ApplicationRuntime#optionalGlobalOptions()
      */
