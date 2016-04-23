@@ -32,14 +32,24 @@ public class BooleanOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     */
     public BooleanOption(Character shortLiteral) {
         this(shortLiteral, null);
     }
 
+    /**
+     * @param longLiteral the literal (without '--')
+     */
     public BooleanOption(String longLiteral) {
         this(null, longLiteral);
     }
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     public BooleanOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
         value = true;

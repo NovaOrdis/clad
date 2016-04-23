@@ -32,14 +32,24 @@ public class DoubleOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     */
     public DoubleOption(Character shortLiteral) {
         this(shortLiteral, null);
     }
 
+    /**
+     * @param longLiteral the literal (without '--')
+     */
     public DoubleOption(String longLiteral) {
         this(null, longLiteral);
     }
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     public DoubleOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
     }

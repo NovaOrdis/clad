@@ -32,18 +32,32 @@ public class StringOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     */
     public StringOption(Character shortLiteral) {
         this(shortLiteral, null, null);
     }
 
+    /**
+     * @param longLiteral the literal (without '--')
+     */
     public StringOption(String longLiteral) {
         this(null, longLiteral, null);
     }
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     public StringOption(Character shortLiteral, String longLiteral) {
         this(shortLiteral, longLiteral, null);
     }
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     public StringOption(Character shortLiteral, String longLiteral, String value) {
         super(shortLiteral, longLiteral);
         this.value = value;

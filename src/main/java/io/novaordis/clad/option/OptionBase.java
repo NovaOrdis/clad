@@ -37,6 +37,10 @@ public abstract class OptionBase implements Option {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     protected OptionBase(Character shortLiteral, String longLiteral) {
         this.shortLiteral = shortLiteral;
         this.longLiteral = longLiteral;

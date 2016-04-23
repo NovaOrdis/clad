@@ -32,14 +32,24 @@ public class LongOption extends OptionBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * @param longLiteral the literal (without '--')
+     */
     public LongOption(Character shortLiteral) {
         this(shortLiteral, null);
     }
 
+    /**
+     * @param longLiteral the literal (without '--')
+     */
     public LongOption(String longLiteral) {
         this(null, longLiteral);
     }
 
+    /**
+     * @param shortLiteral the literal (without '-')
+     * @param longLiteral the literal (without '--')
+     */
     public LongOption(Character shortLiteral, String longLiteral) {
         super(shortLiteral, longLiteral);
     }
