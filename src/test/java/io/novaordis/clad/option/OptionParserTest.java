@@ -771,13 +771,15 @@ public class OptionParserTest {
     @Test
     public void pastLongLiteralOption_NoEqualSign() throws Exception {
 
-        try {
-            OptionParser.parseLongLiteralOption("--option");
-            fail("should have thrown exception");
-        }
-        catch(UserErrorException e) {
-            log.info(e.getMessage());
-        }
+        //
+        // should default to boolean option
+        //
+
+        BooleanOption option = (BooleanOption)OptionParser.parseLongLiteralOption("--option");
+
+        assertEquals("option", option.getLongLiteral());
+        assertNull(option.getShortLiteral());
+        assertTrue(option.getValue());
     }
 
     // handledHelpOption() ---------------------------------------------------------------------------------------------

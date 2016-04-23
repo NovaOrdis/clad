@@ -371,14 +371,22 @@ public class OptionParser {
 
         longLiteralOptionString = longLiteralOptionString.substring(2);
 
+        String optionName, valueAsString;
+
         int i = longLiteralOptionString.indexOf('=');
 
         if (i == -1) {
-            throw new UserErrorException("--" + longLiteralOptionString + " option does not contain '='");
-        }
 
-        String optionName = longLiteralOptionString.substring(0, i);
-        String valueAsString = longLiteralOptionString.substring(i + 1);
+            //
+            // we interpret this as a "true" boolean option
+            //
+            optionName = longLiteralOptionString;
+            valueAsString = "true";
+        }
+        else {
+            optionName = longLiteralOptionString.substring(0, i);
+            valueAsString = longLiteralOptionString.substring(i + 1);
+        }
 
         Object o = typeHeuristics(valueAsString);
 
