@@ -239,11 +239,15 @@ public class InstanceFactory<I> {
 
         List<String> result = new ArrayList<>();
 
+        // JAR entries use the same separator on both Unix and Windows
+        char fileSeparator = '/';
+
         for(JarFile jarFile: jarFiles) {
 
             for(Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
                 JarEntry entry = entries.nextElement();
-                String className = entry.getName().replace(File.separatorChar, '.');
+
+                String className = entry.getName().replace(fileSeparator, '.');
                 if (pattern.matcher(className).matches()) {
                     className = className.substring(0, className.length() - ".class".length());
                     result.add(className);
