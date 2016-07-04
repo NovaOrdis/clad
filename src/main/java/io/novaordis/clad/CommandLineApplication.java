@@ -254,6 +254,12 @@ public class CommandLineApplication {
 
             actOnVerboseOption(globalOptions);
 
+            //
+            // debug statements can be turned on dynamically only if specified *under* actOnVerboseOption() call
+            //
+
+            log.debug("required global options: " + requiredGlobalOptions);
+            log.debug("optional global options: " + optionalGlobalOptions);
             log.debug("command: " + command);
             log.debug("global options: " + globalOptions);
 
