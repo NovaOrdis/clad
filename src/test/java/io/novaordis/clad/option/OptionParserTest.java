@@ -672,6 +672,20 @@ public class OptionParserTest {
         assertEquals("\"%I\" %h %u [%t] \"%r\" %s %b %D", args.get(1));
     }
 
+    @Test
+    public void coalesceQuotedSections_QuotesInsideArgument() throws Exception {
+
+        List<String> args = new ArrayList<>();
+        args.add("--from=\"a");
+        args.add("b\"");
+
+        OptionParser.coalesceQuotedSections(0, args);
+
+        assertEquals(1, args.size());
+
+        assertEquals("--from=a b", args.get(0));
+    }
+
     // typeHeuristics() ------------------------------------------------------------------------------------------------
 
     @Test
@@ -1001,6 +1015,27 @@ public class OptionParserTest {
         // this is how the OptionParser.parse() method gets a quoted timestamp options, upper layers do that
         //
         commandLineArguments.add("--test-timestamp-option=07/25/16 14:00:00");
+        Set<Option> requiredGlobalOptions = Collections.emptySet();
+        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
+
+        List<Option> result = OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
+
+        assertEquals(1, result.size());
+        TimestampOption tso = (TimestampOption)result.get(0);
+        assertFalse(tso.isRelative());
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+    }
+
+    @Test
+    public void parsingTimestampOption_Absolute_Quoted_2() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>();
+
+        //
+        // this is how the OptionParser.parse() method gets a quoted timestamp options, upper layers do that
+        //
+        commandLineArguments.add("--test-timestamp-option=\"07/25/16");
+        commandLineArguments.add("14:00:00\"");
         Set<Option> requiredGlobalOptions = Collections.emptySet();
         Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
 
