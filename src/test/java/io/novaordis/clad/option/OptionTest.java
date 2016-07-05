@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -388,6 +389,9 @@ public abstract class OptionTest {
         else if (value instanceof Boolean) {
             return !(Boolean)value;
         }
+        else if (value instanceof Date) {
+            return new Date(((Date)value).getTime() + 1);
+        }
         else {
 
             // object, return a different object
@@ -410,6 +414,9 @@ public abstract class OptionTest {
             return true;
         }
         else if (value instanceof Boolean) {
+            return new Date(1L);
+        }
+        else if (value instanceof Date) {
             return "string";
         }
         else {

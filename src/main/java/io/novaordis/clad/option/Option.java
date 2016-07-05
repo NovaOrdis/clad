@@ -67,8 +67,14 @@ public interface Option {
      */
     String getLabel();
 
+    /**
+     * @return the option's value in the native option's type.
+     */
     Object getValue();
 
+    /**
+     * Set the option's value - must be the native option's type.
+     */
     void setValue(Object o);
 
     /**

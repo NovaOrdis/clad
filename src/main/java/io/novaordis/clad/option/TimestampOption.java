@@ -16,6 +16,11 @@
 
 package io.novaordis.clad.option;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Used to declare timestamp options. A timestamp option represents a point in time, with millisecond precision.
  * Various formats may be used to declared it. The default format is:
@@ -25,6 +30,8 @@ package io.novaordis.clad.option;
  * No quotation marks are necessary around the timestamp string, the parser knows how to handle the space between the
  * date section and the time section.
  *
+ * The native type (as returned by getValue()) is java.util.Date.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
@@ -32,11 +39,14 @@ public class TimestampOption extends OptionBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    public static final String DEFAULT_FORMAT_AS_STRING = "MM/dd/yy HH:mm:ss";
+    public static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private String value;
+    private Date value;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -44,14 +54,14 @@ public class TimestampOption extends OptionBase {
      * @param shortLiteral the literal (without '-')
      */
     public TimestampOption(Character shortLiteral) {
-        this(shortLiteral, null, null);
+        super(shortLiteral, null);
     }
 
     /**
      * @param longLiteral the literal (without '--')
      */
     public TimestampOption(String longLiteral) {
-        this(null, longLiteral, null);
+        super(null, longLiteral);
     }
 
     /**
@@ -59,44 +69,50 @@ public class TimestampOption extends OptionBase {
      * @param longLiteral the literal (without '--')
      */
     public TimestampOption(Character shortLiteral, String longLiteral) {
-        this(shortLiteral, longLiteral, null);
+        super(shortLiteral, longLiteral);
     }
 
     /**
      * @param shortLiteral the literal (without '-')
      * @param longLiteral the literal (without '--')
+     *
+     * @exception ParseException if the String value cannot be parsed into a Date
      */
-    public TimestampOption(Character shortLiteral, String longLiteral, String value) {
+    public TimestampOption(Character shortLiteral, String longLiteral, String value) throws ParseException {
+
         super(shortLiteral, longLiteral);
-        this.value = value;
+        this.value = DEFAULT_FORMAT.parse(value);
     }
 
     @Override
     public void setValue(Object o) {
 
-        if (o != null && !(o instanceof String)) {
-            throw new IllegalArgumentException(o + " is not a String");
+        if (o != null && !(o instanceof Date)) {
+            throw new IllegalArgumentException(o + " is not a Date");
         }
 
-        this.value = (String)o;
+        this.value = (Date)o;
     }
 
     // OptionBase overrides --------------------------------------------------------------------------------------------
 
+    /**
+     * @return a Date instance.
+     */
     @Override
-    public String getValue() {
+    public Date getValue() {
         return value;
     }
 
-
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public void setValue(String s) {
-        this.value = s;
-    }
-
     public String getString() {
-        return getValue();
+
+        if (value == null) {
+            return null;
+        }
+
+        return DEFAULT_FORMAT.format(value);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ public class LongOption extends OptionBase {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * @param longLiteral the literal (without '--')
+     * @param shortLiteral the literal (without '-')
      */
     public LongOption(Character shortLiteral) {
         this(shortLiteral, null);
