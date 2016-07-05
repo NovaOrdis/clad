@@ -641,7 +641,7 @@ public class OptionParserTest {
     }
 
     @Test
-    public void coalesceQuotedSections_handleDoubleQuotes_EscapedQuotes() throws Exception {
+    public void coalesceQuotedSections_handleDoubleQuotes_EscapedQuotes_All() throws Exception {
 
         char[] arg0 = new char[] { '-', 'f' };
         char[] arg1 = new char[] { '"', '\\', '"', '%', 'I', '\\', '"' };
@@ -691,66 +691,66 @@ public class OptionParserTest {
     @Test
     public void typeHeuristics_null() throws Exception {
 
-        assertNull(OptionParser.typeHeuristics(null));
+        assertNull(OptionParser.typeHeuristics(null, new ArrayList<>()));
     }
 
     @Test
     public void typeHeuristics_Long() throws Exception {
 
-        Long value = (Long)OptionParser.typeHeuristics("1");
+        Long value = (Long)OptionParser.typeHeuristics("1", new ArrayList<>());
         assertEquals(1L, value.longValue());
     }
 
     @Test
     public void typeHeuristics_Double() throws Exception {
 
-        Double value = (Double)OptionParser.typeHeuristics("1.1");
+        Double value = (Double)OptionParser.typeHeuristics("1.1", new ArrayList<>());
         assertEquals(1.1, value.doubleValue(), 0.00001);
     }
 
     @Test
     public void typeHeuristics_True() throws Exception {
 
-        Boolean value = (Boolean)OptionParser.typeHeuristics("true");
+        Boolean value = (Boolean)OptionParser.typeHeuristics("true", new ArrayList<>());
         assertTrue(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("True");
+        value = (Boolean)OptionParser.typeHeuristics("True", new ArrayList<>());
         assertTrue(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("TruE");
+        value = (Boolean)OptionParser.typeHeuristics("TruE", new ArrayList<>());
         assertTrue(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("TRUE");
+        value = (Boolean)OptionParser.typeHeuristics("TRUE", new ArrayList<>());
         assertTrue(value);
     }
 
     @Test
     public void typeHeuristics_FALSE() throws Exception {
 
-        Boolean value = (Boolean)OptionParser.typeHeuristics("false");
+        Boolean value = (Boolean)OptionParser.typeHeuristics("false", new ArrayList<>());
         assertFalse(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("False");
+        value = (Boolean)OptionParser.typeHeuristics("False", new ArrayList<>());
         assertFalse(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("FalsE");
+        value = (Boolean)OptionParser.typeHeuristics("FalsE", new ArrayList<>());
         assertFalse(value);
 
-        value = (Boolean)OptionParser.typeHeuristics("FALSE");
+        value = (Boolean)OptionParser.typeHeuristics("FALSE", new ArrayList<>());
         assertFalse(value);
     }
 
     @Test
     public void typeHeuristics_String() throws Exception {
 
-        String value = (String)OptionParser.typeHeuristics("something");
+        String value = (String)OptionParser.typeHeuristics("something", new ArrayList<>());
         assertEquals("something", value);
     }
 
     @Test
     public void typeHeuristics_RelativeTimestamp() throws Exception {
 
-        Date value = (Date)OptionParser.typeHeuristics("14:00:00");
+        Date value = (Date)OptionParser.typeHeuristics("14:00:00", new ArrayList<>());
 
         // relative
         long time = value.getTime();
@@ -760,8 +760,18 @@ public class OptionParserTest {
     @Test
     public void typeHeuristics_FullTimestamp() throws Exception {
 
-        Date value = (Date)OptionParser.typeHeuristics("06/25/16 14:00:00");
+        Date value = (Date)OptionParser.typeHeuristics("06/25/16 14:00:00", new ArrayList<>());
         assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), value);
+    }
+
+    @Test
+    public void typeHeuristics_FullTimestamp_NoQuotesUsedOnCommandLine() throws Exception {
+
+        List<String> commandLineArgs = new ArrayList<>();
+        commandLineArgs.add("14:00:00");
+        Date value = (Date)OptionParser.typeHeuristics("06/25/16", commandLineArgs);
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), value);
+        assertTrue(commandLineArgs.isEmpty());
     }
 
     // parseLongLiteralOption() ----------------------------------------------------------------------------------------
@@ -770,7 +780,7 @@ public class OptionParserTest {
     public void pastLongLiteralOption_Null() throws Exception {
 
         try {
-            OptionParser.parseLongLiteralOption(null);
+            OptionParser.parseLongLiteralOption(null, null, -1);
             fail("should have thrown Exception");
         }
         catch(IllegalArgumentException e) {
@@ -782,7 +792,7 @@ public class OptionParserTest {
     public void pastLongLiteralOption_DoesNotStartWithDashDash() throws Exception {
 
         try {
-            OptionParser.parseLongLiteralOption("-something");
+            OptionParser.parseLongLiteralOption("-something", null, -1);
             fail("should have thrown Exception");
         }
         catch(IllegalArgumentException e) {
@@ -793,7 +803,7 @@ public class OptionParserTest {
     @Test
     public void pastLongLiteralOption() throws Exception {
 
-        StringOption option = (StringOption)OptionParser.parseLongLiteralOption("--option=option-value");
+        StringOption option = (StringOption)OptionParser.parseLongLiteralOption("--option=option-value", null, -1);
 
         assertEquals("option", option.getLongLiteral());
         assertNull(option.getShortLiteral());
@@ -807,7 +817,7 @@ public class OptionParserTest {
         // should default to boolean option
         //
 
-        BooleanOption option = (BooleanOption)OptionParser.parseLongLiteralOption("--option");
+        BooleanOption option = (BooleanOption)OptionParser.parseLongLiteralOption("--option", null, -1);
 
         assertEquals("option", option.getLongLiteral());
         assertNull(option.getShortLiteral());

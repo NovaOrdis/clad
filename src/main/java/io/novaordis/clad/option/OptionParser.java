@@ -40,7 +40,11 @@ public class OptionParser {
 
     /**
      * Process the command line arguments looking for known (required and optional) options. The method does not
-     * check whether the required options are present, that check belongs in the application or command.
+     * check whether the *required* options are present, that check belongs in the application or command.
+     *
+     * The method applies type heuristics. The logic assumes that timestamp values (and timestamp values only) may or
+     * may be not enclosed in quotes, so, for example, both --from=07/23/16 14:00:00 and --from="=07/23/16 14:00:00"
+     * should be valid and recognized as valid timestamp values by the parser.
      *
      * @param commandLineArguments will remove all command line arguments that were parsed into Options
      */
@@ -83,7 +87,7 @@ public class OptionParser {
             else if (current.startsWith("--")) {
 
                 String longLiteralOptionString = commandLineArguments.get(i);
-                Option option = parseLongLiteralOption(longLiteralOptionString);
+                Option option = parseLongLiteralOption(longLiteralOptionString, commandLineArguments, i + 1);
 
                 if (isRequiredOption(option, required) || isOptionalOption(option, optional)) {
                     commandLineArguments.remove(i--);
@@ -114,7 +118,7 @@ public class OptionParser {
                 else {
 
                     String valueAsString = commandLineArguments.get(i + 1);
-                    Object value = typeHeuristics(valueAsString);
+                    Object value = typeHeuristics(valueAsString, null);
                     if (value instanceof String) {
                         candidateOption = new StringOption(shortLiteral);
                         ((StringOption)candidateOption).setValue((String)value);
@@ -211,10 +215,17 @@ public class OptionParser {
 
             String current = commandLineArguments.get(i);
 
-            if (current.startsWith("\"") || current.startsWith("'")) {
+            int doubleQuoteIndex, singleQuoteIndex = -1;
 
-                boolean doubleQuote = current.startsWith("\"");
-                boolean singleQuote = current.startsWith("'");
+            if (((doubleQuoteIndex = current.indexOf("\"")) != -1 &&
+                    doubleQuoteIndex < current.length() - 1 &&
+                    (doubleQuoteIndex == 0 || current.charAt(doubleQuoteIndex -1) != '\\')) ||
+                    ((singleQuoteIndex = current.indexOf("'")) != -1 &&
+                            singleQuoteIndex < current.length() - 1) &&
+                            (singleQuoteIndex == 0 || current.charAt(singleQuoteIndex -1) != '\\')) {
+
+                boolean doubleQuote = doubleQuoteIndex != -1;
+                boolean singleQuote = singleQuoteIndex != -1;
 
                 if (doubleQuote && doubleQuoted != null) {
                     String beginning = doubleQuoted.toString();
@@ -232,7 +243,9 @@ public class OptionParser {
                     throw new UserErrorException("unbalanced single quotes: '" + beginning + " ... " + current);
                 }
 
-                current = current.substring(1);
+                int separatorIndex = singleQuoteIndex == -1 ? doubleQuoteIndex : singleQuoteIndex;
+
+                current = current.substring(0, separatorIndex) + current.substring(separatorIndex + 1);
                 doubleQuoted = doubleQuote ? new StringBuilder(current) : null;
                 singleQuoted = singleQuote ? new StringBuilder(current) : null;
                 index = i;
@@ -242,8 +255,8 @@ public class OptionParser {
 
                 toRemoveCount ++;
 
-                if ((current.endsWith("\"") && current.charAt(current.length() - 2) != '\\') ||
-                        (current.endsWith("'") && current.charAt(current.length() - 2) != '\\'))
+                if ((current.endsWith("\"") && current.length() > 1 && current.charAt(current.length() - 2) != '\\') ||
+                        (current.endsWith("'") && current.length() > 1 && current.charAt(current.length() - 2) != '\\'))
                 {
                     //
                     // end quote (but NOT escaped quote)
@@ -309,7 +322,18 @@ public class OptionParser {
 
     }
 
-    public static Object typeHeuristics(String value) {
+    /**
+     * The method applies type heuristics by attempting to figure out the correct option type from the string
+     * representation. The logic assumes that timestamp values (and timestamp values only) may or
+     * may be not enclosed in quotes, so, for example, both --from=07/23/16 14:00:00 and --from="=07/23/16 14:00:00"
+     * should be valid and recognized as valid timestamp values by the parser.
+
+     *
+     * @param nextCommandLineSections needed because we can specify timestamps without quotes. If used, the used
+     *                                sections will be removed from the array. The method must be prepared to handle
+     *                                the cases when the list is null or empty.
+     */
+    public static Object typeHeuristics(String value, List<String> nextCommandLineSections) {
 
         if (value == null) {
             return null;
@@ -322,6 +346,21 @@ public class OptionParser {
         Date date = TimestampOption.parseValue(value);
         if (date != null) {
             return date;
+        }
+
+        //
+        // timestamp is a special case in that we allow space separated sections of the timestamp to be specified
+        // on command line without quote enclosure
+        //
+
+        if (nextCommandLineSections != null && nextCommandLineSections.size() > 0) {
+
+            String timestampCandidateValue = value + " " + nextCommandLineSections.get(0);
+            date = TimestampOption.parseValue(timestampCandidateValue);
+            if (date != null) {
+                nextCommandLineSections.remove(0);
+                return date;
+            }
         }
 
         //
@@ -375,7 +414,20 @@ public class OptionParser {
         return value;
     }
 
-    public static Option parseLongLiteralOption(String longLiteralOptionString) throws UserErrorException {
+    /**
+     * The method applies type heuristics. The logic assumes that timestamp values (and timestamp values only) may or
+     * may be not enclosed in quotes, so, for example, both --from=07/23/16 14:00:00 and --from="=07/23/16 14:00:00"
+     * should be valid and recognized as valid timestamp values by the parser.
+     *
+     * @param commandLineArguments the current command line arguments list. We need it in order to handle space-separate
+     *                             options that are not enclosed by quotes.
+     * @param nextArgumentIndex - position in the command line argument list of the next argument that can be used
+     *                          when looking for timestamps. The method must be prepared to handle the case when the
+     *                          index is out out bounds, in which case it should be ignored.
+     */
+    public static Option parseLongLiteralOption(
+            String longLiteralOptionString, List<String> commandLineArguments, int nextArgumentIndex)
+            throws UserErrorException {
 
         if (longLiteralOptionString == null) {
             throw new IllegalArgumentException("null argument");
@@ -407,12 +459,36 @@ public class OptionParser {
             valueAsString = longLiteralOptionString.substring(i + 1);
         }
 
-        Object o = typeHeuristics(valueAsString);
+        List<String> theRestOfTheCommandLineArgs = new ArrayList<>();
+        if (commandLineArguments != null) {
+            for (int k = nextArgumentIndex; k < commandLineArguments.size(); k++) {
+                theRestOfTheCommandLineArgs.add(commandLineArguments.get(k));
+            }
+        }
+        int remainingArgCount = theRestOfTheCommandLineArgs.size();
+
+        Object o = typeHeuristics(valueAsString, theRestOfTheCommandLineArgs);
 
         if (o instanceof Date) {
 
             TimestampOption option = new TimestampOption(optionName);
             option.setValue(o);
+
+            //
+            // timestamp is a special case where heuristics may use the next command line argument (we allow timestamps
+            // to be specified without quotes), so if this is the case, adjust the command line accordingly
+            //
+            int differenceInArgumentCount = remainingArgCount - theRestOfTheCommandLineArgs.size();
+            if (differenceInArgumentCount > 1) {
+                throw new RuntimeException("not prepared to handle the case when we use more than one trailing arguments for the timestamp");
+            }
+            if (commandLineArguments != null && differenceInArgumentCount == 1) {
+                //
+                // we used arguments for the timestamp
+                //
+                commandLineArguments.remove(nextArgumentIndex);
+            }
+
             return option;
         }
 
