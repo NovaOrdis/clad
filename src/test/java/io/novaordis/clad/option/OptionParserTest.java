@@ -993,9 +993,13 @@ public class OptionParserTest {
     }
 
     @Test
-    public void parsingTimestampOption_Absolute() throws Exception {
+    public void parsingTimestampOption_Absolute_Quoted() throws Exception {
 
         List<String> commandLineArguments = new ArrayList<>();
+
+        //
+        // this is how the OptionParser.parse() method gets a quoted timestamp options, upper layers do that
+        //
         commandLineArguments.add("--test-timestamp-option=07/25/16 14:00:00");
         Set<Option> requiredGlobalOptions = Collections.emptySet();
         Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
@@ -1006,7 +1010,23 @@ public class OptionParserTest {
         TimestampOption tso = (TimestampOption)result.get(0);
         assertFalse(tso.isRelative());
         assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+    }
 
+    @Test
+    public void parsingTimestampOption_Absolute_SpaceSeparated() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>();
+        commandLineArguments.add("--test-timestamp-option=07/25/16");
+        commandLineArguments.add("14:00:00");
+        Set<Option> requiredGlobalOptions = Collections.emptySet();
+        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
+
+        List<Option> result = OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
+
+        assertEquals(1, result.size());
+        TimestampOption tso = (TimestampOption)result.get(0);
+        assertFalse(tso.isRelative());
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
