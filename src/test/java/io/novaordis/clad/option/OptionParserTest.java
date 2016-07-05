@@ -956,6 +956,22 @@ public class OptionParserTest {
         assertTrue(OptionParser.isOptionalOption(new MockOption('t'), options));
     }
 
+    // TimestampOption -------------------------------------------------------------------------------------------------
+
+    @Test
+    public void parsingTimestampOption() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>();
+        commandLineArguments.add("--from=14:00:00");
+        Set<Option> requiredGlobalOptions = Collections.emptySet();
+        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-options"));
+
+        List<Option> result = OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
+
+        assertEquals(1, result.size());
+        TimestampOption tso = (TimestampOption)result.get(0);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
