@@ -17,8 +17,15 @@
 package io.novaordis.clad.configuration;
 
 import io.novaordis.clad.option.Option;
+import io.novaordis.clad.option.StringOption;
+import org.junit.Test;
+import org.slf4j.Logger;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -28,6 +35,8 @@ public class ConfigurationImplTest extends ConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ConfigurationImplTest.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -35,6 +44,33 @@ public class ConfigurationImplTest extends ConfigurationTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void setNullGlobalOptions() throws Exception {
+
+        ConfigurationImpl c = new ConfigurationImpl();
+
+        try {
+            c.setGlobalOptions(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void addGlobalOption() throws Exception {
+
+        ConfigurationImpl c = new ConfigurationImpl();
+
+        assertTrue(c.getGlobalOptions().isEmpty());
+
+        c.addGlobalOption(new StringOption(null, "test", "test-value"));
+
+        StringOption o = (StringOption)c.getGlobalOption(new StringOption("test"));
+        assertEquals("test-value", o.getValue());
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

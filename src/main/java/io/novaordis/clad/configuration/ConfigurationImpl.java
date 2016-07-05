@@ -21,6 +21,7 @@ import io.novaordis.clad.option.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,6 +54,8 @@ public class ConfigurationImpl implements Configuration {
         if (applicationName == null) {
             throw new UserErrorException("no '" + APPLICATION_NAME_SYSTEM_PROPERTY_NAME + "' system property set");
         }
+
+        this.globalOptions = new ArrayList<>();
 
         log.debug(this + " constructed");
     }
@@ -92,7 +95,16 @@ public class ConfigurationImpl implements Configuration {
     // Public ----------------------------------------------------------------------------------------------------------
 
     public void setGlobalOptions(List<Option> globalOptions) {
+
+        if (globalOptions == null) {
+            throw new IllegalArgumentException("null globalOptions list");
+        }
         this.globalOptions = globalOptions;
+    }
+
+    public void addGlobalOption(Option o) {
+
+        this.globalOptions.add(o);
     }
 
     public void setApplicationName(String applicationName) {
