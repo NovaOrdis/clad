@@ -23,9 +23,13 @@ import java.util.Date;
 
 /**
  * Used to declare timestamp options. A timestamp option represents a point in time, with millisecond precision.
- * Various formats may be used to declared it. The default format is:
+ * Various formats may be used to declared it. The default full format is:
  *
  * MM/dd/yy HH:mm:ss
+ *
+ * A "relative" format that can be used to declare timestamps within the boundaries of the same day is:
+ *
+ * HH:mm:ss
  *
  * No quotation marks are necessary around the timestamp string, the parser knows how to handle the space between the
  * date section and the time section.
@@ -40,13 +44,42 @@ public class TimestampOption extends OptionBase {
     // Constants -------------------------------------------------------------------------------------------------------
 
     public static final String DEFAULT_FORMAT_AS_STRING = "MM/dd/yy HH:mm:ss";
-    public static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING);
+    public static final DateFormat DEFAULT_FULL_FORMAT = new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING);
+
+    // HH:mm:ss
+    public static final DateFormat DEFAULT_RELATIVE_FORMAT =
+            new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING.substring(DEFAULT_FORMAT_AS_STRING.indexOf(' ') + 1));
 
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * @return a valid Date that matches one of the known formats or null.
+     */
+    public static Date parseValue(String s) {
+
+        try {
+            return DEFAULT_FULL_FORMAT.parse(s);
+
+        }
+        catch(ParseException e) {
+            // ignore, try next
+        }
+
+        try {
+            return DEFAULT_RELATIVE_FORMAT.parse(s);
+
+        }
+        catch(ParseException e) {
+            // ignore, try next
+        }
+
+        return null;
+    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private Date value;
+    private boolean relative;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -81,7 +114,11 @@ public class TimestampOption extends OptionBase {
     public TimestampOption(Character shortLiteral, String longLiteral, String value) throws ParseException {
 
         super(shortLiteral, longLiteral);
-        this.value = DEFAULT_FORMAT.parse(value);
+        Date date = parseValue(value);
+        if (date == null) {
+            throw new ParseException("\"" + value + "\" does not match any of the known formats", 0);
+        }
+        setValue(date);
     }
 
     @Override
@@ -92,6 +129,7 @@ public class TimestampOption extends OptionBase {
         }
 
         this.value = (Date)o;
+        this.relative = value != null && value.getTime() < 24L * 60 * 60 * 1000L;
     }
 
     // OptionBase overrides --------------------------------------------------------------------------------------------
@@ -104,7 +142,26 @@ public class TimestampOption extends OptionBase {
         return value;
     }
 
+    @Override
+    public String toString() {
+
+        String s = value == null ?
+                "" :
+                (relative ? DEFAULT_RELATIVE_FORMAT.format(value) : DEFAULT_FULL_FORMAT.format(value));
+
+        return toString(s);
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * @return true if the timestamp is relative to the beginning of the day ("14:01:02") or false if the timestamp
+     * is specified in full, including the day ("07/25/16 14:01:02").
+     */
+    public boolean isRelative() {
+
+        return relative;
+    }
 
     public String getString() {
 
@@ -112,7 +169,14 @@ public class TimestampOption extends OptionBase {
             return null;
         }
 
-        return DEFAULT_FORMAT.format(value);
+        if (relative) {
+
+            return DEFAULT_RELATIVE_FORMAT.format(value);
+        }
+        else {
+
+            return DEFAULT_FULL_FORMAT.format(value);
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

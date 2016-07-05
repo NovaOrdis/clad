@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -732,6 +733,23 @@ public class OptionParserTest {
         assertEquals("something", value);
     }
 
+    @Test
+    public void typeHeuristics_RelativeTimestamp() throws Exception {
+
+        Date value = (Date)OptionParser.typeHeuristics("14:00:00");
+
+        // relative
+        long time = value.getTime();
+        assertTrue(time < 24L * 60 * 60 * 1000);
+    }
+
+    @Test
+    public void typeHeuristics_FullTimestamp() throws Exception {
+
+        Date value = (Date)OptionParser.typeHeuristics("06/25/16 14:00:00");
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), value);
+    }
+
     // parseLongLiteralOption() ----------------------------------------------------------------------------------------
 
     @Test
@@ -959,17 +977,36 @@ public class OptionParserTest {
     // TimestampOption -------------------------------------------------------------------------------------------------
 
     @Test
-    public void parsingTimestampOption() throws Exception {
+    public void parsingTimestampOption_Relative() throws Exception {
 
         List<String> commandLineArguments = new ArrayList<>();
-        commandLineArguments.add("--from=14:00:00");
+        commandLineArguments.add("--test-timestamp-option=14:00:00");
         Set<Option> requiredGlobalOptions = Collections.emptySet();
-        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-options"));
+        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
 
         List<Option> result = OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
 
         assertEquals(1, result.size());
         TimestampOption tso = (TimestampOption)result.get(0);
+        assertTrue(tso.isRelative());
+        assertEquals(TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("14:00:00"), tso.getValue());
+    }
+
+    @Test
+    public void parsingTimestampOption_Absolute() throws Exception {
+
+        List<String> commandLineArguments = new ArrayList<>();
+        commandLineArguments.add("--test-timestamp-option=07/25/16 14:00:00");
+        Set<Option> requiredGlobalOptions = Collections.emptySet();
+        Set<Option> optionalGlobalOptions = Collections.singleton(new TimestampOption("test-timestamp-option"));
+
+        List<Option> result = OptionParser.parse(0, commandLineArguments, requiredGlobalOptions, optionalGlobalOptions);
+
+        assertEquals(1, result.size());
+        TimestampOption tso = (TimestampOption)result.get(0);
+        assertFalse(tso.isRelative());
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

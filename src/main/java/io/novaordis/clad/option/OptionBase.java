@@ -154,23 +154,27 @@ public abstract class OptionBase implements Option {
     public String toString() {
 
         String value = getValue() == null ? "" : "\"" + getValue() + "\"";
-
-        if (getShortLiteral() != null) {
-
-            if (getLongLiteral() != null) {
-
-                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=" + value;
-            }
-            return "-" + getShortLiteral() + " " + value;
-        }
-        else {
-            return "--" + getLongLiteral() + "=" + value;
-        }
+        return toString(value);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected String toString(String valueToString) {
+
+        if (getShortLiteral() != null) {
+
+            if (getLongLiteral() != null) {
+
+                return "-" + getShortLiteral() + "|--" + getLongLiteral() + "=" + valueToString;
+            }
+            return "-" + getShortLiteral() + " " + valueToString;
+        }
+        else {
+            return "--" + getLongLiteral() + "=" + valueToString;
+        }
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

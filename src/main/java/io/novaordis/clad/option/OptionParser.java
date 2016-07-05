@@ -16,12 +16,13 @@
 
 package io.novaordis.clad.option;
 
-import io.novaordis.clad.command.Command;
-import io.novaordis.clad.UserErrorException;
 import io.novaordis.clad.InstanceFactory;
+import io.novaordis.clad.UserErrorException;
+import io.novaordis.clad.command.Command;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -242,7 +243,7 @@ public class OptionParser {
                 toRemoveCount ++;
 
                 if ((current.endsWith("\"") && current.charAt(current.length() - 2) != '\\') ||
-                    (current.endsWith("'") && current.charAt(current.length() - 2) != '\\'))
+                        (current.endsWith("'") && current.charAt(current.length() - 2) != '\\'))
                 {
                     //
                     // end quote (but NOT escaped quote)
@@ -315,45 +316,63 @@ public class OptionParser {
         }
 
         //
+        // first try timestamps
+        //
+
+        Date date = TimestampOption.parseValue(value);
+        if (date != null) {
+            return date;
+        }
+
+        //
         // attempt to convert to numeric value
         //
 
         try {
 
             return Long.parseLong(value);
+
         }
-        catch(Exception e) {
+        catch (Exception e) {
 
-            //
-            // not a long, that's OK
-            //
-
-            try {
-
-                return Double.parseDouble(value);
-
-            }
-            catch (Exception e2) {
-
-                //
-                // not a double, that's OK
-                //
-
-                String lc = value.toLowerCase();
-
-                if ("true".equals(lc)) {
-
-                    return Boolean.TRUE;
-                }
-
-                if ("false".equals(lc)) {
-
-                    return Boolean.FALSE;
-                }
-
-                return value;
-            }
+            // ignore, keep trying
         }
+
+        //
+        // not a long, that's OK
+        //
+
+        try {
+
+            return Double.parseDouble(value);
+
+        }
+        catch (Exception e) {
+
+            // ignore, keep trying
+        }
+
+        //
+        // not a double, that's OK
+        //
+
+        String lc = value.toLowerCase();
+
+        if ("true".equals(lc)) {
+
+            return Boolean.TRUE;
+        }
+
+        if ("false".equals(lc)) {
+
+            return Boolean.FALSE;
+        }
+
+        //
+        // string
+        //
+
+        return value;
     }
 
     public static Option parseLongLiteralOption(String longLiteralOptionString) throws UserErrorException {
@@ -390,6 +409,13 @@ public class OptionParser {
 
         Object o = typeHeuristics(valueAsString);
 
+        if (o instanceof Date) {
+
+            TimestampOption option = new TimestampOption(optionName);
+            option.setValue(o);
+            return option;
+        }
+
         if (o instanceof Long) {
             LongOption option = new LongOption(optionName);
             option.setValue((Long)o);
@@ -412,13 +438,13 @@ public class OptionParser {
         }
     }
 
-    // Attributes ------------------------------------------------------------------------------------------------------
+// Attributes ------------------------------------------------------------------------------------------------------
 
-    // Constructors ----------------------------------------------------------------------------------------------------
+// Constructors ----------------------------------------------------------------------------------------------------
 
-    // Public ----------------------------------------------------------------------------------------------------------
+// Public ----------------------------------------------------------------------------------------------------------
 
-    // Static Package protected ----------------------------------------------------------------------------------------
+// Static Package protected ----------------------------------------------------------------------------------------
 
     /**
      * @return true if it detected and successfully handled a help option. If the option is detected, both the
@@ -462,13 +488,13 @@ public class OptionParser {
         return false;
     }
 
-    // Package protected -----------------------------------------------------------------------------------------------
+// Package protected -----------------------------------------------------------------------------------------------
 
-    // Protected -------------------------------------------------------------------------------------------------------
+// Protected -------------------------------------------------------------------------------------------------------
 
-    // Private ---------------------------------------------------------------------------------------------------------
+// Private ---------------------------------------------------------------------------------------------------------
 
-    // Private Static --------------------------------------------------------------------------------------------------
+// Private Static --------------------------------------------------------------------------------------------------
 
     private static void copyLiterals(Option option, Set<Option> required, Set<Option> optional) {
 
