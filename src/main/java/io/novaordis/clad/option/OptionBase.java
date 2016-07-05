@@ -43,6 +43,11 @@ public abstract class OptionBase implements Option {
      */
     protected OptionBase(Character shortLiteral, String longLiteral) {
         this.shortLiteral = shortLiteral;
+
+        if (longLiteral != null && longLiteral.startsWith("--")) {
+            throw new IllegalArgumentException("the long literal must not start with --, the dashes are implicit");
+        }
+
         this.longLiteral = longLiteral;
         this.equivalentOptions = new HashSet<>();
     }
