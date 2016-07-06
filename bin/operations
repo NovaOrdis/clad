@@ -30,16 +30,18 @@ Commands:
 
         If 'info' is used, returns the current version information.
 
-        Makes a release by incrementing the release information appropriately, running all tests, building the final
-        artifact and installing the artifact in the appropriate repository.
+        Makes a release by incrementing the release information appropriately, running all tests,
+        tagging the repository, building the final artifact and installing the artifact in the
+        appropriate repository.
 
-        If 'snapshot' is used, and the current release is a dot release, it will be incremented to the next patch
-        snapshot release. If the current release is a snapshot release, the snapshot counter will be simply
-        incremented.
+        If 'snapshot' is used, and the current release is a dot release, it will be incremented to
+        the next patch snapshot release. If the current release is a snapshot release, the
+        snapshot counter will be simply incremented.
 
-        If a version string is used, the string is checked for consistency. The release process will fail if the
-        version string is invalid or represents an older version than the current version. The repository can be
-        the local Maven repository, a directory, a remote server, etc.
+        If a version string is used, the string is checked for consistency. The release process
+        will fail if the version string is invalid or represents an older version than the current
+        version. The repository can be the local Maven repository, a directory, a remote server,
+        etc.
 
      test - internal release tools testing shortcut. Advanced users only.
 
@@ -47,10 +49,11 @@ Installation:
 
     ./src/main/bash/operations install-release-tools <project-home-directory>
 
-        The installation functionality can currently only be accessed from the original repository.
-        'install-release-tools' installs the release tools into the 'bin' subdirectory of the specified project home
-        directory. A target directory qualifies as "project home directory" if it has a Maven pom.xml in it. If an
-        older version of the release tools is already installed, 'install-release-tools' will upgrade in place.
+        The installation functionality can currently only be accessed from the original
+        repository. 'install-release-tools' installs the release tools into the 'bin' subdirectory
+        of the specified project home directory. A target directory qualifies as "project home
+        directory" if it has a Maven pom.xml in it. If an older version of the release tools is
+        already installed, 'install-release-tools' will upgrade in place.
 
 Per-Project Configuration:
 
@@ -308,13 +311,23 @@ function compute-next-version() {
     debug "major=${major}, minor=${minor}, patch=${patch}, snapshot=${snapshot}"
 
     if [ "${mode}" = "major" ]; then
-        major=$(expr ${major} + 1) || exit 1
+        #
+        # only increment if we're not a snapshot
+        #
+        if [ -z "${snapshot}" ]; then
+            major=$(expr ${major} + 1) || exit 1
+        fi
         minor=""
         patch=""
         snapshot=""
     elif [ "${mode}" = "minor" ]; then
         [ -z "${minor}" ] && minor=0
-        minor=$(expr ${minor} + 1) || exit 1
+        #
+        # only increment if we're not a snapshot
+        #
+        if [ -z "${snapshot}" ]; then
+            minor=$(expr ${minor} + 1) || exit 1
+        fi
         patch=""
         snapshot=""
     elif [ "${mode}" = "patch" ]; then
@@ -1037,6 +1050,22 @@ function do-release() {
     yes "releasing ${next_version}, is this OK?" || { info "release canceled, no files were changed"; return 0; }
 
     set-version ${next_version}
+
+    #
+    # run the tests with the new version
+    #
+
+    mvn clean test || fail "test suite failed after version increment, manual intervention required"
+
+    #
+    # tag repository
+    #
+
+    git add . && info "git add ok" || fail "git add . failed"
+
+    git commit -m "release ${next_version}" && info "git commit ok" || fail "git commit failed"
+
+    git tag -m "release ${next_version}" "release-${next_version}" || fail "git tag failed"
 
     #
     # If we release externally (as a zip file), we only need to create the JAR locally in the project, so we package.
