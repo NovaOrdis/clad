@@ -8,8 +8,7 @@
     <artifactId>novaordis-clad</artifactId>
     <packaging>jar</packaging>
 
-    <!--<version>1-SNAPSHOT</version>-->
-    <version>3.2</version>
+    <version>3.3-SNAPSHOT-1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

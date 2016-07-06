@@ -1065,7 +1065,9 @@ function do-release() {
 
     git commit -m "release ${next_version}" && info "git commit ok" || fail "git commit failed"
 
-    git tag -m "release ${next_version}" "release-${next_version}" || fail "git tag failed"
+    git tag -m "release ${next_version}" "release-${next_version}" && info "git tag ok" || fail "git tag failed"
+
+    git push --follow-tags && info "git push ok" || fail "git push failed"
 
     #
     # If we release externally (as a zip file), we only need to create the JAR locally in the project, so we package.
@@ -1082,8 +1084,13 @@ function do-release() {
     fi
 
     info ""
-    info "A new ${mode} version (${next_version}) was released, commited to repository and tagged"
+    info "A new ${mode} version (${next_version}) was released, committed to repository and tagged"
     info ""
+
+    info ""
+    info "TODO: ask whether to start a new major/minor/patch snapshot, and start it ..."
+    info ""
+
 
 }
 
