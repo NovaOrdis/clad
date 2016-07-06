@@ -98,6 +98,13 @@ public class TimestampOption extends OptionBase {
     }
 
     /**
+     * @param longLiteral the literal (without '--')
+     */
+    public TimestampOption(String longLiteral, String value) throws ParseException {
+        this(null, longLiteral, value);
+    }
+
+    /**
      * @param shortLiteral the literal (without '-')
      * @param longLiteral the literal (without '--')
      */

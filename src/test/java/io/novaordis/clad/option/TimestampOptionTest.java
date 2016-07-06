@@ -77,6 +77,17 @@ public class TimestampOptionTest extends OptionTest {
         }
     }
 
+    @Test
+    public void constructor2() throws Exception {
+
+        TimestampOption o = new TimestampOption("test", "00:00:00");
+
+        assertNull(o.getShortLiteral());
+        assertEquals("test", o.getLongLiteral());
+        Date date = o.getValue();
+        assertEquals(date, TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("00:00:00)"));
+    }
+
     // parseValue() ----------------------------------------------------------------------------------------------------
 
     @Test
