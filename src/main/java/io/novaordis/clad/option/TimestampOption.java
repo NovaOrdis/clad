@@ -79,6 +79,7 @@ public class TimestampOption extends OptionBase {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private Date value;
+    private String literalValue;
     private boolean relative;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -126,6 +127,7 @@ public class TimestampOption extends OptionBase {
             throw new ParseException("\"" + value + "\" does not match any of the known formats", 0);
         }
         setValue(date);
+        this.literalValue = value;
     }
 
     @Override
@@ -168,6 +170,10 @@ public class TimestampOption extends OptionBase {
     public boolean isRelative() {
 
         return relative;
+    }
+
+    public String getLiteralValue() {
+        return literalValue;
     }
 
     public String getString() {

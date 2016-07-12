@@ -32,7 +32,7 @@ Commands:
 
         Makes a release by incrementing the release information appropriately, running all tests,
         tagging the repository, building the final artifact and installing the artifact in the
-        appropriate repository.
+        appropriate artifact repository.
 
         If 'snapshot' is used, and the current release is a dot release, it will be incremented to
         the next patch snapshot release. If the current release is a snapshot release, the
@@ -42,6 +42,8 @@ Commands:
         will fail if the version string is invalid or represents an older version than the current
         version. The repository can be the local Maven repository, a directory, a remote server,
         etc.
+
+        Also see https://kb.novaordis.com/index.php/Public_Release_Procedure_for_Projects
 
      test - internal release tools testing shortcut. Advanced users only.
 
@@ -267,6 +269,8 @@ function get-version() {
 #
 function set-version() {
 
+    debug-arguments "$@"
+
     local version=$1
     [ -z "${version}" ] && fail "'version' not specified"
 
@@ -278,9 +282,13 @@ function set-version() {
     # replace the first occurrence of <version>...</version> with our version
     #
 
+    debug "inserting version ${version}"
+
     local tmp_file=./.tmp
-    sed -e '1,/^ *<version>.*<\/version> *$/s/^\( *<version>\).*\(<\/version> *\)$/\1'${version}'\2/' ${pom_file} > ${tmp_file} || \
+
+    sed -e '1,/^ *<version>.*<\/version> */s/^\( *<version>\).*\(<\/version> *\)/\1'${version}'\2/' ${pom_file} > ${tmp_file} || \
         fail "failed to perform sed replacement"
+
     diff -q ${pom_file} ${tmp_file} > /dev/null && fail "no replacement was made in ${pom_file}"
     mv ${tmp_file} ${pom_file} || fail "failed to restore ${pom_file} from ${tmp_file}"
 }
@@ -321,11 +329,27 @@ function compute-next-version() {
         patch=""
         snapshot=""
     elif [ "${mode}" = "minor" ]; then
+
         [ -z "${minor}" ] && minor=0
-        #
-        # only increment if we're not a snapshot
-        #
-        if [ -z "${snapshot}" ]; then
+        if [ -n "${snapshot}" ]; then
+            #
+            # we're a snapshot
+            #
+            if [ -n "${patch}" ]; then
+                #
+                # we're a patch snapshot, so increment the minor
+                #
+                minor=$(expr ${minor} + 1) || exit 1
+            else
+                debug "we're a minor snapshot, we don't increment the minor"
+                #
+                # we're a minor snaps
+                #
+            fi
+        else
+            #
+            # we're not a snapshot
+            #
             minor=$(expr ${minor} + 1) || exit 1
         fi
         patch=""
@@ -841,14 +865,16 @@ function install-release() {
 
     debug-arguments "$@"
 
-    [ -z "${release_repository}" ] && \
-        fail "'release_repository' not defined. Check your local configuration file ${configuration_file}"
-
-    debug "release repository: ${release_repository}"
-
     local release_file_path=$1
     [ -z "${release_file_path}" ] && fail "'release_file' not provided"
     [ -f ${release_file_path} ] || fail "the release file ${release_file_path} does not exist"
+
+    debug "release repository: ${release_repository}"
+
+    if [ -z "${release_repository}" ]; then
+        info "no 'release_repository' defined in ${configuration_file}, the binary release available as ${release_file_path} ..."
+        return 0
+    fi
 
     local target_file=${release_repository}/$(basename ${release_file_path})
 
@@ -862,8 +888,12 @@ function install-release() {
 # return 0 if the configured release_repository is LOCAL_MAVEN
 function is-local-maven-release() {
 
-    [ -z "${release_repository}" ] && \
-        fail "'release_repository' not defined. Check your local configuration file ${configuration_file}"
+    if [ -z "${release_repository}" ]; then
+        #
+        # no ${release_repository} defined, that means we'll handle the binary artifact manually
+        #
+        return 1
+    fi
 
     [ "${release_repository}" = "LOCAL_MAVEN" ] && return 0 || return 1
 }
@@ -1065,7 +1095,9 @@ function do-release() {
 
     git commit -m "release ${next_version}" && info "git commit ok" || fail "git commit failed"
 
-    git tag -m "release ${next_version}" "release-${next_version}" && info "git tag ok" || fail "git tag failed"
+    local tag=release-${next_version}
+
+    git tag -m "release ${next_version}" "${tag}" && info "git tag ok, tagged with ${tag}" || fail "git tag failed"
 
     git push --follow-tags && info "git push ok" || fail "git push failed"
 
@@ -1084,14 +1116,13 @@ function do-release() {
     fi
 
     info ""
-    info "A new ${mode} version (${next_version}) was released, committed to repository and tagged"
+    info "A new ${mode} version (${next_version}) was released, committed to repository and tagged."
+    info "If you want to create an official GitHub release, use tag \"${tag}\" and the following binary: ${release_zip_file_path}"
     info ""
 
     info ""
     info "TODO: ask whether to start a new major/minor/patch snapshot, and start it ..."
     info ""
-
-
 }
 
 main $@
