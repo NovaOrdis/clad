@@ -20,11 +20,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -50,97 +51,140 @@ public class TimestampOptionTest extends OptionTest {
     // constructor -----------------------------------------------------------------------------------------------------
 
     @Test
-    public void constructor_Relative() throws Exception {
-
-        TimestampOption to = new TimestampOption('t', "test", "14:00:00");
-        assertEquals(TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("14:00:00"), to.getValue());
-    }
-
-    @Test
-    public void constructor_Full() throws Exception {
-
-        TimestampOption to = new TimestampOption('t', "test", "06/25/16 14:00:00");
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), to.getValue());
-    }
-
-    @Test
-    public void constructor_Failure() throws Exception {
+    public void constructor_InvalidValue() throws Exception {
 
         try {
-            new TimestampOption('t', "test", "blah");
-            fail("should have failed exception");
-        }
-        catch(ParseException e) {
+
+            new TimestampOption("test", "something that is not a valid timestamp");
+            fail("should have thrown Exception");
+
+        } catch (IllegalArgumentException e) {
+
             String msg = e.getMessage();
             log.info(msg);
-            assertTrue(msg.contains("does not match any of the known formats"));
+            assertTrue(msg.contains("does not match neither format (full or relative)"));
         }
     }
 
     @Test
-    public void constructor2() throws Exception {
+    public void constructor_FullValue() throws Exception {
 
-        TimestampOption o = new TimestampOption("test", "00:00:00");
+        String timestamp = TimestampOption.DEFAULT_FULL_FORMAT.format(new Date());
+        TimestampOption to = new TimestampOption("test", timestamp);
+        assertEquals(timestamp, to.getValue());
+        assertFalse(to.isRelative());
+        assertNull(to.getShortLiteral());
+        assertEquals("test", to.getLongLiteral());
 
-        assertNull(o.getShortLiteral());
-        assertEquals("test", o.getLongLiteral());
-        Date date = o.getValue();
-        assertEquals(date, TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("00:00:00)"));
-    }
-
-    // parseValue() ----------------------------------------------------------------------------------------------------
-
-    @Test
-    public void parseValue_NoKnownFormat() throws Exception {
-
-        assertNull(TimestampOption.parseValue("blah"));
     }
 
     @Test
-    public void parseValue_Relative() throws Exception {
+    public void constructor_FullValue2() throws Exception {
 
-        Date d = TimestampOption.parseValue("14:01:02");
-        assertEquals(TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("14:01:02"), d);
+        TimestampOption to = new TimestampOption('t', "test", "06/25/16 14:00:00");
+        assertEquals("06/25/16 14:00:00", to.getValue());
+        assertEquals(new Character('t'), to.getShortLiteral());
+        assertEquals("test", to.getLongLiteral());
     }
 
     @Test
-    public void parseValue_Full() throws Exception {
+    public void constructor_RelativeValue() throws Exception {
 
-        Date d = TimestampOption.parseValue("07/25/16 14:01:02");
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:01:02"), d);
-    }
-
-    // getValue()/setValue() -------------------------------------------------------------------------------------------
-
-    @Test
-    public void setGetValue() throws Exception {
-
-        TimestampOption o = getOptionToTest('t', "test");
-
-        assertNull(o.getValue());
-
-        String ts = "07/25/16 14:00:00";
-
-        Date d = TimestampOption.DEFAULT_FULL_FORMAT.parse(ts);
-
-        o.setValue(d);
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse(ts), o.getValue());
-
-        assertEquals("07/25/16 14:00:00", o.getString());
+        String timestamp = new TimestampOption("test", null).getRelativeFormat().format(new Date());
+        TimestampOption to = new TimestampOption("test", timestamp);
+        assertEquals(timestamp, to.getValue());
+        assertTrue(to.isRelative());
     }
 
     @Test
-    public void relative() throws Exception {
+    public void constructor_RelativeValue2() throws Exception {
 
-        TimestampOption o = new TimestampOption('t', "test", "14:00:00");
-        assertTrue(o.isRelative());
+        TimestampOption to = new TimestampOption('t', "test", "14:00:00");
+        assertEquals("14:00:00", to.getValue());
     }
 
     @Test
-    public void absolute() throws Exception {
+    public void constructor_RelativeValue3() throws Exception {
 
-        TimestampOption o = new TimestampOption('t', "test", "07/25/16 14:00:00");
-        assertFalse(o.isRelative());
+        TimestampOption to = new TimestampOption('t', "test", "00:00:00");
+        assertEquals("00:00:00", to.getValue());
+    }
+
+    // setValue()/getValue() -------------------------------------------------------------------------------------------
+
+    @Test
+    public void setValue_Null() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+        assertNull(to.getValue());
+
+        to.setValue(null);
+        assertNull(to.getValue());
+    }
+
+    @Test
+    public void setValue_NotAString() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+
+        try {
+            to.setValue(new Integer(1));
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("value is not a String"));
+        }
+    }
+
+    @Test
+    public void setValue_Relative() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+
+        to.setValue("10:00:00");
+        assertEquals("10:00:00", to.getString());
+        assertTrue(to.isRelative());
+    }
+
+    @Test
+    public void setValue_Full() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+        assertNull(to.getValue());
+
+        to.setValue("07/11/15 10:00:00");
+        assertEquals("07/11/15 10:00:00", to.getString());
+        assertFalse(to.isRelative());
+
+        to.setValue(null);
+        assertNull(to.getValue());
+    }
+
+    @Test
+    public void setValue_InvalidFormat() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+
+        try {
+            to.setValue("invalid format");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("does not match neither format (full or relative)"));
+        }
+    }
+
+    // getFullFormat(), getRelativeFormat() ----------------------------------------------------------------------------
+
+    @Test
+    public void formats() throws Exception {
+
+        TimestampOption to = new TimestampOption("test", null);
+
+        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT, to.getFullFormat());
+        assertNotNull(to.getRelativeFormat());
     }
 
     // toString() ------------------------------------------------------------------------------------------------------
@@ -159,11 +203,27 @@ public class TimestampOptionTest extends OptionTest {
         assertEquals("-t|--test=07/23/16 15:01:02", tso.toString());
     }
 
-    @Test
-    public void toString_3() throws Exception {
+    // isTimestampOptionValue() ----------------------------------------------------------------------------------------
 
-        TimestampOption tso = new TimestampOption('t', "test");
-        assertEquals("-t|--test=", tso.toString());
+    @Test
+    public void isTimestampOptionValue_Full() throws Exception {
+
+        boolean b = TimestampOption.isTimestampOptionValue("01/01/16 00:00:00");
+        assertTrue(b);
+
+    }
+    @Test
+    public void isTimestampOptionValue_Relative() throws Exception {
+
+        boolean b = TimestampOption.isTimestampOptionValue("00:00:00");
+        assertTrue(b);
+    }
+
+    @Test
+    public void isTimestampOptionValue_No() throws Exception {
+
+        boolean b = TimestampOption.isTimestampOptionValue("something");
+        assertFalse(b);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -173,19 +233,14 @@ public class TimestampOptionTest extends OptionTest {
     @Override
     protected TimestampOption getOptionToTest(Character shortLiteral, String longLiteral) {
 
-        return new TimestampOption(shortLiteral, longLiteral);
+        return new TimestampOption(shortLiteral, longLiteral, null);
     }
 
     @Override
-    protected Date getAppropriateValueForOptionToTest() {
+    protected String getAppropriateValueForOptionToTest() {
 
-        try {
-            return TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00");
-        }
-        catch (ParseException e) {
-
-            throw new IllegalStateException(e);
-        }
+        DateFormat df = new TimestampOption('t', "test", null).getFullFormat();
+        return df.format(new Date());
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

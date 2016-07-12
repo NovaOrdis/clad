@@ -22,7 +22,6 @@ import io.novaordis.clad.command.Command;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -343,9 +342,8 @@ public class OptionParser {
         // first try timestamps
         //
 
-        Date date = TimestampOption.parseValue(value);
-        if (date != null) {
-            return date;
+        if (TimestampOption.isTimestampOptionValue(value)) {
+            return value;
         }
 
         //
@@ -356,10 +354,10 @@ public class OptionParser {
         if (nextCommandLineSections != null && nextCommandLineSections.size() > 0) {
 
             String timestampCandidateValue = value + " " + nextCommandLineSections.get(0);
-            date = TimestampOption.parseValue(timestampCandidateValue);
-            if (date != null) {
+            if (TimestampOption.isTimestampOptionValue(timestampCandidateValue)) {
+
                 nextCommandLineSections.remove(0);
-                return date;
+                return timestampCandidateValue;
             }
         }
 
@@ -469,29 +467,6 @@ public class OptionParser {
 
         Object o = typeHeuristics(valueAsString, theRestOfTheCommandLineArgs);
 
-        if (o instanceof Date) {
-
-            TimestampOption option = new TimestampOption(optionName);
-            option.setValue(o);
-
-            //
-            // timestamp is a special case where heuristics may use the next command line argument (we allow timestamps
-            // to be specified without quotes), so if this is the case, adjust the command line accordingly
-            //
-            int differenceInArgumentCount = remainingArgCount - theRestOfTheCommandLineArgs.size();
-            if (differenceInArgumentCount > 1) {
-                throw new RuntimeException("not prepared to handle the case when we use more than one trailing arguments for the timestamp");
-            }
-            if (commandLineArguments != null && differenceInArgumentCount == 1) {
-                //
-                // we used arguments for the timestamp
-                //
-                commandLineArguments.remove(nextArgumentIndex);
-            }
-
-            return option;
-        }
-
         if (o instanceof Long) {
             LongOption option = new LongOption(optionName);
             option.setValue((Long)o);
@@ -507,10 +482,40 @@ public class OptionParser {
             option.setValue((Boolean)o);
             return option;
         }
+        else if (o instanceof String) {
+
+            if (TimestampOption.isTimestampOptionValue((String)o)) {
+
+                TimestampOption option = new TimestampOption(optionName, (String) o);
+
+                //
+                // timestamp is a special case where heuristics may use the next command line argument (we allow timestamps
+                // to be specified without quotes), so if this is the case, adjust the command line accordingly
+                //
+                int differenceInArgumentCount = remainingArgCount - theRestOfTheCommandLineArgs.size();
+                if (differenceInArgumentCount > 1) {
+                    throw new RuntimeException(
+                            "not prepared to handle the case when we use more than one trailing arguments for the timestamp");
+                }
+                if (commandLineArguments != null && differenceInArgumentCount == 1) {
+                    //
+                    // we used arguments for the timestamp
+                    //
+                    commandLineArguments.remove(nextArgumentIndex);
+                }
+
+                return option;
+            }
+            else {
+
+                StringOption option = new StringOption(optionName);
+                option.setValue((String)o);
+                return option;
+            }
+        }
         else {
-            StringOption option = new StringOption(optionName);
-            option.setValue((String)o);
-            return option;
+
+            throw new IllegalArgumentException("options of type " + o + " not supported");
         }
     }
 

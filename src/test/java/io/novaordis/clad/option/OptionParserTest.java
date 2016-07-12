@@ -750,18 +750,16 @@ public class OptionParserTest {
     @Test
     public void typeHeuristics_RelativeTimestamp() throws Exception {
 
-        Date value = (Date)OptionParser.typeHeuristics("14:00:00", new ArrayList<>());
+        String value = (String)OptionParser.typeHeuristics("14:00:00", new ArrayList<>());
 
-        // relative
-        long time = value.getTime();
-        assertTrue(time < 24L * 60 * 60 * 1000);
+        assertEquals("14:00:00", value);
     }
 
     @Test
     public void typeHeuristics_FullTimestamp() throws Exception {
 
-        Date value = (Date)OptionParser.typeHeuristics("06/25/16 14:00:00", new ArrayList<>());
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), value);
+        String value = (String)OptionParser.typeHeuristics("06/25/16 14:00:00", new ArrayList<>());
+        assertEquals("06/25/16 14:00:00", value);
     }
 
     @Test
@@ -769,8 +767,8 @@ public class OptionParserTest {
 
         List<String> commandLineArgs = new ArrayList<>();
         commandLineArgs.add("14:00:00");
-        Date value = (Date)OptionParser.typeHeuristics("06/25/16", commandLineArgs);
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("06/25/16 14:00:00"), value);
+        String value = (String)OptionParser.typeHeuristics("06/25/16", commandLineArgs);
+        assertEquals("06/25/16 14:00:00", value);
         assertTrue(commandLineArgs.isEmpty());
     }
 
@@ -1013,7 +1011,7 @@ public class OptionParserTest {
         assertEquals(1, result.size());
         TimestampOption tso = (TimestampOption)result.get(0);
         assertTrue(tso.isRelative());
-        assertEquals(TimestampOption.DEFAULT_RELATIVE_FORMAT.parse("14:00:00"), tso.getValue());
+        assertEquals("14:00:00", tso.getValue());
     }
 
     @Test
@@ -1033,7 +1031,7 @@ public class OptionParserTest {
         assertEquals(1, result.size());
         TimestampOption tso = (TimestampOption)result.get(0);
         assertFalse(tso.isRelative());
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+        assertEquals("07/25/16 14:00:00", tso.getValue());
     }
 
     @Test
@@ -1054,7 +1052,7 @@ public class OptionParserTest {
         assertEquals(1, result.size());
         TimestampOption tso = (TimestampOption)result.get(0);
         assertFalse(tso.isRelative());
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+        assertEquals("07/25/16 14:00:00", tso.getValue());
     }
 
     @Test
@@ -1071,7 +1069,7 @@ public class OptionParserTest {
         assertEquals(1, result.size());
         TimestampOption tso = (TimestampOption)result.get(0);
         assertFalse(tso.isRelative());
-        assertEquals(TimestampOption.DEFAULT_FULL_FORMAT.parse("07/25/16 14:00:00"), tso.getValue());
+        assertEquals("07/25/16 14:00:00", tso.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

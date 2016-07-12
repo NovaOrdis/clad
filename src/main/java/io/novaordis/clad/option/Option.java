@@ -74,6 +74,8 @@ public interface Option {
 
     /**
      * Set the option's value - must be the native option's type.
+     *
+     * @exception IllegalArgumentException on invalid value.
      */
     void setValue(Object o);
 

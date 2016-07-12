@@ -19,13 +19,20 @@ package io.novaordis.clad.option;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Used to declare timestamp options. A timestamp option represents a point in time, with millisecond precision.
- * Various formats may be used to declared it. The default full format is:
+ * The option instance does not store the parsed numeric timestamp value, just the string representation. However,
+ * the string value is parsed during the instance construction to detect invalid formats. The current implementation
+ * relies on a built-in default timestamp format, but it could be improved in the future to allow for a pluggable
+ * format.
+ *
+ * The default built-in full timestamp format is:
  *
  * MM/dd/yy HH:mm:ss
+ *
+ * The format does not provide for an explicitly declared timezone, and the users of the TimestampOption instances must
+ * account for that and adjust the values in case the events' timestamp are declared with a specific timezone offset.
  *
  * A "relative" format that can be used to declare timestamps within the boundaries of the same day is:
  *
@@ -33,8 +40,6 @@ import java.util.Date;
  *
  * No quotation marks are necessary around the timestamp string, the parser knows how to handle the space between the
  * date section and the time section.
- *
- * The native type (as returned by getValue()) is java.util.Date.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
@@ -44,124 +49,108 @@ public class TimestampOption extends OptionBase {
     // Constants -------------------------------------------------------------------------------------------------------
 
     public static final String DEFAULT_FORMAT_AS_STRING = "MM/dd/yy HH:mm:ss";
-    public static final DateFormat DEFAULT_FULL_FORMAT = new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING);
 
-    // HH:mm:ss
-    public static final DateFormat DEFAULT_RELATIVE_FORMAT =
-            new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING.substring(DEFAULT_FORMAT_AS_STRING.indexOf(' ') + 1));
+    public static final DateFormat DEFAULT_FULL_FORMAT = new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * @return a valid Date that matches one of the known formats or null.
-     */
-    public static Date parseValue(String s) {
+    public static boolean isTimestampOptionValue(String value) {
 
         try {
-            return DEFAULT_FULL_FORMAT.parse(s);
-
+            new TimestampOption(null, value);
+            return true;
         }
-        catch(ParseException e) {
-            // ignore, try next
+        catch(IllegalArgumentException e) {
+            return false;
         }
-
-        try {
-            return DEFAULT_RELATIVE_FORMAT.parse(s);
-
-        }
-        catch(ParseException e) {
-            // ignore, try next
-        }
-
-        return null;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Date value;
-    private String literalValue;
+    private String value;
     private boolean relative;
+    private DateFormat fullFormat;
+    private DateFormat relativeFormat;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    /**
-     * @param shortLiteral the literal (without '-')
-     */
-    public TimestampOption(Character shortLiteral) {
-        super(shortLiteral, null);
-    }
-
-    /**
-     * @param longLiteral the literal (without '--')
-     */
     public TimestampOption(String longLiteral) {
-        super(null, longLiteral);
+        this(null, longLiteral, null);
     }
 
     /**
      * @param longLiteral the literal (without '--')
+     *
+     * @exception IllegalArgumentException on invalid value.
      */
-    public TimestampOption(String longLiteral, String value) throws ParseException {
+    public TimestampOption(String longLiteral, String value) {
+
         this(null, longLiteral, value);
     }
 
     /**
-     * @param shortLiteral the literal (without '-')
-     * @param longLiteral the literal (without '--')
-     */
-    public TimestampOption(Character shortLiteral, String longLiteral) {
-        super(shortLiteral, longLiteral);
-    }
-
-    /**
-     * @param shortLiteral the literal (without '-')
      * @param longLiteral the literal (without '--')
      *
-     * @exception ParseException if the String value cannot be parsed into a Date
+     * @param value - null option is acceptable, it can be installed later with setValue().
+     *
+     * @exception IllegalArgumentException on invalid value.
      */
-    public TimestampOption(Character shortLiteral, String longLiteral, String value) throws ParseException {
+    public TimestampOption(Character shortLiteral, String longLiteral, String value) {
 
         super(shortLiteral, longLiteral);
-        Date date = parseValue(value);
-        if (date == null) {
-            throw new ParseException("\"" + value + "\" does not match any of the known formats", 0);
-        }
-        setValue(date);
-        this.literalValue = value;
-    }
 
-    @Override
-    public void setValue(Object o) {
+        this.fullFormat = DEFAULT_FULL_FORMAT;
 
-        if (o != null && !(o instanceof Date)) {
-            throw new IllegalArgumentException(o + " is not a Date");
-        }
+        this.relativeFormat =
+                new SimpleDateFormat(DEFAULT_FORMAT_AS_STRING.substring(DEFAULT_FORMAT_AS_STRING.indexOf(' ') + 1));
 
-        this.value = (Date)o;
-        this.relative = value != null && value.getTime() < 24L * 60 * 60 * 1000L;
+        setValue(value);
     }
 
     // OptionBase overrides --------------------------------------------------------------------------------------------
 
-    /**
-     * @return a Date instance.
-     */
     @Override
-    public Date getValue() {
+    public void setValue(Object o) {
+
+        if (o == null) {
+
+            value = null;
+            relative = false;
+            return;
+        }
+
+        if (!(o instanceof String)) {
+            throw new IllegalArgumentException("value is not a String");
+        }
+
+        Object[] result = validateValue((String)o);
+
+        this.value = (String)result[0];
+        this.relative = (Boolean)result[1];
+    }
+
+    @Override
+    public String getValue() {
         return value;
     }
 
     @Override
     public String toString() {
 
-        String s = value == null ?
-                "" :
-                (relative ? DEFAULT_RELATIVE_FORMAT.format(value) : DEFAULT_FULL_FORMAT.format(value));
-
-        return toString(s);
+        return super.toString(value == null ?  "" : value);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public DateFormat getFullFormat() {
+
+        return fullFormat;
+    }
+
+    public DateFormat getRelativeFormat() {
+
+        return relativeFormat;
+    }
 
     /**
      * @return true if the timestamp is relative to the beginning of the day ("14:01:02") or false if the timestamp
@@ -172,24 +161,9 @@ public class TimestampOption extends OptionBase {
         return relative;
     }
 
-    public String getLiteralValue() {
-        return literalValue;
-    }
-
     public String getString() {
 
-        if (value == null) {
-            return null;
-        }
-
-        if (relative) {
-
-            return DEFAULT_RELATIVE_FORMAT.format(value);
-        }
-        else {
-
-            return DEFAULT_FULL_FORMAT.format(value);
-        }
+        return value;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -198,6 +172,47 @@ public class TimestampOption extends OptionBase {
 
     // Private ---------------------------------------------------------------------------------------------------------
 
+    /**
+     * @throws IllegalArgumentException on invalid value.
+     *
+     * @return an array that has on the first position the validated value as string - may be adjusted, trimmed, etc.
+     * and on the second the boolean value of "is relative"
+     */
+    private Object[] validateValue(String value) throws IllegalArgumentException {
+
+        Object[] result = new Object[2];
+
+        try {
+
+            getFullFormat().parse(value);
+
+            result[0] = value;
+            result[1] = false;
+            return result;
+
+        }
+        catch(ParseException e) {
+            // ignore, try next
+        }
+
+        try {
+
+            getRelativeFormat().parse(value);
+
+            result[0] = value;
+            result[1] = true;
+            return result;
+
+        }
+        catch(ParseException e) {
+
+            throw new IllegalArgumentException("\"" + value + "\" does not match neither format (full or relative)");
+        }
+    }
+
     // Inner classes ---------------------------------------------------------------------------------------------------
+
+
+
 
 }

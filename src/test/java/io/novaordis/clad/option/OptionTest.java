@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Set;
 
@@ -372,10 +373,25 @@ public abstract class OptionTest {
 
     // Private ---------------------------------------------------------------------------------------------------------
 
-    private Object generateDifferentValue(Object value) {
+    private Object generateDifferentValue(Object value) throws Exception {
 
         if (value instanceof String) {
-            return "different " + ((String)value);
+
+            String s = (String)value;
+
+            if (TimestampOption.isTimestampOptionValue(s)) {
+
+                TimestampOption to = new TimestampOption("test", s);
+                DateFormat df = to.isRelative() ? to.getRelativeFormat() : to.getFullFormat();
+                Date d = df.parse(s);
+                //
+                // we add one hour
+                //
+                Date d2 = new Date(d.getTime() + 3600L * 1000L);
+                return df.format(d2);
+            }
+
+            return "different " + s;
         }
         else if (value instanceof Integer) {
             return ((Integer)value) + 1;
