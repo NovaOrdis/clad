@@ -1,0 +1,3 @@
+
+* Upgraded novaordis-util dependency to 4.1.2-SNAPSHOT-1. novaordis-util declares now
+  io.novaordis.utilities.UserErrorException. THis breaks backward compatibility.

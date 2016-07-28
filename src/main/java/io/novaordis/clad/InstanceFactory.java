@@ -17,6 +17,7 @@
 package io.novaordis.clad;
 
 import io.novaordis.clad.command.Command;
+import io.novaordis.utilities.UserErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,7 +18,7 @@ package io.novaordis.clad.command;
 
 import io.novaordis.clad.application.ApplicationRuntime;
 import io.novaordis.clad.configuration.Configuration;
-import io.novaordis.clad.UserErrorException;
+import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.option.Option;
 
 import java.util.List;

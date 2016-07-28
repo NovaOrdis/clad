@@ -24,6 +24,7 @@ import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.configuration.ConfigurationImpl;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;
+import io.novaordis.utilities.UserErrorException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

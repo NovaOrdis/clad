@@ -16,7 +16,7 @@
 
 package io.novaordis.clad.configuration;
 
-import io.novaordis.clad.UserErrorException;
+import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.option.BooleanOption;
 import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;

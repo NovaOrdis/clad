@@ -24,6 +24,7 @@ import io.novaordis.clad.option.HelpOption;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.OptionParser;
 import io.novaordis.clad.option.VerboseOption;
+import io.novaordis.utilities.UserErrorException;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Category;
 import org.apache.log4j.ConsoleAppender;

@@ -17,7 +17,7 @@
 package io.novaordis.clad.option;
 
 import io.novaordis.clad.InstanceFactory;
-import io.novaordis.clad.UserErrorException;
+import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.command.Command;
 import org.apache.log4j.Logger;
 

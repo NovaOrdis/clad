@@ -18,7 +18,7 @@ package io.novaordis.clad.option;
 
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.command.TestCommand;
-import io.novaordis.clad.UserErrorException;
+import io.novaordis.utilities.UserErrorException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
