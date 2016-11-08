@@ -19,6 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -68,6 +69,36 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     public void init(Configuration configuration) throws Exception {
 
         throw new SyntheticException("SYNTHETIC");
+    }
+
+    @Override
+    public void setStdoutOutputStream(OutputStream outputStream) {
+
+        //
+        // this needs to simulate working correctly
+        //
+
+        // noop
+    }
+
+    @Override
+    public OutputStream getStdoutOutputStream() {
+        throw new RuntimeException("getStdoutOutputStream() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void setStderrOutputStream(OutputStream outputStream) {
+        
+        //
+        // this needs to simulate working correctly
+        //
+
+        // noop
+    }
+
+    @Override
+    public OutputStream getStderrOutputStream() {
+        throw new RuntimeException("getStderrOutputStream() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

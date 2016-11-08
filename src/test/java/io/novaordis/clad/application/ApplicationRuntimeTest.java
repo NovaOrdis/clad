@@ -16,13 +16,16 @@
 
 package io.novaordis.clad.application;
 
-import java.io.OutputStream;
+import io.novaordis.clad.MockOutputStream;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 2/4/16
+ * @since 11/8/16
  */
-public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
+public abstract class ApplicationRuntimeTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,62 +33,37 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private OutputStream stdoutOutputStream;
-    private OutputStream stderrOutputStream;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    // ApplicationRuntime overrides ------------------------------------------------------------------------------------
-
-    @Override
-    public String getName() {
-
-        String simpleName = this.getClass().getSimpleName();
-
-        if (!simpleName.endsWith("ApplicationRuntime")) {
-            throw new IllegalStateException(
-                    "non-standard application class name " + simpleName + ", we don't know how to handle it");
-        }
-
-        return simpleName.substring(0, simpleName.length() - "ApplicationRuntime".length()).toLowerCase();
-    }
-
-    @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
-    }
-
-    @Override
-    public void setStdoutOutputStream(OutputStream os) {
-
-        this.stdoutOutputStream = os;
-    }
-
-    @Override
-    public OutputStream getStdoutOutputStream() {
-
-        return stdoutOutputStream;
-    }
-
-    @Override
-    public void setStderrOutputStream(OutputStream os) {
-
-        this.stderrOutputStream = os;
-    }
-
-    @Override
-    public OutputStream getStderrOutputStream() {
-
-        return stderrOutputStream;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @Test
+    public void stdoutHandling() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        MockOutputStream mos = new MockOutputStream();
+
+        runtime.setStdoutOutputStream(mos);
+
+        assertEquals(mos, runtime.getStdoutOutputStream());
+    }
+
+    @Test
+    public void stderrHandling() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        MockOutputStream mos = new MockOutputStream();
+
+        runtime.setStderrOutputStream(mos);
+
+        assertEquals(mos, runtime.getStderrOutputStream());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
+
+    protected abstract ApplicationRuntime getApplicationRuntimeToTest();
 
     // Protected -------------------------------------------------------------------------------------------------------
 

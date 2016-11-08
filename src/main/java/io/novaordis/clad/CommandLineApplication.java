@@ -237,6 +237,12 @@ public class CommandLineApplication {
                 throw new UserErrorException("no application runtime");
             }
 
+            //
+            // connect the application runtime to our own streams, so we can display things consistently
+            //
+            application.setStderrOutputStream(getStderrOutputStream());
+            application.setStdoutOutputStream(getStdoutOutputStream());
+
             // identify and instantiate the command - the first command line argument that corresponds to a Command
             // implementation
 

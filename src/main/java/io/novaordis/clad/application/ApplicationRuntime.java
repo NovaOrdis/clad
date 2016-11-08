@@ -20,6 +20,7 @@ import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.io.OutputStream;
 import java.util.Set;
 
 /**
@@ -71,5 +72,19 @@ public interface ApplicationRuntime {
     Set<Option> optionalGlobalOptions();
 
     void init(Configuration configuration) throws Exception;
+
+    /**
+     * Allows plugging an external stdout stream.
+     */
+    void setStdoutOutputStream(OutputStream outputStream);
+
+    OutputStream getStdoutOutputStream();
+
+    /**
+     * Allows plugging an external stderr stream.
+     */
+    void setStderrOutputStream(OutputStream outputStream);
+
+    OutputStream getStderrOutputStream();
 
 }

@@ -16,13 +16,17 @@
 
 package io.novaordis.clad.application;
 
-import java.io.OutputStream;
+import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.option.Option;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 2/4/16
+ * @since 11/8/16
  */
-public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
+public class MockApplicationRuntime extends ApplicationRuntimeBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,57 +34,28 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private OutputStream stdoutOutputStream;
-    private OutputStream stderrOutputStream;
-
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // ApplicationRuntime overrides ------------------------------------------------------------------------------------
+    // ApplicationRuntimeBase overrides --------------------------------------------------------------------------------
 
     @Override
-    public String getName() {
-
-        String simpleName = this.getClass().getSimpleName();
-
-        if (!simpleName.endsWith("ApplicationRuntime")) {
-            throw new IllegalStateException(
-                    "non-standard application class name " + simpleName + ", we don't know how to handle it");
-        }
-
-        return simpleName.substring(0, simpleName.length() - "ApplicationRuntime".length()).toLowerCase();
+    public String getDefaultCommandName() {
+        return null;
     }
 
     @Override
-    public String getHelpFilePath() {
-
-        String s = getClass().getName();
-        s = s.substring(0, s.lastIndexOf('.'));
-        s = s.replace('.', '/');
-        return s + "/" + getName() + ".txt";
+    public Set<Option> requiredGlobalOptions() {
+        return Collections.emptySet();
     }
 
     @Override
-    public void setStdoutOutputStream(OutputStream os) {
-
-        this.stdoutOutputStream = os;
+    public Set<Option> optionalGlobalOptions() {
+        return Collections.emptySet();
     }
 
     @Override
-    public OutputStream getStdoutOutputStream() {
-
-        return stdoutOutputStream;
-    }
-
-    @Override
-    public void setStderrOutputStream(OutputStream os) {
-
-        this.stderrOutputStream = os;
-    }
-
-    @Override
-    public OutputStream getStderrOutputStream() {
-
-        return stderrOutputStream;
+    public void init(Configuration configuration) throws Exception {
+        // noop
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
