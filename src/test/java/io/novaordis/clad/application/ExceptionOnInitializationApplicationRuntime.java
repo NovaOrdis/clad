@@ -88,7 +88,7 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public void setStderrOutputStream(OutputStream outputStream) {
-        
+
         //
         // this needs to simulate working correctly
         //
@@ -99,6 +99,21 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     @Override
     public OutputStream getStderrOutputStream() {
         throw new RuntimeException("getStderrOutputStream() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void info(String s) {
+        throw new RuntimeException("info() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void warn(String s) {
+        throw new RuntimeException("warn() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void error(String s) {
+        throw new RuntimeException("error() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

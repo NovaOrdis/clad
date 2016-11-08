@@ -61,6 +61,66 @@ public abstract class ApplicationRuntimeTest {
         assertEquals(mos, runtime.getStderrOutputStream());
     }
 
+    /**
+     * Tests ApplicationRuntimeBase behavior.
+     */
+    @Test
+    public void info() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        MockOutputStream stdout = new MockOutputStream();
+        runtime.setStdoutOutputStream(stdout);
+
+        MockOutputStream stderr = new MockOutputStream();
+        runtime.setStderrOutputStream(stderr);
+
+        runtime.info("test");
+
+        assertEquals("test\n", stdout.getWrittenString());
+        assertEquals(0, stderr.getWrittenBytes().length);
+    }
+
+    /**
+     * Tests ApplicationRuntimeBase behavior.
+     */
+    @Test
+    public void warn() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        MockOutputStream stdout = new MockOutputStream();
+        runtime.setStdoutOutputStream(stdout);
+
+        MockOutputStream stderr = new MockOutputStream();
+        runtime.setStderrOutputStream(stderr);
+
+        runtime.warn("test");
+
+        assertEquals("[warn]: test\n", stdout.getWrittenString());
+        assertEquals(0, stderr.getWrittenBytes().length);
+    }
+
+    /**
+     * Tests ApplicationRuntimeBase behavior.
+     */
+    @Test
+    public void error() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        MockOutputStream stdout = new MockOutputStream();
+        runtime.setStdoutOutputStream(stdout);
+
+        MockOutputStream stderr = new MockOutputStream();
+        runtime.setStderrOutputStream(stderr);
+
+        runtime.error("test");
+
+        assertEquals(0, stdout.getWrittenBytes().length);
+        assertEquals("[error]: test\n", stderr.getWrittenString());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     protected abstract ApplicationRuntime getApplicationRuntimeToTest();

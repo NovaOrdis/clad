@@ -87,4 +87,19 @@ public interface ApplicationRuntime {
 
     OutputStream getStderrOutputStream();
 
+    /**
+     * Sends to given string to stdout in "info" mode, followed by a new line.
+     */
+    void info(String s);
+
+    /**
+     * Sends to given string to stdout in "warning" mode, followed by a new line.
+     */
+    void warn(String s);
+
+    /**
+     * Sends to given string to stderr in "error" mode, followed by a new line.
+     */
+    void error(String s);
+
 }

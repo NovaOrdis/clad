@@ -16,6 +16,7 @@
 
 package io.novaordis.clad.application;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -81,6 +82,45 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     public OutputStream getStderrOutputStream() {
 
         return stderrOutputStream;
+    }
+
+    @Override
+    public void info(String s) {
+
+        OutputStream stdout = getStdoutOutputStream();
+
+        try {
+            stdout.write((s + "\n").getBytes());
+        }
+        catch(IOException e) {
+            System.err.println("internal error: failed to write the application runtime stdout: " + e);
+        }
+    }
+
+    @Override
+    public void warn(String s) {
+
+        OutputStream stdout = getStdoutOutputStream();
+
+        try {
+            stdout.write(("[warn]: " + s + "\n").getBytes());
+        }
+        catch(IOException e) {
+            System.err.println("internal error: failed to write the application runtime stdout: " + e);
+        }
+    }
+
+    @Override
+    public void error(String s) {
+
+        OutputStream stderr = getStderrOutputStream();
+
+        try {
+            stderr.write(("[error]: " + s + "\n").getBytes());
+        }
+        catch(IOException e) {
+            System.err.println("internal error: failed to write the application runtime stderr: " + e);
+        }
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
