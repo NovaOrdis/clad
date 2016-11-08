@@ -244,6 +244,8 @@ public class CommandLineApplication {
 
             command = identifyAndConfigureCommand(commandLineArguments);
 
+            log.debug(command == null ? "no known command identified in classpath" : "identified command " + command + " in classpath");
+
             Set<Option> requiredGlobalOptions = application.requiredGlobalOptions();
             Set<Option> optionalGlobalOptions = application.optionalGlobalOptions();
             // --verbose, --help are always optional options

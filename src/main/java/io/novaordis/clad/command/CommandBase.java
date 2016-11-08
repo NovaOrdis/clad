@@ -145,7 +145,9 @@ public abstract class CommandBase implements Command {
     }
 
     /**
-     * The default implementation does everything that needs to be done, in most cases the subclasses should use this.
+     * The default implementation handles declared options and removes the associated strings from the argument list.
+     * In most cases, this behavior is all subclasses need, and they should use it. The method can be overridden
+     * when the command expects arguments, other than declared options.
      */
     @Override
     public void configure(int from, List<String> commandLineArguments) throws Exception {
