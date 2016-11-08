@@ -361,7 +361,7 @@ public class CommandLineApplication {
 
             if (command.needsRuntime()) {
 
-                log.debug("initializing the runtime");
+                log.debug("initializing the runtime ...");
 
                 application.init(configuration);
 
@@ -369,6 +369,8 @@ public class CommandLineApplication {
             }
 
             insureRequiredCommandOptionsArePresent(command);
+
+            log.debug("executing command " + command + " ...");
 
             command.execute(configuration, application);
 
