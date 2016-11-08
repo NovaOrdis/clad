@@ -299,8 +299,20 @@ public class CommandLineApplication {
 
                 if (defaultCommandName == null) {
 
-                    throw new UserErrorException(
-                            "no command specified on command line and no default command was configured");
+                    String msg = "no known command specified on command line and no default command was configured, command line: \"";
+
+                    for(int i = 0; i < args.length; i++) {
+
+                        msg += args[i];
+
+                        if (i < args.length - 1) {
+                            msg += " ";
+                        }
+                    }
+
+                    msg += "\"";
+
+                    throw new UserErrorException(msg);
                 }
 
                 // attempt to instantiate the default command and execute it

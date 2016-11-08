@@ -343,7 +343,8 @@ public class CommandLineApplicationTest {
 
         byte[] bytes = mos.getWrittenBytes();
         String msg = new String(bytes);
-        assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
+
+        assertTrue(msg.startsWith("[error]: no known command specified on command line and no default command was configured, command line: \""));
 
         assertFalse(TestApplicationRuntime.isInitialized());
     }
@@ -369,8 +370,7 @@ public class CommandLineApplicationTest {
 
             byte[] bytes = mos.getWrittenBytes();
             String msg = new String(bytes);
-            assertEquals("[error]: no command specified on command line and no default command was configured\n", msg);
-
+            assertEquals("[error]: no known command specified on command line and no default command was configured, command line: \"something\"\n", msg);
             assertFalse(TestApplicationRuntime.isInitialized());
         }
         finally {
