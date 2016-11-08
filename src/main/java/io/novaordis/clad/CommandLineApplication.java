@@ -347,7 +347,7 @@ public class CommandLineApplication {
             // at this point we should not have unrecognized command line arguments, if we do, fail
             //
 
-            failOnUnknownCommandOrOptions(commandLineArguments);
+            failOnUnknownCommandOrOptionsOrArguments(commandLineArguments);
 
             //
             // not a special situation, execute the command
@@ -453,7 +453,7 @@ public class CommandLineApplication {
         }
     }
 
-    private void failOnUnknownCommandOrOptions(List<String> unprocessedCommandLineArguments) throws UserErrorException {
+    private void failOnUnknownCommandOrOptionsOrArguments(List<String> unprocessedCommandLineArguments) throws UserErrorException {
 
         if (unprocessedCommandLineArguments.isEmpty()) {
 
