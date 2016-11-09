@@ -19,6 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -114,6 +115,11 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     @Override
     public void error(String s) {
         throw new RuntimeException("error() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public File getCurrentDirectory() {
+        throw new RuntimeException("getCurrentDirectory() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

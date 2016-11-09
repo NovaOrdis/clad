@@ -20,6 +20,7 @@ import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.Set;
 
@@ -101,5 +102,10 @@ public interface ApplicationRuntime {
      * Sends to given string to stderr in "error" mode, followed by a new line.
      */
     void error(String s);
+
+    /**
+     * @return the current directory the application runs from.
+     */
+    File getCurrentDirectory();
 
 }

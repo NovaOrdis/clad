@@ -19,6 +19,8 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.MockOutputStream;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -119,6 +121,21 @@ public abstract class ApplicationRuntimeTest {
 
         assertEquals(0, stdout.getWrittenBytes().length);
         assertEquals("[error]: test\n", stderr.getWrittenString());
+    }
+
+    // current directory -----------------------------------------------------------------------------------------------
+
+    /**
+     * Default ApplicationRuntimeBase behavior.
+     */
+    @Test
+    public void getCurrentDirectory() throws Exception {
+
+        ApplicationRuntime runtime = getApplicationRuntimeToTest();
+
+        File crtDir = runtime.getCurrentDirectory();
+
+        assertEquals(new File("."), crtDir);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

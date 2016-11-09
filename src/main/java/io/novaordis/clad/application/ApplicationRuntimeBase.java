@@ -16,6 +16,7 @@
 
 package io.novaordis.clad.application;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -121,6 +122,12 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         catch(IOException e) {
             System.err.println("internal error: failed to write the application runtime stderr: " + e);
         }
+    }
+
+    @Override
+    public File getCurrentDirectory() {
+
+        return new File(".");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
