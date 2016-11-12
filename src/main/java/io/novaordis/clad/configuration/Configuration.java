@@ -75,7 +75,7 @@ public interface Configuration {
 
     /**
      * @return true if the application was configured to run in verbose mode (and all DEBUG information displayed
-     * at stdout). 
+     * at stdout).
      */
     boolean isVerbose();
 
