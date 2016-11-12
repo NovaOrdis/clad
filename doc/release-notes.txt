@@ -4,4 +4,5 @@
 
 * ApplicationRuntime API additions (get/setStdoutOutputStream(), get/setStderrOutputStream(),
   info(), warn(), error(), getCurrentDirectory()).
-    
+
+* Added Configuration.isVerbose() shortcut.

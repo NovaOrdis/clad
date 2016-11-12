@@ -72,4 +72,11 @@ public interface Configuration {
      */
     Option getGlobalOption(Option definition);
 
+
+    /**
+     * @return true if the application was configured to run in verbose mode (and all DEBUG information displayed
+     * at stdout). 
+     */
+    boolean isVerbose();
+
 }

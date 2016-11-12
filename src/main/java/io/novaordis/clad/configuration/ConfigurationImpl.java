@@ -16,6 +16,7 @@
 
 package io.novaordis.clad.configuration;
 
+import io.novaordis.clad.option.VerboseOption;
 import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.option.Option;
 import org.slf4j.Logger;
@@ -91,6 +92,19 @@ public class ConfigurationImpl implements Configuration {
         return null;
     }
 
+    @Override
+    public boolean isVerbose() {
+
+        for(Option o: globalOptions) {
+
+            if (o instanceof VerboseOption) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
