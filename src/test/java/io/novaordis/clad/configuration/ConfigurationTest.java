@@ -79,6 +79,8 @@ public abstract class ConfigurationTest {
         assertEquals("gval", ((StringOption) c.getGlobalOptions().get(0)).getValue());
 
         assertEquals("something", c.getApplicationName());
+
+        assertFalse(c.isVerbose());
     }
 
     @Test

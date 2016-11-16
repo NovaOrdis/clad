@@ -22,7 +22,10 @@ import io.novaordis.clad.option.Option;
 import java.util.List;
 
 /**
- * The configuration of the command execution context.
+ * During the initialization phase, the clad-based application runtime gathers configuration information from different
+ * sources (command line options, the optional configuration file, etc) and exposes them internally via a Configuration
+ * implementation. For more details see
+ * {@linktourl https://kb.novaordis.com/index.php/Clad_User_Manual_-_Concepts#Application_Configuration}
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
