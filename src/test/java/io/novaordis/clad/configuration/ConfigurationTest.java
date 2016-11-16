@@ -165,6 +165,28 @@ public abstract class ConfigurationTest {
         assertEquals("test", so2.getValue());
     }
 
+    // generic configuration labels ------------------------------------------------------------------------------------
+
+    @Test
+    public void get_NoSuchLabel() throws Exception {
+
+        Configuration c = getConfigurationToTest(Collections.emptyList());
+
+        assertNull(c.get("I.AM.SURE.THERE.IS.NO.SUCH.CONFIGURATION.LABEL"));
+    }
+
+    @Test
+    public void genericConfigurationLabelGetSet() throws Exception {
+
+        Configuration c = getConfigurationToTest(Collections.emptyList());
+
+        assertNull(c.get("test"));
+
+        c.set("test", "something");
+
+        assertEquals("something", c.get("test"));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

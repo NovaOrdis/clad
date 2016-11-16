@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -42,6 +44,8 @@ public class ConfigurationImpl implements Configuration {
     private String applicationName;
     private List<Option> globalOptions;
 
+    private Map<String, String> genericLabels;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public ConfigurationImpl() throws UserErrorException {
@@ -57,6 +61,8 @@ public class ConfigurationImpl implements Configuration {
         }
 
         this.globalOptions = new ArrayList<>();
+
+        this.genericLabels = new HashMap<>();
 
         log.debug(this + " constructed");
     }
@@ -104,6 +110,18 @@ public class ConfigurationImpl implements Configuration {
         }
 
         return false;
+    }
+
+    @Override
+    public void set(String genericLabel, String value) {
+
+        genericLabels.put(genericLabel, value);
+    }
+
+    @Override
+    public String get(String genericLabel) {
+
+        return genericLabels.get(genericLabel);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

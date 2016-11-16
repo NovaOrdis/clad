@@ -82,4 +82,15 @@ public interface Configuration {
      */
     boolean isVerbose();
 
+    //
+    // Generic configuration labels support -----------------------------------------------------------------------------
+    //
+
+    void set(String configurationLabel, String value);
+
+    /**
+     * May return null.
+     */
+    String get(String configurationLabel);
+
 }
