@@ -37,6 +37,16 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    protected ApplicationRuntimeBase() {
+
+        //
+        // start with the default streams, they can be overwritten at any moment
+        //
+
+        setStdoutOutputStream(System.out);
+        setStderrOutputStream(System.err);
+    }
+
     // ApplicationRuntime overrides ------------------------------------------------------------------------------------
 
     @Override
