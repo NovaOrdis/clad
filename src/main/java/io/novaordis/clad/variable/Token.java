@@ -16,6 +16,8 @@
 
 package io.novaordis.clad.variable;
 
+import java.util.Map;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
@@ -31,5 +33,7 @@ public interface Token {
     String getLiteral();
 
     String resolve(VariableProvider provider);
+
+    String resolve(Map<String, String> map);
 
 }

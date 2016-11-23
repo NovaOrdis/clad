@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -63,7 +65,7 @@ public class StringWithVariablesTest {
 
         StringWithVariables s = new StringWithVariables("something");
         assertEquals("something", s.getLiteral());
-        String s2 = s.resolve(null);
+        String s2 = s.resolve((VariableProvider)null);
         assertEquals("something", s2);
     }
 
@@ -72,7 +74,7 @@ public class StringWithVariablesTest {
 
         StringWithVariables s = new StringWithVariables("${something}");
         assertEquals("${something}", s.getLiteral());
-        String s2 = s.resolve(null);
+        String s2 = s.resolve((VariableProvider)null);
         assertEquals("${something}", s2);
 
         List<Token> tokens = s.getTokens();
@@ -86,7 +88,7 @@ public class StringWithVariablesTest {
 
         StringWithVariables s = new StringWithVariables("blah${something}");
         assertEquals("blah${something}", s.getLiteral());
-        String s2 = s.resolve(null);
+        String s2 = s.resolve((VariableProvider)null);
         assertEquals("blah${something}", s2);
 
         List<Token> tokens = s.getTokens();
@@ -117,7 +119,7 @@ public class StringWithVariablesTest {
 
         StringWithVariables s = new StringWithVariables("${a}b${c}d${d}");
         assertEquals("${a}b${c}d${d}", s.getLiteral());
-        String s2 = s.resolve(null);
+        String s2 = s.resolve((VariableProvider)null);
         assertEquals("${a}b${c}d${d}", s2);
 
         List<Token> tokens = s.getTokens();
@@ -132,6 +134,71 @@ public class StringWithVariablesTest {
         assertEquals("d", c2.getLiteral());
         Variable v3 = (Variable)tokens.get(4);
         assertEquals("d", v3.getName());
+    }
+
+    // resolve with key/value pair list --------------------------------------------------------------------------------
+
+    @Test
+    public void resolveWithKeyValuePairs() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("a ${b} c ${d}");
+
+        String s2 = s.resolve("b", "BValue", "d", "DValue", "x", "XValue", "y", "yValue");
+
+        assertEquals("a BValue c DValue", s2);
+    }
+
+    @Test
+    public void resolveWithKeyValuePairs_MissingKeyValue() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("a ${b} c ${d}");
+
+        String s2 = s.resolve("x", "XValue", "y", "yValue", "d", "DValue");
+
+        assertEquals("a ${b} c DValue", s2);
+    }
+
+    @Test
+    public void resolveWithKeyValuePairs_OddElementCount() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("a ${b} c ${d}");
+
+        String s2 = s.resolve("b", "BValue", "d");
+
+        assertEquals("a BValue c ${d}", s2);
+    }
+
+    // resolve with key/value pair map ---------------------------------------------------------------------------------
+
+    @Test
+    public void resolveWithKeyValuePairs_Map() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("a ${b} c ${d}");
+
+        Map<String, String> map = new HashMap<>();
+        map.put("b", "BValue");
+        map.put("d", "DValue");
+        map.put("x", "XValue");
+        map.put("y", "yValue");
+
+        String s2 = s.resolve(map);
+
+        assertEquals("a BValue c DValue", s2);
+    }
+
+    @Test
+    public void resolveWithKeyValuePairs_MissingKeyValue_Map() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("a ${b} c ${d}");
+
+        Map<String, String> map = new HashMap<>();
+        map.put("d", "DValue");
+        map.put("x", "XValue");
+        map.put("y", "yValue");
+
+        String s2 = s.resolve(map);
+
+        assertEquals("a ${b} c DValue", s2);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

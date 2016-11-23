@@ -17,7 +17,9 @@
 package io.novaordis.clad.variable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -59,6 +61,45 @@ public class StringWithVariables {
         }
 
         return s;
+    }
+
+    /**
+     * @param keyValuePairs a source of key/value pairs that can be used to resolve variables.
+     */
+    public String resolve(Map<String, String> keyValuePairs) {
+
+        String s = "";
+
+        for(Token t: tokens) {
+
+            s += t.resolve(keyValuePairs);
+        }
+
+        return s;
+    }
+
+    /**
+     * @param keyValuePairs a list of successive key and value pairs: the key is used as variable name and the
+     *                            subsequent value as variable value. If the number of arguments is odd, the last
+     *                            key is ignored.
+     */
+    public String resolve(String ... keyValuePairs) {
+
+        Map<String, String> map = new HashMap<>();
+
+        for(int i = 0; i < keyValuePairs.length; i = i + 2) {
+
+            String key = keyValuePairs[i];
+
+            if (i + 1 == keyValuePairs.length) {
+                break;
+            }
+
+            String value = keyValuePairs[i + 1];
+            map.put(key, value);
+        }
+
+        return resolve(map);
     }
 
     public String getLiteral() {

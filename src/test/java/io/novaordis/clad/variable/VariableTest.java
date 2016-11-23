@@ -18,6 +18,9 @@ package io.novaordis.clad.variable;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -41,7 +44,7 @@ public class VariableTest extends TokenTest {
 
         Variable v = new Variable("something");
 
-        String s = v.resolve(null);
+        String s = v.resolve((VariableProvider)null);
 
         assertEquals("${something}", s);
     }
@@ -60,9 +63,31 @@ public class VariableTest extends TokenTest {
         p.setValue("something", "blah");
 
         assertEquals("blah", v.resolve(p));
-
     }
 
+    @Test
+    public void resolve_Map_KeyExists() throws Exception {
+
+        Variable v = new Variable("something");
+
+        Map<String, String> map = new HashMap<>();
+        map.put("something", "blah");
+
+        String s = v.resolve(map);
+        assertEquals("blah", s);
+    }
+
+    @Test
+    public void resolve_Map_KeyDoesNotExist() throws Exception {
+
+        Variable v = new Variable("something");
+
+        Map<String, String> map = new HashMap<>();
+        map.put("somethingelse", "blah");
+
+        String s = v.resolve(map);
+        assertEquals("${something}", s);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

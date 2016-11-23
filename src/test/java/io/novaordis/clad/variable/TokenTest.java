@@ -18,6 +18,9 @@ package io.novaordis.clad.variable;
 
 import org.junit.Test;
 
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -59,6 +62,24 @@ public abstract class TokenTest {
         else {
             fail("unknown token type " + t);
         }
+    }
+
+    @Test
+    public void resolve_NullProvider() throws Exception {
+
+        Token t = getTokenToTest();
+
+        String v = t.resolve((VariableProvider) null);
+        assertEquals(t.getLiteral(), v);
+    }
+
+    @Test
+    public void resolve_NullMap() throws Exception {
+
+        Token t = getTokenToTest();
+
+        String v = t.resolve((Map<String, String>)null);
+        assertEquals(t.getLiteral(), v);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

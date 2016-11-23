@@ -40,7 +40,7 @@ public class ConstantTest extends TokenTest {
     public void resolve() throws Exception {
 
         Constant c = new Constant("something");
-        String s2 = c.resolve(null);
+        String s2 = c.resolve((VariableProvider)null);
 
         assertEquals("something", s2);
     }

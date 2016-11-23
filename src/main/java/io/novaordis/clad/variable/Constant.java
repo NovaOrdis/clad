@@ -16,6 +16,8 @@
 
 package io.novaordis.clad.variable;
 
+import java.util.Map;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
@@ -46,6 +48,12 @@ public class Constant implements Token {
 
     @Override
     public String resolve(VariableProvider provider) {
+
+        return literal;
+    }
+
+    @Override
+    public String resolve(Map<String, String> map) {
 
         return literal;
     }

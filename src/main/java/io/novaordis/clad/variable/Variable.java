@@ -16,6 +16,8 @@
 
 package io.novaordis.clad.variable;
 
+import java.util.Map;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
@@ -56,6 +58,22 @@ public class Variable implements Token {
         }
 
         String value = provider.getValue(name);
+
+        if (value == null) {
+            return getLiteral();
+        }
+
+        return value;
+    }
+
+    @Override
+    public String resolve(Map<String, String> map) {
+
+        if (map == null) {
+            return getLiteral();
+        }
+
+        String value = map.get(name);
 
         if (value == null) {
             return getLiteral();
