@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -136,6 +137,54 @@ public abstract class ApplicationRuntimeTest {
         File crtDir = runtime.getCurrentDirectory();
 
         assertEquals(new File("."), crtDir);
+    }
+
+    // variable replacement --------------------------------------------------------------------------------------------
+
+    @Test
+    public void resolveVariables_Null() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        assertNull(r.resolveVariables(null));
+     }
+
+    @Test
+    public void resolveVariables_NoVariables() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        String orig = "this is a \"string\" that contains 'no' variable";
+
+        String s = r.resolveVariables(orig);
+
+        assertEquals(orig, s);
+    }
+
+    @Test
+    public void resolveVariables_VariableDoesNotExistInTheRuntime() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        String orig = "I am sure ${there.is.no.such.variable}";
+
+        String s = r.resolveVariables(orig);
+
+        assertEquals(orig, s);
+    }
+
+    @Test
+    public void resolveVariables_VariableExistsInTheRuntime() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        r.setValue("this.is.a.variable", "d");
+
+        String orig = "a b c ${this.is.a.variable} e";
+
+        String s = r.resolveVariables(orig);
+
+        assertEquals("a b c d e", s);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

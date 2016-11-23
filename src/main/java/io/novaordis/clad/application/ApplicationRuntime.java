@@ -19,6 +19,8 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
+import io.novaordis.clad.variable.VariableFormatException;
+import io.novaordis.clad.variable.VariableProvider;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -33,7 +35,7 @@ import java.util.Set;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public interface ApplicationRuntime {
+public interface ApplicationRuntime extends VariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -107,5 +109,15 @@ public interface ApplicationRuntime {
      * @return the current directory the application runs from.
      */
     File getCurrentDirectory();
+
+    /**
+     * The method replaces the runtime variables found in the given string with values existing in the runtime.
+     * If no corresponding value is found, no replacement is made, the variable is left in the ${var_name} format.
+     *
+     * See ${linkUrl https://kb.novaordis.com/index.php/Clad_User_Manual_-_Concepts#Variable_Support} for more details.
+     *
+     * @return the string with runtime variables (those that could be resolved) replaced.
+     */
+    String resolveVariables(String s) throws VariableFormatException;
 
 }

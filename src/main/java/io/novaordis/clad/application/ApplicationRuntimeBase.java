@@ -16,6 +16,13 @@
 
 package io.novaordis.clad.application;
 
+import io.novaordis.clad.variable.StringWithVariables;
+import io.novaordis.clad.variable.VariableFormatException;
+import io.novaordis.clad.variable.VariableProvider;
+import io.novaordis.clad.variable.VariableProviderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,12 +35,16 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationRuntimeBase.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
+
+    private VariableProvider variableProvider;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -45,6 +56,24 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
 
         setStdoutOutputStream(System.out);
         setStderrOutputStream(System.err);
+
+        this.variableProvider = new VariableProviderImpl();
+
+        log.debug(this + " constructed");
+    }
+
+    // VariableProvider implementation ---------------------------------------------------------------------------------
+
+    @Override
+    public String getValue(String variableName) {
+
+        return variableProvider.getValue(variableName);
+    }
+
+    @Override
+    public String setValue(String variableName, String variableValue) {
+
+        return variableProvider.setValue(variableName, variableValue);
     }
 
     // ApplicationRuntime overrides ------------------------------------------------------------------------------------
@@ -138,6 +167,19 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     public File getCurrentDirectory() {
 
         return new File(".");
+    }
+
+    // runtime variable support ----------------------------------------------------------------------------------------
+
+    @Override
+    public String resolveVariables(String s) throws VariableFormatException {
+
+        if (s == null) {
+            return null;
+        }
+
+        StringWithVariables sv = new StringWithVariables(s);
+        return sv.resolve(this);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

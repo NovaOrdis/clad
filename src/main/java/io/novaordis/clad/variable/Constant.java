@@ -14,83 +14,49 @@
  * limitations under the License.
  */
 
-package io.novaordis.clad.application;
-
-import io.novaordis.utilities.UserErrorException;
-import io.novaordis.clad.configuration.Configuration;
-import io.novaordis.clad.option.Option;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+package io.novaordis.clad.variable;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 1/26/16
+ * @since 11/22/16
  */
-public class TestApplicationRuntime extends ApplicationRuntimeBase {
+public class Constant implements Token {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    private static boolean initialized = false;
-
-    private static Set<Option> optionalGlobalOptions = new HashSet<>();
-
-    public static boolean isInitialized() {
-
-        return initialized;
-    }
-
-    public static void clear() {
-
-        initialized = false;
-        optionalGlobalOptions.clear();
-    }
-
-    public static void addOptionalGlobalOption(Option option) {
-        optionalGlobalOptions.add(option);
-    }
-
     // Attributes ------------------------------------------------------------------------------------------------------
+
+    private String literal;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // ApplicationRuntime implementation -------------------------------------------------------------------------------
+    public Constant(String literal) {
+
+        this.literal = literal;
+    }
+
+    // Token implementation --------------------------------------------------------------------------------------------
 
     @Override
-    public String getDefaultCommandName() {
-        return null;
+    public String getLiteral() {
+        return literal;
     }
 
     @Override
-    public Set<Option> requiredGlobalOptions() {
-        return Collections.emptySet();
-    }
+    public String resolve(VariableProvider provider) {
 
-    @Override
-    public Set<Option> optionalGlobalOptions() {
-        return optionalGlobalOptions;
-    }
-
-    @Override
-    public void init(Configuration configuration) throws UserErrorException {
-
-        initialized = true;
-    }
-
-    @Override
-    public String getValue(String variableName) {
-        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public String setValue(String variableName, String variableValue) {
-        throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
+        return literal;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+
+        return literal;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

@@ -10,3 +10,5 @@
 ** Added support for generic configuration labels (Configuration.set()/Configuration.get()). For more details
    see https://kb.novaordis.com/index.php/Clad_User_Manual_-_Concepts#Application_Configuration
 
+* Added runtime variable resolving mechanism (ApplicationRuntime.resolveVariables())
+

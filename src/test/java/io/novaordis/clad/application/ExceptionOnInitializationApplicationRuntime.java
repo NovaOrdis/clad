@@ -122,6 +122,21 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
         throw new RuntimeException("getCurrentDirectory() NOT YET IMPLEMENTED");
     }
 
+    @Override
+    public String resolveVariables(String s) {
+        throw new RuntimeException("resolveVariables() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public String getValue(String variableName) {
+        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public String setValue(String variableName, String variableValue) {
+        throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
