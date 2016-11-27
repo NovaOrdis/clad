@@ -16,10 +16,10 @@
 
 package io.novaordis.clad.application;
 
-import io.novaordis.clad.variable.StringWithVariables;
-import io.novaordis.clad.variable.VariableFormatException;
-import io.novaordis.clad.variable.VariableProvider;
-import io.novaordis.clad.variable.VariableProviderImpl;
+import io.novaordis.utilities.variable.StringWithVariables;
+import io.novaordis.utilities.variable.VariableFormatException;
+import io.novaordis.utilities.variable.VariableProvider;
+import io.novaordis.utilities.variable.VariableProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

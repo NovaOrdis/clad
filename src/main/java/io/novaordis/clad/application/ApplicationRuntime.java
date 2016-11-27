@@ -19,8 +19,8 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
-import io.novaordis.clad.variable.VariableFormatException;
-import io.novaordis.clad.variable.VariableProvider;
+import io.novaordis.utilities.variable.VariableFormatException;
+import io.novaordis.utilities.variable.VariableProvider;
 
 import java.io.File;
 import java.io.OutputStream;
