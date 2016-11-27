@@ -32,6 +32,10 @@ import java.util.Set;
  * The "official" name of the application will be inferred from the prefix of that simple class name. Example: If
  * MockApplicationRuntime is found on the classpath, then the application name is assumed to be "mock".
  *
+ * The application runtime instance is the root VariableProvider in the hierarchy.
+ *
+ * @see VariableProvider
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */

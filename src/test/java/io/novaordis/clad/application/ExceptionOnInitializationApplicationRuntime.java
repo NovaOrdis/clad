@@ -18,6 +18,7 @@ package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
+import io.novaordis.utilities.variable.VariableProvider;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -128,13 +129,23 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     }
 
     @Override
-    public String getValue(String variableName) {
+    public String getVariableValue(String variableName) {
         throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
     }
 
     @Override
-    public String setValue(String variableName, String variableValue) {
+    public String setVariableValue(String variableName, String variableValue) {
         throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public VariableProvider getVariableProviderParent() {
+        throw new RuntimeException("getVariableProviderParent() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void setVariableProviderParent(VariableProvider parent) {
+        throw new RuntimeException("setVariableProviderParent() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

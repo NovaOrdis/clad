@@ -17,12 +17,16 @@
 package io.novaordis.clad.application;
 
 import io.novaordis.clad.MockOutputStream;
+import io.novaordis.utilities.variable.VariableProviderImpl;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -31,6 +35,8 @@ import static org.junit.Assert.assertNull;
 public abstract class ApplicationRuntimeTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(ApplicationRuntimeTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -142,6 +148,31 @@ public abstract class ApplicationRuntimeTest {
     // variable replacement --------------------------------------------------------------------------------------------
 
     @Test
+    public void theRuntimeIsTheRootOfVariableProviderHierarchy() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+        assertNull(r.getVariableProviderParent());
+    }
+
+    @Test
+    public void attemptToSetParent() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        try {
+
+            r.setVariableProviderParent(new VariableProviderImpl());
+            fail("should throw exception");
+        }
+        catch(UnsupportedOperationException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+        }
+    }
+
+
+    @Test
     public void resolveVariables_Null() throws Exception {
 
         ApplicationRuntime r = getApplicationRuntimeToTest();
@@ -178,7 +209,7 @@ public abstract class ApplicationRuntimeTest {
 
         ApplicationRuntime r = getApplicationRuntimeToTest();
 
-        r.setValue("this.is.a.variable", "d");
+        r.setVariableValue("this.is.a.variable", "d");
 
         String orig = "a b c ${this.is.a.variable} e";
 

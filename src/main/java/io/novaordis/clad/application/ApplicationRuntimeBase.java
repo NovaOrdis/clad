@@ -44,7 +44,7 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
 
-    private VariableProvider variableProvider;
+    private VariableProvider variableProviderDelegate;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         setStdoutOutputStream(System.out);
         setStderrOutputStream(System.err);
 
-        this.variableProvider = new VariableProviderImpl();
+        this.variableProviderDelegate = new VariableProviderImpl();
 
         log.debug(this + " constructed");
     }
@@ -65,15 +65,33 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     // VariableProvider implementation ---------------------------------------------------------------------------------
 
     @Override
-    public String getValue(String variableName) {
+    public String getVariableValue(String variableName) {
 
-        return variableProvider.getValue(variableName);
+        return variableProviderDelegate.getVariableValue(variableName);
     }
 
     @Override
-    public String setValue(String variableName, String variableValue) {
+    public String setVariableValue(String variableName, String variableValue) {
 
-        return variableProvider.setValue(variableName, variableValue);
+        return variableProviderDelegate.setVariableValue(variableName, variableValue);
+    }
+
+    @Override
+    public VariableProvider getVariableProviderParent() {
+
+        //
+        // the application runtime instance is the root VariableProvider in the hierarchy
+        //
+
+        return null;
+    }
+
+    @Override
+    public void setVariableProviderParent(VariableProvider p) {
+
+        throw new UnsupportedOperationException(
+                "cannot set the parent on an application runtime, as it is the top of the hierarchy");
+
     }
 
     // ApplicationRuntime overrides ------------------------------------------------------------------------------------

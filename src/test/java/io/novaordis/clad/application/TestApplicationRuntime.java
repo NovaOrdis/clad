@@ -81,12 +81,12 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
     }
 
     @Override
-    public String getValue(String variableName) {
+    public String getVariableValue(String variableName) {
         throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
     }
 
     @Override
-    public String setValue(String variableName, String variableValue) {
+    public String setVariableValue(String variableName, String variableValue) {
         throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
     }
 
