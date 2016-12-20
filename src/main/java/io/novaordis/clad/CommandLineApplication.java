@@ -163,7 +163,6 @@ public class CommandLineApplication {
 
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
-    private Configuration configuration;
     private Command command;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -212,10 +211,6 @@ public class CommandLineApplication {
         return stderrOutputStream;
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
     // Package protected -----------------------------------------------------------------------------------------------
 
     /**
@@ -231,17 +226,17 @@ public class CommandLineApplication {
             // identify and instantiate the runtime
             //
 
-            ApplicationRuntime application = identifyRuntime(nativeConfiguration);
+            ApplicationRuntime applicationRuntime = identifyRuntime(nativeConfiguration);
 
-            if (application == null) {
+            if (applicationRuntime == null) {
                 throw new UserErrorException("no application runtime");
             }
 
             //
             // connect the application runtime to our own streams, so we can display things consistently
             //
-            application.setStderrOutputStream(getStderrOutputStream());
-            application.setStdoutOutputStream(getStdoutOutputStream());
+            applicationRuntime.setStderrOutputStream(getStderrOutputStream());
+            applicationRuntime.setStdoutOutputStream(getStdoutOutputStream());
 
             // identify and instantiate the command - the first command line argument that corresponds to a Command
             // implementation
@@ -250,8 +245,8 @@ public class CommandLineApplication {
 
             command = identifyAndConfigureCommand(commandLineArguments);
 
-            Set<Option> requiredGlobalOptions = application.requiredGlobalOptions();
-            Set<Option> optionalGlobalOptions = application.optionalGlobalOptions();
+            Set<Option> requiredGlobalOptions = applicationRuntime.requiredGlobalOptions();
+            Set<Option> optionalGlobalOptions = applicationRuntime.optionalGlobalOptions();
             // --verbose, --help are always optional options
             optionalGlobalOptions = new HashSet<>(optionalGlobalOptions);
             optionalGlobalOptions.add(new VerboseOption());
@@ -290,7 +285,7 @@ public class CommandLineApplication {
                             helpOption.setCommandName(commandLineArguments.get(0));
                         }
                     }
-                    helpOption.setApplication(application);
+                    helpOption.setApplication(applicationRuntime);
                     helpOption.displayHelp(getStdoutOutputStream());
                     return 0;
                 }
@@ -299,9 +294,10 @@ public class CommandLineApplication {
                 // try to figure out the default command
                 //
 
-                String defaultCommandName = application.getDefaultCommandName();
+                String defaultCommandName = applicationRuntime.getDefaultCommandName();
 
-                log.debug(application + "'s default command name: " + (defaultCommandName == null ? null : "\"" + defaultCommandName + "\""));
+                log.debug(applicationRuntime + "'s default command name: " +
+                        (defaultCommandName == null ? null : "\"" + defaultCommandName + "\""));
 
                 if (defaultCommandName == null) {
 
@@ -324,7 +320,7 @@ public class CommandLineApplication {
                 // attempt to instantiate the default command and execute it
                 command = InstanceFactory.getCommand(defaultCommandName);
 
-                log.debug(application + "'s default command: " +  command);
+                log.debug(applicationRuntime + "'s default command: " +  command);
 
                 if (command == null) {
                     throw new UserErrorException("no command specified and no default command configured");
@@ -344,7 +340,7 @@ public class CommandLineApplication {
                 // inject the current command, if any - this will fail if the help is already configured with a command
 
                 helpOption.setCommand(command);
-                helpOption.setApplication(application);
+                helpOption.setApplication(applicationRuntime);
                 helpOption.displayHelp(getStdoutOutputStream());
                 return 0;
             }
@@ -369,33 +365,16 @@ public class CommandLineApplication {
 
                 log.debug("initializing the runtime ...");
 
-                Configuration c = application.init(nativeConfiguration);
-
-                if (c != null) {
-
-                    //
-                    // swap configuration with the one provided by the application, if not null
-                    //
-                    this.configuration = c;
-                }
+                applicationRuntime.init(nativeConfiguration);
 
                 log.debug("runtime initialized");
-            }
-
-            //
-            // always provide a configuration, even if we did not have the chance to build a runtime and run init()
-            //
-
-            if (configuration == null) {
-
-                this.configuration = nativeConfiguration;
             }
 
             insureRequiredCommandOptionsArePresent(command);
 
             log.debug("executing command " + command + " ...");
 
-            command.execute(configuration, application);
+            command.execute(applicationRuntime);
 
             log.debug("command successfully executed");
 

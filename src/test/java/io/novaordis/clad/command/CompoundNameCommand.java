@@ -17,7 +17,6 @@
 package io.novaordis.clad.command;
 
 import io.novaordis.clad.application.ApplicationRuntime;
-import io.novaordis.clad.configuration.Configuration;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -36,7 +35,7 @@ public class CompoundNameCommand extends CommandBase {
     // CommandBase overrides -------------------------------------------------------------------------------------------
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
+    public void execute(ApplicationRuntime runtime) throws Exception {
         throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 

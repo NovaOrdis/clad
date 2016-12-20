@@ -125,11 +125,11 @@ public class MockCommand implements Command {
     }
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
+    public void execute(ApplicationRuntime runtime) throws Exception {
 
         log.info(this + " executing ...");
 
-        this.configuration = configuration;
+        this.configuration = runtime.getConfiguration();
     }
 
     @Override

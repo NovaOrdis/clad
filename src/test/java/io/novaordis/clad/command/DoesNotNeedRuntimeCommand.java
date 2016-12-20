@@ -17,7 +17,6 @@
 package io.novaordis.clad.command;
 
 import io.novaordis.clad.application.ApplicationRuntime;
-import io.novaordis.clad.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +24,8 @@ import org.slf4j.LoggerFactory;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/31/16
  */
+// initialized via reflection
+@SuppressWarnings("unused")
 public class DoesNotNeedRuntimeCommand extends CommandBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ public class DoesNotNeedRuntimeCommand extends CommandBase {
     }
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
+    public void execute(ApplicationRuntime runtime) throws Exception {
 
         log.info(this + " executed");
         System.setProperty("DoesNotNeedRuntimeCommand.executed", "true");

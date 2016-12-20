@@ -37,6 +37,11 @@ public class MockConfiguration implements Configuration {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public MockConfiguration() {
+
+        this(null);
+    }
+
     /**
      * @param delegate may be null.
      */

@@ -618,38 +618,13 @@ public class CommandLineApplicationTest {
     }
 
     @Test
-    public void run_initReturnsNull() throws Exception {
-
-        MockOutputStream mos = new MockOutputStream();
-        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
-
-        TestApplicationRuntime.installDefaultCommandName("mock");
-        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_NULL);
-        MockCommand.setNeedsRuntime(true);
-
-        int exitCode = commandLineApplication.run(new String[] {});
-        assertEquals(0, exitCode);
-
-        MockCommand c = (MockCommand)commandLineApplication.getCommand();
-        Configuration config = c.getConfigurationProvidedDuringTheLastExecution();
-
-        //
-        // make sure it is not null and an instance of ConfigurationImpl
-        //
-
-        assertNotNull(config);
-        assertTrue(config instanceof ConfigurationImpl);
-
-    }
-
-    @Test
     public void run_initReturnsTheConfigurationItWasGiven() throws Exception {
 
         MockOutputStream mos = new MockOutputStream();
         CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
 
         TestApplicationRuntime.installDefaultCommandName("mock");
-        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_SAME_INSTANCE);
+        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.INSTALLS_SAME_INSTANCE);
         MockCommand.setNeedsRuntime(true);
 
         int exitCode = commandLineApplication.run(new String[] {});
@@ -673,7 +648,7 @@ public class CommandLineApplicationTest {
         CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
 
         TestApplicationRuntime.installDefaultCommandName("mock");
-        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_WRAPPER);
+        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.INSTALLS_WRAPPER);
         MockCommand.setNeedsRuntime(true);
 
         int exitCode = commandLineApplication.run(new String[] {});

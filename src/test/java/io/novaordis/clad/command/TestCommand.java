@@ -68,11 +68,13 @@ public class TestCommand extends CommandBase {
     }
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
+    public void execute(ApplicationRuntime runtime) throws UserErrorException {
 
         //
         // inject global options and command options into the static lists for testing
         //
+
+        Configuration configuration = runtime.getConfiguration();
 
         globalOptionsInjectedByExecution.addAll(configuration.getGlobalOptions());
     }

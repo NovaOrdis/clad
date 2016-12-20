@@ -52,7 +52,7 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
         initialized = false;
         optionalGlobalOptions = new HashSet<>();
         defaultCommandName = null;
-        initBehavior = ApplicationInitBehavior.RETURN_NULL;
+        initBehavior = ApplicationInitBehavior.INSTALLS_SAME_INSTANCE;
     }
 
     public static boolean isInitialized() {
@@ -104,27 +104,21 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
     }
 
     @Override
-    public Configuration init(Configuration configuration) throws UserErrorException {
+    public void init(Configuration configuration) throws UserErrorException {
 
         initialized = true;
 
-        if (ApplicationInitBehavior.RETURN_NULL.equals(initBehavior)) {
+        if (ApplicationInitBehavior.INSTALLS_SAME_INSTANCE.equals(initBehavior)) {
 
-            log.info("init returns null");
+            log.info("init installs the given configuration instance");
 
-            return null;
+            setConfiguration(configuration);
         }
-        else if (ApplicationInitBehavior.RETURN_SAME_INSTANCE.equals(initBehavior)) {
+        else if (ApplicationInitBehavior.INSTALLS_WRAPPER.equals(initBehavior)) {
 
-            log.info("init returns the same instance");
+            log.info("init installs wrapper");
 
-            return configuration;
-        }
-        else if (ApplicationInitBehavior.RETURN_WRAPPER.equals(initBehavior)) {
-
-            log.info("init returns wrapper");
-
-            return new MockConfiguration(configuration);
+            setConfiguration(new MockConfiguration(configuration));
         }
         else {
 

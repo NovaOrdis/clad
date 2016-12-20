@@ -17,7 +17,6 @@
 package io.novaordis.clad.command;
 
 import io.novaordis.clad.application.ApplicationRuntime;
-import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.utilities.UserErrorException;
 import io.novaordis.utilities.version.VersionUtilities;
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class VersionCommand extends CommandBase {
     }
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws UserErrorException {
+    public void execute(ApplicationRuntime runtime) throws UserErrorException {
 
         String version = VersionUtilities.getVersion();
         String releaseDate = VersionUtilities.getReleaseDate();

@@ -22,7 +22,6 @@ package io.novaordis.clad.application;
  */
 public enum ApplicationInitBehavior {
 
-    RETURN_NULL,
-    RETURN_SAME_INSTANCE,
-    RETURN_WRAPPER
+    INSTALLS_SAME_INSTANCE,
+    INSTALLS_WRAPPER
 }

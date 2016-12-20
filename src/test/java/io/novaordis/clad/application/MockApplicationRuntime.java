@@ -53,12 +53,6 @@ public class MockApplicationRuntime extends ApplicationRuntimeBase {
         return Collections.emptySet();
     }
 
-    @Override
-    public Configuration init(Configuration configuration) throws Exception {
-        // noop
-        return null;
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

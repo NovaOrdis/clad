@@ -16,6 +16,8 @@
 
 package io.novaordis.clad.application;
 
+import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.utilities.UserErrorException;
 import io.novaordis.utilities.variable.StringWithVariables;
 import io.novaordis.utilities.variable.VariableFormatException;
 import io.novaordis.utilities.variable.VariableProvider;
@@ -45,6 +47,8 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     private OutputStream stderrOutputStream;
 
     private VariableProvider variableProviderDelegate;
+
+    private Configuration configuration;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -92,6 +96,28 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         throw new UnsupportedOperationException(
                 "cannot set the parent on an application runtime, as it is the top of the hierarchy");
 
+    }
+
+    /**
+     * The default implementation installs the given configuration or fails if null.
+     *
+     * @exception IllegalArgumentException if configuration is null
+     */
+    @Override
+    public void init(Configuration c) throws UserErrorException {
+
+        if (c == null) {
+
+            throw new IllegalArgumentException("null configuration");
+        }
+
+        setConfiguration(c);
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+
+        return configuration;
     }
 
     // ApplicationRuntime overrides ------------------------------------------------------------------------------------
@@ -205,6 +231,11 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected void setConfiguration(Configuration c) {
+
+        this.configuration = c;
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

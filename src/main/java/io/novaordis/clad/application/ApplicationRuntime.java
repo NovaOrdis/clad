@@ -79,16 +79,18 @@ public interface ApplicationRuntime extends VariableProvider {
     Set<Option> optionalGlobalOptions();
 
     /**
-     * The method returns configuration instance to give the application a chance to wrap the configuration into
-     * an application-specific implementation if it chooses so. Returning null or the configuration instance that
-     * was passed as argument is fine.
-     *
-     * TODO this is a first step towards the full refactoring of the configuration support, with the goal of
-     * giving the application control over the configuration implementation.
-     *
-     * @param configuration the initial configuration instance built by the clad runtime.
+     * The method gives the application a chance to wrap the configuration into an application-specific and
+     * install it internally, if it chooses so.
      */
-    Configuration init(Configuration configuration) throws Exception;
+    void init(Configuration configuration) throws Exception;
+
+    /**
+     * @return the application's configuration. May return null if the application was not initialized (init() was
+     * not executed on this instance).
+     *
+     * @see ApplicationRuntime#init(Configuration)
+     */
+    Configuration getConfiguration();
 
     /**
      * Allows plugging an external stdout stream.

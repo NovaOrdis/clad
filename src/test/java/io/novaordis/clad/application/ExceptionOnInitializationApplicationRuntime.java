@@ -18,6 +18,7 @@ package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
+import io.novaordis.utilities.NotYetImplementedException;
 import io.novaordis.utilities.variable.VariableProvider;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public String getName() {
-        throw new RuntimeException("getName() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("getName() NOT YET IMPLEMENTED");
     }
 
     @Override
@@ -54,7 +55,7 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public String getHelpFilePath() {
-        throw new RuntimeException("getHelpFilePath() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("getHelpFilePath() NOT YET IMPLEMENTED");
     }
 
     @Override
@@ -68,9 +69,15 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     }
 
     @Override
-    public Configuration init(Configuration configuration) throws Exception {
+    public void init(Configuration configuration) throws Exception {
 
         throw new SyntheticException("SYNTHETIC");
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+
+        throw new NotYetImplementedException("getConfiguration() NOT YET IMPLEMENTED");
     }
 
     @Override
@@ -85,7 +92,7 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public OutputStream getStdoutOutputStream() {
-        throw new RuntimeException("getStdoutOutputStream() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("getStdoutOutputStream() NOT YET IMPLEMENTED");
     }
 
     @Override
@@ -100,27 +107,27 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
 
     @Override
     public OutputStream getStderrOutputStream() {
-        throw new RuntimeException("getStderrOutputStream() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("getStderrOutputStream() NOT YET IMPLEMENTED");
     }
 
     @Override
     public void info(String s) {
-        throw new RuntimeException("info() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("info() NOT YET IMPLEMENTED");
     }
 
     @Override
     public void warn(String s) {
-        throw new RuntimeException("warn() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("warn() NOT YET IMPLEMENTED");
     }
 
     @Override
     public void error(String s) {
-        throw new RuntimeException("error() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("error() NOT YET IMPLEMENTED");
     }
 
     @Override
     public File getCurrentDirectory() {
-        throw new RuntimeException("getCurrentDirectory() NOT YET IMPLEMENTED");
+        throw new NotYetImplementedException("getCurrentDirectory() NOT YET IMPLEMENTED");
     }
 
     @Override

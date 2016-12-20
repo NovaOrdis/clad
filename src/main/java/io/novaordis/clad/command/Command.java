@@ -102,16 +102,14 @@ public interface Command extends Comparable<Command> {
     void setOption(Option o);
 
     /**
-     * @param configuration the command execution context configuration. Offers access to global options and command
-     *                      options.
-     *
-     * @param runtime the command execution runtime. Guaranteed to be called init() at this time.
+     * @param runtime the command execution runtime. Guaranteed to be called init() at this time. Gives access to the
+     *                configuration.
      *
      * @exception UserErrorException - if thrown, the framework will display the message after [error]: and exit with
      *  a non-zero exit code.
      *
      * @exception Exception any other kind of error.
      */
-    void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception;
+    void execute(ApplicationRuntime runtime) throws Exception;
 
 }

@@ -17,6 +17,8 @@
 package io.novaordis.clad.application;
 
 import io.novaordis.clad.MockOutputStream;
+import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.configuration.MockConfiguration;
 import io.novaordis.utilities.variable.VariableProviderImpl;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
@@ -216,6 +219,47 @@ public abstract class ApplicationRuntimeTest {
         String s = r.resolveVariables(orig);
 
         assertEquals("a b c d e", s);
+    }
+
+    // init ------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void init_NullConfig() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        try {
+
+            r.init(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("null configuration", msg);
+        }
+    }
+
+    // configuration ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void configuration() throws Exception {
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        assertNull(r.getConfiguration());
+
+        MockConfiguration mc = new MockConfiguration();
+
+        //
+        // this tests that the ApplicationRuntimeBase installs the given configuration
+        //
+
+        r.init(mc);
+
+        Configuration c = r.getConfiguration();
+        assertNotNull(c);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

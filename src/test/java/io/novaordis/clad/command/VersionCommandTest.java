@@ -63,7 +63,7 @@ public class VersionCommandTest extends CommandTest {
         VersionCommand c = new VersionCommand();
         c.setOutputStream(baos);
 
-        c.execute(null, null);
+        c.execute(null);
 
         baos.close();
         byte[] bytes = baos.toByteArray();
@@ -99,7 +99,7 @@ public class VersionCommandTest extends CommandTest {
             VersionCommand c = new VersionCommand();
             c.setOutputStream(baos);
 
-            c.execute(null, null);
+            c.execute(null);
 
             baos.close();
             byte[] bytes = baos.toByteArray();

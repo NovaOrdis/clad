@@ -17,7 +17,6 @@
 package a.test;
 
 import io.novaordis.clad.application.ApplicationRuntime;
-import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.command.CommandBase;
 
 /**
@@ -37,7 +36,7 @@ public class Sample1Command extends CommandBase {
     // Command implementation ------------------------------------------------------------------------------------------
 
     @Override
-    public void execute(Configuration configuration, ApplicationRuntime runtime) throws Exception {
+    public void execute(ApplicationRuntime runtime) throws Exception {
         throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
