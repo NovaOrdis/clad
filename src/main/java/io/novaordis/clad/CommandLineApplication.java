@@ -383,7 +383,7 @@ public class CommandLineApplication {
             }
 
             //
-            // always provide a configuration
+            // always provide a configuration, even if we did not have the chance to build a runtime and run init()
             //
 
             if (configuration == null) {
