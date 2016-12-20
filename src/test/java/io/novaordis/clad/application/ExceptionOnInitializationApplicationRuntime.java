@@ -68,7 +68,7 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     }
 
     @Override
-    public void init(Configuration configuration) throws Exception {
+    public Configuration init(Configuration configuration) throws Exception {
 
         throw new SyntheticException("SYNTHETIC");
     }

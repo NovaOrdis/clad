@@ -75,9 +75,11 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
     }
 
     @Override
-    public void init(Configuration configuration) throws UserErrorException {
+    public Configuration init(Configuration configuration) throws UserErrorException {
 
         initialized = true;
+
+        return null;
     }
 
     @Override

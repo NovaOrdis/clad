@@ -54,8 +54,9 @@ public class MockApplicationRuntime extends ApplicationRuntimeBase {
     }
 
     @Override
-    public void init(Configuration configuration) throws Exception {
+    public Configuration init(Configuration configuration) throws Exception {
         // noop
+        return null;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
