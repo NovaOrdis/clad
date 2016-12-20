@@ -16,12 +16,15 @@
 
 package io.novaordis.clad;
 
+import io.novaordis.clad.application.ApplicationInitBehavior;
 import io.novaordis.clad.application.SyntheticException;
 import io.novaordis.clad.application.TestApplicationRuntime;
 import io.novaordis.clad.command.Command;
+import io.novaordis.clad.command.MockCommand;
 import io.novaordis.clad.command.TestCommand;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.configuration.ConfigurationImpl;
+import io.novaordis.clad.configuration.MockConfiguration;
 import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.StringOption;
 import io.novaordis.utilities.UserErrorException;
@@ -63,6 +66,7 @@ public class CommandLineApplicationTest {
 
     @Before
     public void setUp() {
+
         System.setProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME, "test");
     }
 
@@ -70,10 +74,13 @@ public class CommandLineApplicationTest {
     public void tearDown() {
 
         TestCommand.clear();
-        TestApplicationRuntime.clear();
+        TestApplicationRuntime.reset();
+        MockCommand.reset();
         System.clearProperty(Configuration.APPLICATION_NAME_SYSTEM_PROPERTY_NAME);
         System.clearProperty("DoesNotNeedRuntimeCommand.executed");
     }
+
+    // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
     public void identifyAndConfigureCommand_NoArguments() throws Exception {
@@ -317,7 +324,7 @@ public class CommandLineApplicationTest {
 
             TestCommand.clear();
             assertTrue(TestCommand.getGlobalOptionsInjectedByExecution().isEmpty());
-            TestApplicationRuntime.clear();
+            TestApplicationRuntime.reset();
             assertFalse(TestApplicationRuntime.isInitialized());
         }
     }
@@ -374,7 +381,7 @@ public class CommandLineApplicationTest {
             assertFalse(TestApplicationRuntime.isInitialized());
         }
         finally {
-            TestApplicationRuntime.clear();
+            TestApplicationRuntime.reset();
             assertFalse(TestApplicationRuntime.isInitialized());
         }
     }
@@ -608,6 +615,84 @@ public class CommandLineApplicationTest {
         assertEquals(1, exitCode);
         String s = mos.getWrittenString();
         assertEquals("[error]: required \"test\" command option \"--required-test-command-option\" is missing\n", s);
+    }
+
+    @Test
+    public void run_initReturnsNull() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        TestApplicationRuntime.installDefaultCommandName("mock");
+        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_NULL);
+        MockCommand.setNeedsRuntime(true);
+
+        int exitCode = commandLineApplication.run(new String[] {});
+        assertEquals(0, exitCode);
+
+        MockCommand c = (MockCommand)commandLineApplication.getCommand();
+        Configuration config = c.getConfigurationProvidedDuringTheLastExecution();
+
+        //
+        // make sure it is not null and an instance of ConfigurationImpl
+        //
+
+        assertNotNull(config);
+        assertTrue(config instanceof ConfigurationImpl);
+
+    }
+
+    @Test
+    public void run_initReturnsTheConfigurationItWasGiven() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        TestApplicationRuntime.installDefaultCommandName("mock");
+        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_SAME_INSTANCE);
+        MockCommand.setNeedsRuntime(true);
+
+        int exitCode = commandLineApplication.run(new String[] {});
+        assertEquals(0, exitCode);
+
+        MockCommand c = (MockCommand)commandLineApplication.getCommand();
+        Configuration config = c.getConfigurationProvidedDuringTheLastExecution();
+
+        //
+        // make sure it is not null and an instance of ConfigurationImpl
+        //
+
+        assertNotNull(config);
+        assertTrue(config instanceof ConfigurationImpl);
+    }
+
+    @Test
+    public void run_initReturnsANewConfigurationInstance() throws Exception {
+
+        MockOutputStream mos = new MockOutputStream();
+        CommandLineApplication commandLineApplication = new CommandLineApplication(mos);
+
+        TestApplicationRuntime.installDefaultCommandName("mock");
+        TestApplicationRuntime.setInitBehavior(ApplicationInitBehavior.RETURN_WRAPPER);
+        MockCommand.setNeedsRuntime(true);
+
+        int exitCode = commandLineApplication.run(new String[] {});
+        assertEquals(0, exitCode);
+
+        MockCommand c = (MockCommand)commandLineApplication.getCommand();
+        Configuration config = c.getConfigurationProvidedDuringTheLastExecution();
+
+        //
+        // make sure it is not null and it is a wrapper
+        //
+
+        assertNotNull(config);
+        assertTrue(config instanceof MockConfiguration);
+        MockConfiguration mc = (MockConfiguration)config;
+
+        Configuration delegate = mc.getDelegate();
+        assertNotNull(delegate);
+        assertTrue(delegate instanceof ConfigurationImpl);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

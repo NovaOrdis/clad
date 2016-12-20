@@ -16,9 +16,12 @@
 
 package io.novaordis.clad.application;
 
+import io.novaordis.clad.configuration.MockConfiguration;
 import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,25 +35,50 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = LoggerFactory.getLogger(TestApplicationRuntime.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
-    private static boolean initialized = false;
+    private static boolean initialized;
 
-    private static Set<Option> optionalGlobalOptions = new HashSet<>();
+    private static Set<Option> optionalGlobalOptions;
+
+    private static String defaultCommandName;
+
+    private static ApplicationInitBehavior initBehavior;
+
+    static {
+
+        initialized = false;
+        optionalGlobalOptions = new HashSet<>();
+        defaultCommandName = null;
+        initBehavior = ApplicationInitBehavior.RETURN_NULL;
+    }
 
     public static boolean isInitialized() {
 
         return initialized;
     }
 
-    public static void clear() {
+    public static void reset() {
 
         initialized = false;
         optionalGlobalOptions.clear();
+        defaultCommandName = null;
     }
 
     public static void addOptionalGlobalOption(Option option) {
         optionalGlobalOptions.add(option);
+    }
+
+    public static void installDefaultCommandName(String name) {
+
+        defaultCommandName = name;
+    }
+
+    public static void setInitBehavior(ApplicationInitBehavior behavior) {
+
+        initBehavior = behavior;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -61,7 +89,8 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
 
     @Override
     public String getDefaultCommandName() {
-        return null;
+
+        return defaultCommandName;
     }
 
     @Override
@@ -79,7 +108,28 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
 
         initialized = true;
 
-        return null;
+        if (ApplicationInitBehavior.RETURN_NULL.equals(initBehavior)) {
+
+            log.info("init returns null");
+
+            return null;
+        }
+        else if (ApplicationInitBehavior.RETURN_SAME_INSTANCE.equals(initBehavior)) {
+
+            log.info("init returns the same instance");
+
+            return configuration;
+        }
+        else if (ApplicationInitBehavior.RETURN_WRAPPER.equals(initBehavior)) {
+
+            log.info("init returns wrapper");
+
+            return new MockConfiguration(configuration);
+        }
+        else {
+
+            throw new IllegalStateException("invalid init behaviour: " + initBehavior);
+        }
     }
 
     @Override

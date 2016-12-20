@@ -53,6 +53,7 @@ public abstract class CommandBase implements Command {
         if (o == null) {
             throw new NullPointerException();
         }
+
         return getName().compareTo(o.getName());
     }
 

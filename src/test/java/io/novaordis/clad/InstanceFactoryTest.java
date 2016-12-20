@@ -20,6 +20,7 @@ import a.test.Sample1Command;
 import b.test.Sample2Command;
 import c.test.Sample3Command;
 import io.novaordis.clad.command.Command;
+import io.novaordis.clad.command.MockCommand;
 import io.novaordis.clad.command.Test2Command;
 import io.novaordis.clad.command.TestCommand;
 import org.junit.Test;
@@ -379,12 +380,13 @@ public class InstanceFactoryTest {
 
         Set<Command> commands = commandFactory.instances(Command.class, Collections.emptyList(), directories);
 
-        assertEquals(8, commands.size());
+        assertEquals(9, commands.size());
         boolean sample1found = false;
         boolean sample2found = false;
         boolean sample3found = false;
         boolean testFound = false;
         boolean test2Found = false;
+        boolean mockFound = false;
 
         for(Command c: commands) {
             if (c instanceof Sample1Command) {
@@ -402,6 +404,9 @@ public class InstanceFactoryTest {
             else if (c instanceof Test2Command) {
                 test2Found  = true;
             }
+            else if (c instanceof MockCommand) {
+                mockFound  = true;
+            }
             else {
                 log.info("command that was not counted: " + c);
             }
@@ -412,6 +417,7 @@ public class InstanceFactoryTest {
         assertTrue(sample3found);
         assertTrue(testFound);
         assertTrue(test2Found);
+        assertTrue(mockFound);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

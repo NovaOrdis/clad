@@ -163,7 +163,7 @@ public class CommandLineApplication {
 
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
-    private ConfigurationImpl configuration;
+    private Configuration configuration;
     private Command command;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -225,13 +225,13 @@ public class CommandLineApplication {
 
         try {
 
-            this.configuration = new ConfigurationImpl();
+            ConfigurationImpl nativeConfiguration = new ConfigurationImpl();
 
             //
             // identify and instantiate the runtime
             //
 
-            ApplicationRuntime application = identifyRuntime(configuration);
+            ApplicationRuntime application = identifyRuntime(nativeConfiguration);
 
             if (application == null) {
                 throw new UserErrorException("no application runtime");
@@ -272,7 +272,7 @@ public class CommandLineApplication {
 
             // place global options in configuration
 
-            configuration.setGlobalOptions(globalOptions);
+            nativeConfiguration.setGlobalOptions(globalOptions);
 
             if (command == null) {
 
@@ -369,9 +369,26 @@ public class CommandLineApplication {
 
                 log.debug("initializing the runtime ...");
 
-                application.init(configuration);
+                Configuration c = application.init(nativeConfiguration);
+
+                if (c != null) {
+
+                    //
+                    // swap configuration with the one provided by the application, if not null
+                    //
+                    this.configuration = c;
+                }
 
                 log.debug("runtime initialized");
+            }
+
+            //
+            // always provide a configuration
+            //
+
+            if (configuration == null) {
+
+                this.configuration = nativeConfiguration;
             }
 
             insureRequiredCommandOptionsArePresent(command);
