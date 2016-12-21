@@ -39,7 +39,7 @@ import java.util.Set;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public interface ApplicationRuntime extends VariableProvider {
+public interface ApplicationRuntime extends Console, VariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -105,21 +105,6 @@ public interface ApplicationRuntime extends VariableProvider {
     void setStderrOutputStream(OutputStream outputStream);
 
     OutputStream getStderrOutputStream();
-
-    /**
-     * Sends to given string to stdout in "info" mode, followed by a new line.
-     */
-    void info(String s);
-
-    /**
-     * Sends to given string to stdout in "warning" mode, followed by a new line.
-     */
-    void warn(String s);
-
-    /**
-     * Sends to given string to stderr in "error" mode, followed by a new line.
-     */
-    void error(String s);
 
     /**
      * @return the current directory the application runs from.
