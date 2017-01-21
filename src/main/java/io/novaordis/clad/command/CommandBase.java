@@ -146,9 +146,10 @@ public abstract class CommandBase implements Command {
     }
 
     /**
-     * The default implementation handles declared options and removes the associated strings from the argument list.
-     * In most cases, this behavior is all subclasses need, and they should use it. The method can be overridden
-     * when the command expects arguments, other than declared options.
+     * The default implementation handles declared required and optional options and removes the associated strings
+     * from the argument list. In most cases, this behavior is all subclasses need, and they should use it. The method
+     * can be overridden when the command expects arguments, other than declared options. The override must process
+     * the know arguments and remove them from the argument list, leaving the unknown arguments in the list.
      */
     @Override
     public void configure(int from, List<String> commandLineArguments) throws Exception {
