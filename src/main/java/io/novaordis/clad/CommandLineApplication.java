@@ -25,11 +25,8 @@ import io.novaordis.clad.option.Option;
 import io.novaordis.clad.option.OptionParser;
 import io.novaordis.clad.option.VerboseOption;
 import io.novaordis.utilities.UserErrorException;
-import org.apache.log4j.Appender;
-import org.apache.log4j.Category;
-import org.apache.log4j.ConsoleAppender;
+import io.novaordis.utilities.logging.StderrVerboseLogging;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -53,16 +50,26 @@ public class CommandLineApplication {
 
     public static void main(String[] args) throws Exception {
 
+        //
+        // turn on verbose logging as soon as we can. See
+        // https://kb.novaordis.com/index.php/Project_log4j_Debugging_on_--verbose#Overview for more details.
+        //
+
+        StderrVerboseLogging.init();
+
         int exitCode = 0;
 
         //noinspection finally
         try {
+
             exitCode = new CommandLineApplication().run(args);
         }
         catch(Throwable t) {
+
             log.error("internal error", t);
         }
         finally {
+
             System.exit(exitCode);
         }
     }
@@ -402,41 +409,21 @@ public class CommandLineApplication {
     // Private ---------------------------------------------------------------------------------------------------------
 
     /**
-     * Scans the global option list and turns DEBUG on the underlying logging system, so CONSOLE displays everything
-     * DEBUG. The method does not remove the option from the list.
+     * This method is a vestige of the old way of handling verbose logging, and we left it to warn if we still
+     * detect -v|--verbose at command line. We should not see those, the verbose logging should be turned on by
+     * -Dverbose=true. For more details see https://kb.novaordis.com/index.php/Project_log4j_Debugging_on_--verbose
      */
     private void actOnVerboseOption(List<Option> globalOptions) {
-
-        boolean verboseLogging = false;
 
         for(Option o: globalOptions) {
 
             if (o instanceof VerboseOption) {
 
-                verboseLogging = true;
-                break;
-            }
-        }
+                if (!StderrVerboseLogging.isEnabled()) {
+                    throw new IllegalStateException("-v|--verbose present in the command line but stderr verbose logging is not enabled. See https://kb.novaordis.com/index.php/Project_log4j_Debugging_on_--verbose");
+                }
 
-        if (verboseLogging) {
-
-            //
-            // Turn DEBUG on CONSOLE
-            //
-
-            Category c = log;
-            Category root = c;
-            if ((c = c.getParent()) != null) {
-                root = c;
-            }
-
-            Appender appender = root.getAppender("CONSOLE");
-
-            if (appender != null) {
-
-                ConsoleAppender console = (ConsoleAppender) appender;
-                //noinspection deprecation
-                console.setThreshold(Priority.DEBUG);
+                log.warn("redundant -v|--verbose present in the command line, see https://kb.novaordis.com/index.php/Project_log4j_Debugging_on_--verbose");
             }
         }
     }

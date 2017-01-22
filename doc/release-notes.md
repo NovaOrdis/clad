@@ -1,5 +1,5 @@
 
-* Upgraded novaordis-util dependency to 4.1.2-SNAPSHOT-1. novaordis-util declares now
+* Upgraded novaordis-util dependency to 4,5. novaordis-util declares now
   io.novaordis.utilities.UserErrorException. THis breaks backward compatibility.
 
 * ApplicationRuntime API additions (get/setStdoutOutputStream(), get/setStderrOutputStream(),
@@ -13,4 +13,8 @@
 
 * Added runtime variable resolving mechanism (ApplicationRuntime.resolveVariables()), which delegates variable
   processing to novaordis-utilities variable support.
+  
+* stderr verbose logging is turned on as soon as the application starts executing, based on -Dverbose=true 
+  declaration.
+  
 

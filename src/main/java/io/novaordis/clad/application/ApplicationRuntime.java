@@ -20,6 +20,7 @@ import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 import io.novaordis.utilities.variable.VariableFormatException;
+import io.novaordis.utilities.variable.VariableNotDefinedException;
 import io.novaordis.utilities.variable.VariableProvider;
 
 import java.io.File;
@@ -119,6 +120,6 @@ public interface ApplicationRuntime extends Console, VariableProvider {
      *
      * @return the string with runtime variables (those that could be resolved) replaced.
      */
-    String resolveVariables(String s) throws VariableFormatException;
+    String resolveVariables(String s) throws VariableFormatException, VariableNotDefinedException;
 
 }

@@ -20,6 +20,7 @@ import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.utilities.UserErrorException;
 import io.novaordis.utilities.variable.StringWithVariables;
 import io.novaordis.utilities.variable.VariableFormatException;
+import io.novaordis.utilities.variable.VariableNotDefinedException;
 import io.novaordis.utilities.variable.VariableProvider;
 import io.novaordis.utilities.variable.VariableProviderImpl;
 import org.slf4j.Logger;
@@ -216,7 +217,7 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     // runtime variable support ----------------------------------------------------------------------------------------
 
     @Override
-    public String resolveVariables(String s) throws VariableFormatException {
+    public String resolveVariables(String s) throws VariableFormatException, VariableNotDefinedException {
 
         if (s == null) {
             return null;
