@@ -11,10 +11,21 @@
     <version>3.5.1-SNAPSHOT-1</version>
 
     <properties>
+
+        <!--
+            Dependencies
+        -->
+
+        <novaordis.utilities.version>4.7.6</novaordis.utilities.version>
+        <slf4j.version>1.7.12</slf4j.version>
+        <junit.version>4.12</junit.version>
+
+        <!--
+            End of Dependencies
+        -->
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j-version>1.7.12</slf4j-version>
-        <junit-version>4.12</junit-version>
-        <novaordis-utilities-version>4.5</novaordis-utilities-version>
+
     </properties>
 
     <build>
@@ -33,31 +44,27 @@
                 </includes>
             </resource>
         </resources>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <systemProperties>
-                            <property>
-                                <name>basedir</name>
-                                <value>${basedir}</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>basedir</name>
+                            <value>${basedir}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -74,49 +81,28 @@
         </plugins>
     </build>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.novaordis.utilities</groupId>
-                <artifactId>novaordis-utilities</artifactId>
-                <version>${novaordis-utilities-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit-version}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
+        <dependency>
+            <groupId>io.novaordis.utilities</groupId>
+            <artifactId>novaordis-utilities</artifactId>
+            <version>${novaordis.utilities.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.novaordis.utilities</groupId>
-            <artifactId>novaordis-utilities</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
