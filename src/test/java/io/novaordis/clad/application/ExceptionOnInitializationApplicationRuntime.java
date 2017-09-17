@@ -19,7 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
 import io.novaordis.utilities.NotYetImplementedException;
-import io.novaordis.utilities.variable.VariableProvider;
+import io.novaordis.utilities.expressions.Scope;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -131,28 +131,8 @@ public class ExceptionOnInitializationApplicationRuntime implements ApplicationR
     }
 
     @Override
-    public String resolveVariables(String s) {
-        throw new RuntimeException("resolveVariables() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public String getVariableValue(String variableName) {
-        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public String setVariableValue(String variableName, String variableValue) {
-        throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public VariableProvider getVariableProviderParent() {
-        throw new RuntimeException("getVariableProviderParent() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public void setVariableProviderParent(VariableProvider parent) {
-        throw new RuntimeException("setVariableProviderParent() NOT YET IMPLEMENTED");
+    public Scope getRootScope() {
+        throw new RuntimeException("getRootScope() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

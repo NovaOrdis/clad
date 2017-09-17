@@ -18,11 +18,8 @@ package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.utilities.UserErrorException;
-import io.novaordis.utilities.variable.StringWithVariables;
-import io.novaordis.utilities.variable.VariableFormatException;
-import io.novaordis.utilities.variable.VariableNotDefinedException;
-import io.novaordis.utilities.variable.VariableProvider;
-import io.novaordis.utilities.variable.VariableProviderImpl;
+import io.novaordis.utilities.expressions.Scope;
+import io.novaordis.utilities.expressions.ScopeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +44,7 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
 
-    private VariableProvider variableProviderDelegate;
+    private Scope rootScope;
 
     private Configuration configuration;
 
@@ -62,63 +59,9 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         setStdoutOutputStream(System.out);
         setStderrOutputStream(System.err);
 
-        this.variableProviderDelegate = new VariableProviderImpl();
+        this.rootScope = new ScopeImpl();
 
         log.debug(this + " constructed");
-    }
-
-    // VariableProvider implementation ---------------------------------------------------------------------------------
-
-    @Override
-    public String getVariableValue(String variableName) {
-
-        return variableProviderDelegate.getVariableValue(variableName);
-    }
-
-    @Override
-    public String setVariableValue(String variableName, String variableValue) {
-
-        return variableProviderDelegate.setVariableValue(variableName, variableValue);
-    }
-
-    @Override
-    public VariableProvider getVariableProviderParent() {
-
-        //
-        // the application runtime instance is the root VariableProvider in the hierarchy
-        //
-
-        return null;
-    }
-
-    @Override
-    public void setVariableProviderParent(VariableProvider p) {
-
-        throw new UnsupportedOperationException(
-                "cannot set the parent on an application runtime, as it is the top of the hierarchy");
-
-    }
-
-    /**
-     * The default implementation installs the given configuration or fails if null.
-     *
-     * @exception IllegalArgumentException if configuration is null
-     */
-    @Override
-    public void init(Configuration c) throws UserErrorException {
-
-        if (c == null) {
-
-            throw new IllegalArgumentException("null configuration");
-        }
-
-        setConfiguration(c);
-    }
-
-    @Override
-    public Configuration getConfiguration() {
-
-        return configuration;
     }
 
     // ApplicationRuntime overrides ------------------------------------------------------------------------------------
@@ -214,20 +157,36 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         return new File(".");
     }
 
-    // runtime variable support ----------------------------------------------------------------------------------------
-
     @Override
-    public String resolveVariables(String s) throws VariableFormatException, VariableNotDefinedException {
+    public Scope getRootScope() {
 
-        if (s == null) {
-            return null;
-        }
-
-        StringWithVariables sv = new StringWithVariables(s);
-        return sv.resolve(this);
+        return rootScope;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * The default implementation installs the given configuration or fails if null.
+     *
+     * @exception IllegalArgumentException if configuration is null
+     */
+    @Override
+    public void init(Configuration c) throws UserErrorException {
+
+        if (c == null) {
+
+            throw new IllegalArgumentException("null configuration");
+        }
+
+        setConfiguration(c);
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+
+        return configuration;
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 

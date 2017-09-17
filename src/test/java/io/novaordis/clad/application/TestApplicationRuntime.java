@@ -16,10 +16,10 @@
 
 package io.novaordis.clad.application;
 
-import io.novaordis.clad.configuration.MockConfiguration;
-import io.novaordis.utilities.UserErrorException;
 import io.novaordis.clad.configuration.Configuration;
+import io.novaordis.clad.configuration.MockConfiguration;
 import io.novaordis.clad.option.Option;
+import io.novaordis.utilities.UserErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,16 +124,6 @@ public class TestApplicationRuntime extends ApplicationRuntimeBase {
 
             throw new IllegalStateException("invalid init behaviour: " + initBehavior);
         }
-    }
-
-    @Override
-    public String getVariableValue(String variableName) {
-        throw new RuntimeException("getValue() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public String setVariableValue(String variableName, String variableValue) {
-        throw new RuntimeException("setValue() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

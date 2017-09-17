@@ -19,7 +19,6 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.MockOutputStream;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.configuration.MockConfiguration;
-import io.novaordis.utilities.variable.VariableProviderImpl;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,34 +153,8 @@ public abstract class ApplicationRuntimeTest {
     public void theRuntimeIsTheRootOfVariableProviderHierarchy() throws Exception {
 
         ApplicationRuntime r = getApplicationRuntimeToTest();
-        assertNull(r.getVariableProviderParent());
+        assertNotNull(r.getRootScope());
     }
-
-    @Test
-    public void attemptToSetParent() throws Exception {
-
-        ApplicationRuntime r = getApplicationRuntimeToTest();
-
-        try {
-
-            r.setVariableProviderParent(new VariableProviderImpl());
-            fail("should throw exception");
-        }
-        catch(UnsupportedOperationException e) {
-
-            String msg = e.getMessage();
-            log.info(msg);
-        }
-    }
-
-
-    @Test
-    public void resolveVariables_Null() throws Exception {
-
-        ApplicationRuntime r = getApplicationRuntimeToTest();
-
-        assertNull(r.resolveVariables(null));
-     }
 
     @Test
     public void resolveVariables_NoVariables() throws Exception {
@@ -190,7 +163,7 @@ public abstract class ApplicationRuntimeTest {
 
         String orig = "this is a \"string\" that contains 'no' variable";
 
-        String s = r.resolveVariables(orig);
+        String s = r.getRootScope().evaluate(orig);
 
         assertEquals(orig, s);
     }
@@ -202,7 +175,7 @@ public abstract class ApplicationRuntimeTest {
 
         String orig = "I am sure ${there.is.no.such.variable}";
 
-        String s = r.resolveVariables(orig);
+        String s = r.getRootScope().evaluate(orig);
 
         assertEquals(orig, s);
     }
@@ -212,11 +185,11 @@ public abstract class ApplicationRuntimeTest {
 
         ApplicationRuntime r = getApplicationRuntimeToTest();
 
-        r.setVariableValue("this.is.a.variable", "d");
+        r.getRootScope().declare("this.is.a.variable", "d");
 
         String orig = "a b c ${this.is.a.variable} e";
 
-        String s = r.resolveVariables(orig);
+        String s = r.getRootScope().evaluate(orig);
 
         assertEquals("a b c d e", s);
     }

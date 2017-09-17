@@ -19,9 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.command.Command;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.option.Option;
-import io.novaordis.utilities.variable.VariableFormatException;
-import io.novaordis.utilities.variable.VariableNotDefinedException;
-import io.novaordis.utilities.variable.VariableProvider;
+import io.novaordis.utilities.expressions.Scope;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -33,14 +31,12 @@ import java.util.Set;
  * The "official" name of the application will be inferred from the prefix of that simple class name. Example: If
  * MockApplicationRuntime is found on the classpath, then the application name is assumed to be "mock".
  *
- * The application runtime instance is the root VariableProvider in the hierarchy.
- *
- * @see VariableProvider
+ * The application runtime instance is the root variable Scope in the hierarchy.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/26/16
  */
-public interface ApplicationRuntime extends Console, VariableProvider {
+public interface ApplicationRuntime extends Console {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -112,14 +108,6 @@ public interface ApplicationRuntime extends Console, VariableProvider {
      */
     File getCurrentDirectory();
 
-    /**
-     * The method replaces the runtime variables found in the given string with values existing in the runtime.
-     * If no corresponding value is found, no replacement is made, the variable is left in the ${var_name} format.
-     *
-     * See ${linkUrl https://kb.novaordis.com/index.php/Clad_User_Manual_-_Concepts#Variable_Support} for more details.
-     *
-     * @return the string with runtime variables (those that could be resolved) replaced.
-     */
-    String resolveVariables(String s) throws VariableFormatException, VariableNotDefinedException;
+    Scope getRootScope();
 
 }
