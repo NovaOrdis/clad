@@ -19,6 +19,7 @@ package io.novaordis.clad.application;
 import io.novaordis.clad.MockOutputStream;
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.clad.configuration.MockConfiguration;
+import io.novaordis.utilities.expressions.Variable;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,6 +193,20 @@ public abstract class ApplicationRuntimeTest {
         String s = r.getRootScope().evaluate(orig);
 
         assertEquals("a b c d e", s);
+    }
+
+
+    @Test
+    public void scope_WeCanAccessEnvironmentVariables() throws Exception {
+
+        String user =  System.getenv("USER");
+        assertNotNull(user);
+
+        ApplicationRuntime r = getApplicationRuntimeToTest();
+
+        Variable v = r.getRootScope().getVariable("USER");
+        assertNotNull(v);
+        assertEquals(user, v.get());
     }
 
     // init ------------------------------------------------------------------------------------------------------------

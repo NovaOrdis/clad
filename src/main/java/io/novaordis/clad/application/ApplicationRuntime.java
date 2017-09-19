@@ -108,6 +108,9 @@ public interface ApplicationRuntime extends Console {
      */
     File getCurrentDirectory();
 
+    /**
+     * The scope is configured to resolve environment properties by default.
+     */
     Scope getRootScope();
 
 }

@@ -18,8 +18,10 @@ package io.novaordis.clad.application;
 
 import io.novaordis.clad.configuration.Configuration;
 import io.novaordis.utilities.UserErrorException;
+import io.novaordis.utilities.expressions.EncloseableScope;
 import io.novaordis.utilities.expressions.Scope;
 import io.novaordis.utilities.expressions.ScopeImpl;
+import io.novaordis.utilities.expressions.env.OSProcessScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +46,8 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
     private OutputStream stdoutOutputStream;
     private OutputStream stderrOutputStream;
 
-    private Scope rootScope;
+    // the scope is configured to resolve environment properties by default
+    private EncloseableScope rootScope;
 
     private Configuration configuration;
 
@@ -60,6 +63,11 @@ public abstract class ApplicationRuntimeBase implements ApplicationRuntime {
         setStderrOutputStream(System.err);
 
         this.rootScope = new ScopeImpl();
+
+        //
+        // this is how we resolve environment variables
+        //
+        this.rootScope.setParent(new OSProcessScope());
 
         log.debug(this + " constructed");
     }
