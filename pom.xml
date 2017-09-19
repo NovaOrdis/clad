@@ -8,7 +8,7 @@
     <artifactId>novaordis-clad</artifactId>
     <packaging>jar</packaging>
 
-    <version>3.6.0-SNAPSHOT-6</version>
+    <version>3.6.0-SNAPSHOT-7</version>
 
     <properties>
 
@@ -16,7 +16,7 @@
             Dependencies
         -->
 
-        <novaordis.utilities.version>4.7.12-SNAPSHOT-12</novaordis.utilities.version>
+        <novaordis.utilities.version>4.7.12</novaordis.utilities.version>
         <slf4j.version>1.7.12</slf4j.version>
         <junit.version>4.12</junit.version>
 
